@@ -68,18 +68,21 @@ export type Database = {
       event_guests: {
         Row: {
           created_at: string
+          email: string | null
           event_id: string
           id: string
           name: string
         }
         Insert: {
           created_at?: string
+          email?: string | null
           event_id: string
           id?: string
           name: string
         }
         Update: {
           created_at?: string
+          email?: string | null
           event_id?: string
           id?: string
           name?: string
