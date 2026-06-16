@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      event_contributions: {
+        Row: {
+          category: string
+          claimed_by_name: string | null
+          claimed_by_rsvp_id: string | null
+          created_at: string
+          event_id: string
+          id: string
+          label: string
+          proposed_by_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          claimed_by_name?: string | null
+          claimed_by_rsvp_id?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          label: string
+          proposed_by_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          claimed_by_name?: string | null
+          claimed_by_rsvp_id?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          label?: string
+          proposed_by_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_contributions_claimed_by_rsvp_id_fkey"
+            columns: ["claimed_by_rsvp_id"]
+            isOneToOne: false
+            referencedRelation: "event_rsvps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_contributions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_guests: {
         Row: {
           created_at: string
@@ -43,6 +94,44 @@ export type Database = {
           },
         ]
       }
+      event_rsvps: {
+        Row: {
+          created_at: string
+          event_id: string
+          guest_name: string
+          id: string
+          message: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          guest_name: string
+          id?: string
+          message?: string | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          guest_name?: string
+          id?: string
+          message?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_rsvps_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           created_at: string
@@ -51,6 +140,7 @@ export type Database = {
           event_subtype: string | null
           event_type: string
           id: string
+          invite_token: string
           location: string | null
           menu_or_theme: string | null
           owner_id: string
@@ -64,6 +154,7 @@ export type Database = {
           event_subtype?: string | null
           event_type: string
           id?: string
+          invite_token?: string
           location?: string | null
           menu_or_theme?: string | null
           owner_id: string
@@ -77,6 +168,7 @@ export type Database = {
           event_subtype?: string | null
           event_type?: string
           id?: string
+          invite_token?: string
           location?: string | null
           menu_or_theme?: string | null
           owner_id?: string
