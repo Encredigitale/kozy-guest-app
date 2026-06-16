@@ -90,6 +90,7 @@ function EventDetailPage() {
   const [inviteToken, setInviteToken] = useState("");
   const [guests, setGuests] = useState<Guest[]>([]);
   const [guestInput, setGuestInput] = useState("");
+  const [guestEmailInput, setGuestEmailInput] = useState("");
   const [rsvps, setRsvps] = useState<Rsvp[]>([]);
   const [contributions, setContributions] = useState<Contribution[]>([]);
   const [newContribCategory, setNewContribCategory] = useState<ContributionCategory>("plat");
