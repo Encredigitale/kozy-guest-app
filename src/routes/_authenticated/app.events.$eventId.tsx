@@ -120,7 +120,7 @@ function EventDetailPage() {
         supabase.from("events").select("*").eq("id", eventId).maybeSingle(),
         supabase
           .from("event_guests")
-          .select("id, name")
+          .select("id, name, email")
           .eq("event_id", eventId)
           .order("created_at", { ascending: true }),
       ]);
