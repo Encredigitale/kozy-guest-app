@@ -46,7 +46,7 @@ export const Route = createFileRoute("/_authenticated/app/events/$eventId")({
   component: EventDetailPage,
 });
 
-type Guest = { id: string; name: string };
+type Guest = { id: string; name: string; email: string | null };
 type Rsvp = {
   id: string;
   guest_name: string;
