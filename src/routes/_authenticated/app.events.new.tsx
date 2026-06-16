@@ -77,7 +77,7 @@ function NewEventPage() {
     if (guests.length > 0) {
       await supabase
         .from("event_guests")
-        .insert(guests.map((name) => ({ event_id: created.id, name })));
+        .insert(guests.map((g) => ({ event_id: created.id, name: g.name, email: g.email })));
     }
     setSaving(false);
     toast.success("Moment créé.");
