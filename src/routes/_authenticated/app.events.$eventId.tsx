@@ -25,8 +25,21 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, Plus, Trash2, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  Copy,
+  Loader2,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
 import { EVENT_SUBTYPES, EVENT_TYPES, type EventTypeValue } from "@/lib/event-types";
+import {
+  CONTRIBUTION_CATEGORIES,
+  contributionCategoryLabel,
+  type ContributionCategory,
+} from "@/lib/contribution-categories";
 
 export const Route = createFileRoute("/_authenticated/app/events/$eventId")({
   head: () => ({ meta: [{ title: "Moment — Kosy" }] }),
@@ -34,6 +47,26 @@ export const Route = createFileRoute("/_authenticated/app/events/$eventId")({
 });
 
 type Guest = { id: string; name: string };
+type Rsvp = {
+  id: string;
+  guest_name: string;
+  status: "yes" | "no" | "maybe";
+  message: string | null;
+  created_at: string;
+};
+type Contribution = {
+  id: string;
+  category: string;
+  label: string;
+  claimed_by_name: string | null;
+  proposed_by_name: string | null;
+};
+
+const STATUS_LABELS: Record<Rsvp["status"], string> = {
+  yes: "Oui",
+  maybe: "Peut-être",
+  no: "Non",
+};
 
 function toLocalInput(iso: string) {
   const d = new Date(iso);
@@ -54,8 +87,31 @@ function EventDetailPage() {
   const [location, setLocation] = useState("");
   const [description, setDescription] = useState("");
   const [menu, setMenu] = useState("");
+  const [inviteToken, setInviteToken] = useState("");
   const [guests, setGuests] = useState<Guest[]>([]);
   const [guestInput, setGuestInput] = useState("");
+  const [rsvps, setRsvps] = useState<Rsvp[]>([]);
+  const [contributions, setContributions] = useState<Contribution[]>([]);
+  const [newContribCategory, setNewContribCategory] = useState<ContributionCategory>("plat");
+  const [newContribLabel, setNewContribLabel] = useState("");
+
+  const loadRsvps = async () => {
+    const { data } = await supabase
+      .from("event_rsvps")
+      .select("id, guest_name, status, message, created_at")
+      .eq("event_id", eventId)
+      .order("created_at", { ascending: false });
+    setRsvps((data ?? []) as Rsvp[]);
+  };
+
+  const loadContribs = async () => {
+    const { data } = await supabase
+      .from("event_contributions")
+      .select("id, category, label, claimed_by_name, proposed_by_name")
+      .eq("event_id", eventId)
+      .order("created_at", { ascending: true });
+    setContributions((data ?? []) as Contribution[]);
+  };
 
   useEffect(() => {
     (async () => {
@@ -79,10 +135,13 @@ function EventDetailPage() {
       setLocation(ev.location ?? "");
       setDescription(ev.description ?? "");
       setMenu(ev.menu_or_theme ?? "");
+      setInviteToken(ev.invite_token);
       setGuests((gs ?? []) as Guest[]);
+      await Promise.all([loadRsvps(), loadContribs()]);
       setLoading(false);
     })();
-  }, [eventId, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventId]);
 
   const onSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,6 +205,58 @@ function EventDetailPage() {
     navigate({ to: "/app" });
   };
 
+  const inviteUrl =
+    typeof window !== "undefined" && inviteToken
+      ? `${window.location.origin}/i/${inviteToken}`
+      : "";
+
+  const copyInvite = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+      toast.success("Lien copié !");
+    } catch {
+      toast.error("Copie impossible.");
+    }
+  };
+
+  const addContribution = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newContribLabel.trim()) return;
+    const { data, error } = await supabase
+      .from("event_contributions")
+      .insert({
+        event_id: eventId,
+        category: newContribCategory,
+        label: newContribLabel.trim(),
+      })
+      .select("id, category, label, claimed_by_name, proposed_by_name")
+      .single();
+    if (error || !data) {
+      toast.error("Ajout impossible.");
+      return;
+    }
+    setContributions((cs) => [...cs, data as Contribution]);
+    setNewContribLabel("");
+  };
+
+  const removeContribution = async (id: string) => {
+    const { error } = await supabase.from("event_contributions").delete().eq("id", id);
+    if (error) {
+      toast.error("Suppression impossible.");
+      return;
+    }
+    setContributions((cs) => cs.filter((c) => c.id !== id));
+  };
+
+  const removeRsvp = async (id: string) => {
+    const { error } = await supabase.from("event_rsvps").delete().eq("id", id);
+    if (error) {
+      toast.error("Suppression impossible.");
+      return;
+    }
+    setRsvps((r) => r.filter((x) => x.id !== id));
+  };
+
   if (loading) return <p className="text-muted-foreground">Chargement…</p>;
 
   const subtypes = EVENT_SUBTYPES[type];
@@ -168,7 +279,7 @@ function EventDetailPage() {
             <AlertDialogHeader>
               <AlertDialogTitle>Supprimer ce moment ?</AlertDialogTitle>
               <AlertDialogDescription>
-                Cette action est définitive. Les invités liés seront aussi supprimés.
+                Cette action est définitive. Les invités, réponses et contributions liés seront aussi supprimés.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
@@ -178,6 +289,23 @@ function EventDetailPage() {
           </AlertDialogContent>
         </AlertDialog>
       </div>
+
+      <Card className="mb-6 border-primary/40">
+        <CardHeader>
+          <CardTitle className="text-base">Lien d'invitation</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <p className="text-sm text-muted-foreground">
+            Partage ce lien pour que tes invités répondent et proposent ce qu'ils apportent — sans créer de compte.
+          </p>
+          <div className="flex gap-2">
+            <Input readOnly value={inviteUrl} onFocus={(e) => e.currentTarget.select()} />
+            <Button type="button" variant="outline" onClick={copyInvite}>
+              <Copy className="h-4 w-4" /> Copier
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       <form onSubmit={onSave} className="space-y-6">
         <Card>
@@ -256,7 +384,7 @@ function EventDetailPage() {
 
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle className="text-base">Invités ({guests.length})</CardTitle>
+          <CardTitle className="text-base">Invités prévus ({guests.length})</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex gap-2">
@@ -273,7 +401,7 @@ function EventDetailPage() {
             </Button>
           </div>
           {guests.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Aucun invité pour le moment.</p>
+            <p className="text-sm text-muted-foreground">Aucun invité noté pour le moment.</p>
           ) : (
             <ul className="flex flex-wrap gap-2">
               {guests.map((g) => (
@@ -286,6 +414,110 @@ function EventDetailPage() {
                     aria-label={`Retirer ${g.name}`}
                   >
                     <X className="h-3 w-3" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-base">Réponses ({rsvps.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {rsvps.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Aucune réponse pour l'instant.</p>
+          ) : (
+            <ul className="divide-y">
+              {rsvps.map((r) => (
+                <li key={r.id} className="py-3 flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium">
+                      {r.guest_name}{" "}
+                      <span className={
+                        r.status === "yes"
+                          ? "text-xs ml-1 text-green-700"
+                          : r.status === "no"
+                            ? "text-xs ml-1 text-destructive"
+                            : "text-xs ml-1 text-muted-foreground"
+                      }>
+                        · {STATUS_LABELS[r.status]}
+                      </span>
+                    </p>
+                    {r.message && (
+                      <p className="text-sm text-muted-foreground whitespace-pre-wrap">{r.message}</p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeRsvp(r.id)}
+                    className="text-muted-foreground hover:text-destructive"
+                    aria-label="Supprimer la réponse"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6 mb-12">
+        <CardHeader>
+          <CardTitle className="text-base">Contributions ({contributions.length})</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <form onSubmit={addContribution} className="grid sm:grid-cols-[140px_1fr_auto] gap-2">
+            <Select value={newContribCategory} onValueChange={(v) => setNewContribCategory(v as ContributionCategory)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {CONTRIBUTION_CATEGORIES.map((c) => (
+                  <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Input
+              placeholder="Ex. Vin rouge, salade, dessert…"
+              value={newContribLabel}
+              onChange={(e) => setNewContribLabel(e.target.value)}
+              maxLength={120}
+            />
+            <Button type="submit" variant="outline">
+              <Plus className="h-4 w-4" /> Ajouter
+            </Button>
+          </form>
+          {contributions.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              Aucun item demandé. Ajoute ce que tu aimerais que les invités apportent.
+            </p>
+          ) : (
+            <ul className="divide-y">
+              {contributions.map((c) => (
+                <li key={c.id} className="py-2 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                      {contributionCategoryLabel(c.category)}
+                      {c.proposed_by_name ? ` · proposé par ${c.proposed_by_name}` : ""}
+                    </p>
+                    <p className="text-sm truncate">{c.label}</p>
+                    {c.claimed_by_name ? (
+                      <p className="text-xs text-green-700 inline-flex items-center gap-1 mt-0.5">
+                        <Check className="h-3 w-3" /> Apporté par {c.claimed_by_name}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground mt-0.5">Pas encore pris</p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeContribution(c.id)}
+                    className="text-muted-foreground hover:text-destructive"
+                    aria-label="Supprimer"
+                  >
+                    <X className="h-4 w-4" />
                   </button>
                 </li>
               ))}
