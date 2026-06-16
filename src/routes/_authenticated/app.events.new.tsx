@@ -172,7 +172,6 @@ function NewEventPage() {
             <CardTitle className="text-base">Invités</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex gap-2">
             <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
               <Input
                 placeholder="Prénom"
