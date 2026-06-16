@@ -79,6 +79,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Organisez vos moments et gardez-en le souvenir." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { property: "og:title", content: "Kosy" },
+      { name: "twitter:title", content: "Kosy" },
+      { property: "og:description", content: "Organisez vos moments et gardez-en le souvenir." },
+      { name: "twitter:description", content: "Organisez vos moments et gardez-en le souvenir." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/138174b4-e88f-4d60-9211-994d55091412/id-preview-4b03e345--1d2e76d7-37ad-4e92-b6af-e9cade9b7b8b.lovable.app-1781613459129.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/138174b4-e88f-4d60-9211-994d55091412/id-preview-4b03e345--1d2e76d7-37ad-4e92-b6af-e9cade9b7b8b.lovable.app-1781613459129.png" },
     ],
     links: [
       {
