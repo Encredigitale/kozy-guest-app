@@ -14,6 +14,77 @@ export type Database = {
   }
   public: {
     Tables: {
+      event_guests: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_guests_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string
+          description: string | null
+          event_at: string
+          event_subtype: string | null
+          event_type: string
+          id: string
+          location: string | null
+          menu_or_theme: string | null
+          owner_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          event_at: string
+          event_subtype?: string | null
+          event_type: string
+          id?: string
+          location?: string | null
+          menu_or_theme?: string | null
+          owner_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          event_at?: string
+          event_subtype?: string | null
+          event_type?: string
+          id?: string
+          location?: string | null
+          menu_or_theme?: string | null
+          owner_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           allergies: string | null
@@ -21,9 +92,11 @@ export type Database = {
           created_at: string
           dietary_preferences: string | null
           email: string | null
+          favorite_drinks: string | null
           first_name: string | null
           id: string
           last_name: string | null
+          personal_notes: string | null
           phone: string | null
           status: string
           updated_at: string
@@ -34,9 +107,11 @@ export type Database = {
           created_at?: string
           dietary_preferences?: string | null
           email?: string | null
+          favorite_drinks?: string | null
           first_name?: string | null
           id: string
           last_name?: string | null
+          personal_notes?: string | null
           phone?: string | null
           status?: string
           updated_at?: string
@@ -47,9 +122,11 @@ export type Database = {
           created_at?: string
           dietary_preferences?: string | null
           email?: string | null
+          favorite_drinks?: string | null
           first_name?: string | null
           id?: string
           last_name?: string | null
+          personal_notes?: string | null
           phone?: string | null
           status?: string
           updated_at?: string
