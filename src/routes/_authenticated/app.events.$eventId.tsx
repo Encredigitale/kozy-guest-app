@@ -46,7 +46,7 @@ export const Route = createFileRoute("/_authenticated/app/events/$eventId")({
   component: EventDetailPage,
 });
 
-type Guest = { id: string; name: string };
+type Guest = { id: string; name: string; email: string | null };
 type Rsvp = {
   id: string;
   guest_name: string;
@@ -90,6 +90,7 @@ function EventDetailPage() {
   const [inviteToken, setInviteToken] = useState("");
   const [guests, setGuests] = useState<Guest[]>([]);
   const [guestInput, setGuestInput] = useState("");
+  const [guestEmailInput, setGuestEmailInput] = useState("");
   const [rsvps, setRsvps] = useState<Rsvp[]>([]);
   const [contributions, setContributions] = useState<Contribution[]>([]);
   const [newContribCategory, setNewContribCategory] = useState<ContributionCategory>("plat");
@@ -119,7 +120,7 @@ function EventDetailPage() {
         supabase.from("events").select("*").eq("id", eventId).maybeSingle(),
         supabase
           .from("event_guests")
-          .select("id, name")
+          .select("id, name, email")
           .eq("event_id", eventId)
           .order("created_at", { ascending: true }),
       ]);
@@ -172,11 +173,12 @@ function EventDetailPage() {
 
   const addGuest = async () => {
     const name = guestInput.trim();
+    const email = guestEmailInput.trim();
     if (!name) return;
     const { data, error } = await supabase
       .from("event_guests")
-      .insert({ event_id: eventId, name })
-      .select("id, name")
+      .insert({ event_id: eventId, name, email: email || null })
+      .select("id, name, email")
       .single();
     if (error || !data) {
       toast.error("Ajout impossible.");
@@ -184,6 +186,7 @@ function EventDetailPage() {
     }
     setGuests((g) => [...g, data as Guest]);
     setGuestInput("");
+    setGuestEmailInput("");
   };
 
   const removeGuest = async (id: string) => {
@@ -384,11 +387,20 @@ function EventDetailPage() {
           <CardTitle className="text-base">Invités prévus ({guests.length})</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="flex gap-2">
+          <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
             <Input
               placeholder="Prénom"
               value={guestInput}
               onChange={(e) => setGuestInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") { e.preventDefault(); addGuest(); }
+              }}
+            />
+            <Input
+              type="email"
+              placeholder="Email (optionnel)"
+              value={guestEmailInput}
+              onChange={(e) => setGuestEmailInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") { e.preventDefault(); addGuest(); }
               }}
@@ -400,17 +412,22 @@ function EventDetailPage() {
           {guests.length === 0 ? (
             <p className="text-sm text-muted-foreground">Aucun invité noté pour le moment.</p>
           ) : (
-            <ul className="flex flex-wrap gap-2">
+            <ul className="divide-y rounded-md border">
               {guests.map((g) => (
-                <li key={g.id} className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-sm">
-                  {g.name}
+                <li key={g.id} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+                  <div className="min-w-0">
+                    <p className="truncate">{g.name}</p>
+                    {g.email && (
+                      <p className="text-xs text-muted-foreground truncate">{g.email}</p>
+                    )}
+                  </div>
                   <button
                     type="button"
                     onClick={() => removeGuest(g.id)}
-                    className="hover:text-destructive"
+                    className="text-muted-foreground hover:text-destructive"
                     aria-label={`Retirer ${g.name}`}
                   >
-                    <X className="h-3 w-3" />
+                    <X className="h-4 w-4" />
                   </button>
                 </li>
               ))}

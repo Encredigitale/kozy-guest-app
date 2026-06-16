@@ -33,16 +33,19 @@ function NewEventPage() {
   const [description, setDescription] = useState("");
   const [menu, setMenu] = useState("");
   const [guestInput, setGuestInput] = useState("");
-  const [guests, setGuests] = useState<string[]>([]);
+  const [guestEmailInput, setGuestEmailInput] = useState("");
+  const [guests, setGuests] = useState<{ name: string; email: string | null }[]>([]);
   const [saving, setSaving] = useState(false);
 
   const subtypes = EVENT_SUBTYPES[type];
 
   const addGuest = () => {
-    const v = guestInput.trim();
-    if (!v) return;
-    setGuests((g) => [...g, v]);
+    const name = guestInput.trim();
+    const email = guestEmailInput.trim();
+    if (!name) return;
+    setGuests((g) => [...g, { name, email: email || null }]);
     setGuestInput("");
+    setGuestEmailInput("");
   };
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -74,7 +77,7 @@ function NewEventPage() {
     if (guests.length > 0) {
       await supabase
         .from("event_guests")
-        .insert(guests.map((name) => ({ event_id: created.id, name })));
+        .insert(guests.map((g) => ({ event_id: created.id, name: g.name, email: g.email })));
     }
     setSaving(false);
     toast.success("Moment créé.");
@@ -169,11 +172,20 @@ function NewEventPage() {
             <CardTitle className="text-base">Invités</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex gap-2">
+            <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
               <Input
                 placeholder="Prénom"
                 value={guestInput}
                 onChange={(e) => setGuestInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") { e.preventDefault(); addGuest(); }
+                }}
+              />
+              <Input
+                type="email"
+                placeholder="Email (optionnel)"
+                value={guestEmailInput}
+                onChange={(e) => setGuestEmailInput(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") { e.preventDefault(); addGuest(); }
                 }}
@@ -183,17 +195,20 @@ function NewEventPage() {
               </Button>
             </div>
             {guests.length > 0 && (
-              <ul className="flex flex-wrap gap-2">
+              <ul className="divide-y rounded-md border">
                 {guests.map((g, i) => (
-                  <li key={i} className="inline-flex items-center gap-1 bg-secondary text-secondary-foreground rounded-full px-3 py-1 text-sm">
-                    {g}
+                  <li key={i} className="flex items-center justify-between gap-3 px-3 py-2 text-sm">
+                    <div className="min-w-0">
+                      <p className="truncate">{g.name}</p>
+                      {g.email && <p className="text-xs text-muted-foreground truncate">{g.email}</p>}
+                    </div>
                     <button
                       type="button"
                       onClick={() => setGuests((arr) => arr.filter((_, idx) => idx !== i))}
-                      className="hover:text-destructive"
-                      aria-label={`Retirer ${g}`}
+                      className="text-muted-foreground hover:text-destructive"
+                      aria-label={`Retirer ${g.name}`}
                     >
-                      <X className="h-3 w-3" />
+                      <X className="h-4 w-4" />
                     </button>
                   </li>
                 ))}
