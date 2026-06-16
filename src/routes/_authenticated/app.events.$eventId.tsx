@@ -298,12 +298,9 @@ function EventDetailPage() {
           <p className="text-sm text-muted-foreground">
             Partage ce lien pour que tes invités répondent et proposent ce qu'ils apportent — sans créer de compte.
           </p>
-          <div className="flex gap-2">
-            <Input readOnly value={inviteUrl} onFocus={(e) => e.currentTarget.select()} />
-            <Button type="button" variant="outline" onClick={copyInvite}>
-              <Copy className="h-4 w-4" /> Copier
-            </Button>
-          </div>
+          <Button type="button" variant="outline" onClick={copyInvite} disabled={!inviteUrl}>
+            <Copy className="h-4 w-4" /> Cliquer pour copier le lien
+          </Button>
         </CardContent>
       </Card>
 
