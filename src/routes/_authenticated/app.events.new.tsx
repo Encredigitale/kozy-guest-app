@@ -33,16 +33,19 @@ function NewEventPage() {
   const [description, setDescription] = useState("");
   const [menu, setMenu] = useState("");
   const [guestInput, setGuestInput] = useState("");
-  const [guests, setGuests] = useState<string[]>([]);
+  const [guestEmailInput, setGuestEmailInput] = useState("");
+  const [guests, setGuests] = useState<{ name: string; email: string | null }[]>([]);
   const [saving, setSaving] = useState(false);
 
   const subtypes = EVENT_SUBTYPES[type];
 
   const addGuest = () => {
-    const v = guestInput.trim();
-    if (!v) return;
-    setGuests((g) => [...g, v]);
+    const name = guestInput.trim();
+    const email = guestEmailInput.trim();
+    if (!name) return;
+    setGuests((g) => [...g, { name, email: email || null }]);
     setGuestInput("");
+    setGuestEmailInput("");
   };
 
   const onSubmit = async (e: React.FormEvent) => {
