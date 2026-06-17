@@ -171,13 +171,31 @@ function EventDetailPage() {
     toast.success("Moment mis à jour.");
   };
 
+  const [inviting, setInviting] = useState(false);
   const addGuest = async () => {
     const name = guestInput.trim();
     const email = guestEmailInput.trim();
     if (!name) return;
+    if (email) {
+      setInviting(true);
+      try {
+        const { sendEventInvitation } = await import("@/lib/invitations.functions");
+        const res = await sendEventInvitation({ data: { eventId, name, email } });
+        setGuests((g) => [...g, res.guest as Guest]);
+        setGuestInput("");
+        setGuestEmailInput("");
+        toast.success("Invitation envoyée !");
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "Envoi impossible.";
+        toast.error(msg);
+      } finally {
+        setInviting(false);
+      }
+      return;
+    }
     const { data, error } = await supabase
       .from("event_guests")
-      .insert({ event_id: eventId, name, email: email || null })
+      .insert({ event_id: eventId, name, email: null })
       .select("id, name, email")
       .single();
     if (error || !data) {
@@ -405,8 +423,9 @@ function EventDetailPage() {
                 if (e.key === "Enter") { e.preventDefault(); addGuest(); }
               }}
             />
-            <Button type="button" variant="outline" onClick={addGuest}>
-              <Plus className="h-4 w-4" /> Ajouter
+            <Button type="button" variant="outline" onClick={addGuest} disabled={inviting}>
+              {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              {guestEmailInput.trim() ? "Inviter" : "Ajouter"}
             </Button>
           </div>
           {guests.length === 0 ? (
