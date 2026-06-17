@@ -423,8 +423,9 @@ function EventDetailPage() {
                 if (e.key === "Enter") { e.preventDefault(); addGuest(); }
               }}
             />
-            <Button type="button" variant="outline" onClick={addGuest}>
-              <Plus className="h-4 w-4" /> Ajouter
+            <Button type="button" variant="outline" onClick={addGuest} disabled={inviting}>
+              {inviting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              {guestEmailInput.trim() ? "Inviter" : "Ajouter"}
             </Button>
           </div>
           {guests.length === 0 ? (
