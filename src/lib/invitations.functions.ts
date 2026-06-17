@@ -37,8 +37,8 @@ export const sendEventInvitation = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Insert guest (avoid duplicate by email if present)
-    let guest: { id: string; name: string; email: string | null } | null = null;
+    type GuestRow = { id: string; name: string; email: string | null };
+    let guest: GuestRow;
     const { data: existing } = await supabaseAdmin
       .from("event_guests")
       .select("id, name, email")
@@ -46,7 +46,7 @@ export const sendEventInvitation = createServerFn({ method: "POST" })
       .eq("email", data.email)
       .maybeSingle();
     if (existing) {
-      guest = existing as typeof guest;
+      guest = existing as GuestRow;
     } else {
       const { data: inserted, error: insErr } = await supabaseAdmin
         .from("event_guests")
@@ -54,7 +54,7 @@ export const sendEventInvitation = createServerFn({ method: "POST" })
         .select("id, name, email")
         .single();
       if (insErr || !inserted) throw new Error("Ajout impossible");
-      guest = inserted as typeof guest;
+      guest = inserted as GuestRow;
     }
 
     const origin =
