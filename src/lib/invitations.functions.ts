@@ -28,10 +28,10 @@ export const sendEventInvitation = createServerFn({ method: "POST" })
 
     const { data: event, error: evErr } = await supabase
       .from("events")
-      .select("id, title, event_at, location, invite_token, user_id")
+      .select("id, title, event_at, location, invite_token, owner_id")
       .eq("id", data.eventId)
       .maybeSingle();
-    if (evErr || !event || event.user_id !== userId) {
+    if (evErr || !event || event.owner_id !== userId) {
       throw new Error("Moment introuvable");
     }
 
