@@ -212,13 +212,14 @@ function SignUpForm() {
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
           <Label htmlFor="signup-phone">Téléphone</Label>
-          <Input id="signup-phone" type="tel" autoComplete="tel" placeholder="+33 6 12 34 56 78" value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <Input id="signup-phone" type="tel" autoComplete="tel" inputMode="tel" placeholder="+33 6 12 34 56 78" pattern="^[+0-9\s().-]{8,20}$" value={phone} onChange={(e) => setPhone(e.target.value)} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="signup-birthdate">Date de naissance</Label>
-          <Input id="signup-birthdate" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} max={new Date().toISOString().split("T")[0]} />
+          <Input id="signup-birthdate" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} min="1900-01-01" max={new Date().toISOString().split("T")[0]} />
         </div>
       </div>
+
       <div className="space-y-2">
         <Label htmlFor="signup-password">Mot de passe</Label>
         <Input id="signup-password" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
