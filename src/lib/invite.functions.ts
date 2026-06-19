@@ -14,7 +14,17 @@ async function admin() {
   return supabaseAdmin;
 }
 
-async function resolveEventAndGuest(token: string, guestId: string) {
+// Error codes used by the page to render specific states.
+export const INVITE_ERROR = {
+  INVALID: "INVITE_INVALID",
+  USED: "INVITE_USED",
+} as const;
+
+async function resolveEventAndGuest(
+  token: string,
+  guestId: string,
+  opts: { requireUnused: boolean },
+) {
   const sb = await admin();
   const { data: ev, error: evErr } = await sb
     .from("events")
@@ -23,15 +33,21 @@ async function resolveEventAndGuest(token: string, guestId: string) {
     )
     .eq("invite_token", token)
     .maybeSingle();
-  if (evErr || !ev) throw new Error("Not found");
+  if (evErr || !ev) throw new Error(INVITE_ERROR.INVALID);
   const { data: guest, error: gErr } = await sb
     .from("event_guests")
     .select("id, name, email, event_id, responded_at, rsvp_status")
     .eq("id", guestId)
     .maybeSingle();
-  if (gErr || !guest || guest.event_id !== ev.id) throw new Error("Not found");
+  if (gErr || !guest || guest.event_id !== ev.id) {
+    throw new Error(INVITE_ERROR.INVALID);
+  }
+  if (opts.requireUnused && guest.responded_at) {
+    throw new Error(INVITE_ERROR.USED);
+  }
   return { ev, guest };
 }
+
 
 export const getInviteEventForGuest = createServerFn({ method: "GET" })
   .inputValidator((d) =>
