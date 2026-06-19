@@ -35,11 +35,9 @@ export const sendEventInvitation = createServerFn({ method: "POST" })
       throw new Error("Moment introuvable");
     }
 
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
     type GuestRow = { id: string; name: string; email: string | null };
     let guest: GuestRow;
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await supabase
       .from("event_guests")
       .select("id, name, email")
       .eq("event_id", data.eventId)
@@ -48,7 +46,7 @@ export const sendEventInvitation = createServerFn({ method: "POST" })
     if (existing) {
       guest = existing as GuestRow;
     } else {
-      const { data: inserted, error: insErr } = await supabaseAdmin
+      const { data: inserted, error: insErr } = await supabase
         .from("event_guests")
         .insert({ event_id: data.eventId, name: data.name, email: data.email })
         .select("id, name, email")
