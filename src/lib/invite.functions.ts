@@ -54,7 +54,9 @@ export const getInviteEventForGuest = createServerFn({ method: "GET" })
     z.object({ token: tokenSchema, guestId: uuidSchema }).parse(d),
   )
   .handler(async ({ data }) => {
-    const { ev, guest } = await resolveEventAndGuest(data.token, data.guestId);
+    const { ev, guest } = await resolveEventAndGuest(data.token, data.guestId, {
+      requireUnused: false,
+    });
     const sb = await admin();
 
     const { data: guests } = await sb
