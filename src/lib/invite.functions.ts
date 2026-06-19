@@ -152,8 +152,11 @@ export const claimContributionsAsGuest = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { ev, guest } = await resolveEventAndGuest(data.token, data.guestId, {
-      requireUnused: true,
+      requireUnused: false,
     });
+    if (guest.rsvp_status !== "yes") {
+      throw new Error(INVITE_ERROR.INVALID);
+    }
     const sb = await admin();
     // Only claim items in this event that are still free.
     const { error } = await sb
