@@ -126,6 +126,41 @@ function SignUpForm() {
       toast.error("Les mots de passe ne correspondent pas.");
       return;
     }
+    const phoneTrimmed = phone.trim();
+    if (phoneTrimmed) {
+      const digits = phoneTrimmed.replace(/[\s().-]/g, "");
+      // E.164-compatible : optionnel +, 8 à 15 chiffres
+      if (!/^\+?[0-9]{8,15}$/.test(digits)) {
+        toast.error("Numéro de téléphone invalide. Ex. +33 6 12 34 56 78.");
+        return;
+      }
+    }
+    if (birthDate) {
+      const d = new Date(birthDate);
+      if (Number.isNaN(d.getTime())) {
+        toast.error("Date de naissance invalide.");
+        return;
+      }
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (d > today) {
+        toast.error("La date de naissance ne peut pas être dans le futur.");
+        return;
+      }
+      const minDate = new Date();
+      minDate.setFullYear(minDate.getFullYear() - 120);
+      if (d < minDate) {
+        toast.error("Date de naissance invalide.");
+        return;
+      }
+      let age = today.getFullYear() - d.getFullYear();
+      const m = today.getMonth() - d.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
+      if (age < 13) {
+        toast.error("Vous devez avoir au moins 13 ans pour créer un compte.");
+        return;
+      }
+    }
     if (!accepted) {
       toast.error("Vous devez accepter les CGU et la politique de confidentialité.");
       return;
@@ -139,7 +174,7 @@ function SignUpForm() {
         data: {
           first_name: firstName,
           last_name: lastName,
-          phone: phone.trim() || null,
+          phone: phoneTrimmed || null,
           birth_date: birthDate || null,
         },
       },
@@ -156,6 +191,7 @@ function SignUpForm() {
     toast.success("Compte créé !");
     navigate({ to: "/app" });
   };
+
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -176,13 +212,14 @@ function SignUpForm() {
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-2">
           <Label htmlFor="signup-phone">Téléphone</Label>
-          <Input id="signup-phone" type="tel" autoComplete="tel" placeholder="+33 6 12 34 56 78" value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <Input id="signup-phone" type="tel" autoComplete="tel" inputMode="tel" placeholder="+33 6 12 34 56 78" pattern="^[+0-9\s().-]{8,20}$" value={phone} onChange={(e) => setPhone(e.target.value)} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="signup-birthdate">Date de naissance</Label>
-          <Input id="signup-birthdate" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} max={new Date().toISOString().split("T")[0]} />
+          <Input id="signup-birthdate" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} min="1900-01-01" max={new Date().toISOString().split("T")[0]} />
         </div>
       </div>
+
       <div className="space-y-2">
         <Label htmlFor="signup-password">Mot de passe</Label>
         <Input id="signup-password" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
