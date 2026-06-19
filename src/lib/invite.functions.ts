@@ -114,8 +114,9 @@ export const respondAsGuest = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const { ev, guest } = await resolveEventAndGuest(data.token, data.guestId);
-    if (guest.responded_at) throw new Error("Lien déjà utilisé");
+    const { ev, guest } = await resolveEventAndGuest(data.token, data.guestId, {
+      requireUnused: true,
+    });
     const sb = await admin();
     const { data: rsvp, error: rErr } = await sb
       .from("event_rsvps")
