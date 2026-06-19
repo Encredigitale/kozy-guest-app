@@ -14,7 +14,17 @@ async function admin() {
   return supabaseAdmin;
 }
 
-async function resolveEventAndGuest(token: string, guestId: string) {
+// Error codes used by the page to render specific states.
+export const INVITE_ERROR = {
+  INVALID: "INVITE_INVALID",
+  USED: "INVITE_USED",
+} as const;
+
+async function resolveEventAndGuest(
+  token: string,
+  guestId: string,
+  opts: { requireUnused: boolean },
+) {
   const sb = await admin();
   const { data: ev, error: evErr } = await sb
     .from("events")
@@ -23,22 +33,30 @@ async function resolveEventAndGuest(token: string, guestId: string) {
     )
     .eq("invite_token", token)
     .maybeSingle();
-  if (evErr || !ev) throw new Error("Not found");
+  if (evErr || !ev) throw new Error(INVITE_ERROR.INVALID);
   const { data: guest, error: gErr } = await sb
     .from("event_guests")
     .select("id, name, email, event_id, responded_at, rsvp_status")
     .eq("id", guestId)
     .maybeSingle();
-  if (gErr || !guest || guest.event_id !== ev.id) throw new Error("Not found");
+  if (gErr || !guest || guest.event_id !== ev.id) {
+    throw new Error(INVITE_ERROR.INVALID);
+  }
+  if (opts.requireUnused && guest.responded_at) {
+    throw new Error(INVITE_ERROR.USED);
+  }
   return { ev, guest };
 }
+
 
 export const getInviteEventForGuest = createServerFn({ method: "GET" })
   .inputValidator((d) =>
     z.object({ token: tokenSchema, guestId: uuidSchema }).parse(d),
   )
   .handler(async ({ data }) => {
-    const { ev, guest } = await resolveEventAndGuest(data.token, data.guestId);
+    const { ev, guest } = await resolveEventAndGuest(data.token, data.guestId, {
+      requireUnused: false,
+    });
     const sb = await admin();
 
     const { data: guests } = await sb
@@ -96,8 +114,9 @@ export const respondAsGuest = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const { ev, guest } = await resolveEventAndGuest(data.token, data.guestId);
-    if (guest.responded_at) throw new Error("Lien déjà utilisé");
+    const { ev, guest } = await resolveEventAndGuest(data.token, data.guestId, {
+      requireUnused: true,
+    });
     const sb = await admin();
     const { data: rsvp, error: rErr } = await sb
       .from("event_rsvps")
@@ -132,7 +151,12 @@ export const claimContributionsAsGuest = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const { ev, guest } = await resolveEventAndGuest(data.token, data.guestId);
+    const { ev, guest } = await resolveEventAndGuest(data.token, data.guestId, {
+      requireUnused: false,
+    });
+    if (guest.rsvp_status !== "yes") {
+      throw new Error(INVITE_ERROR.INVALID);
+    }
     const sb = await admin();
     // Only claim items in this event that are still free.
     const { error } = await sb
