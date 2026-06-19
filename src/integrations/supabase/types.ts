@@ -72,6 +72,9 @@ export type Database = {
           event_id: string
           id: string
           name: string
+          responded_at: string | null
+          rsvp_id: string | null
+          rsvp_status: string | null
         }
         Insert: {
           created_at?: string
@@ -79,6 +82,9 @@ export type Database = {
           event_id: string
           id?: string
           name: string
+          responded_at?: string | null
+          rsvp_id?: string | null
+          rsvp_status?: string | null
         }
         Update: {
           created_at?: string
@@ -86,6 +92,9 @@ export type Database = {
           event_id?: string
           id?: string
           name?: string
+          responded_at?: string | null
+          rsvp_id?: string | null
+          rsvp_status?: string | null
         }
         Relationships: [
           {
@@ -93,6 +102,13 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_guests_rsvp_id_fkey"
+            columns: ["rsvp_id"]
+            isOneToOne: false
+            referencedRelation: "event_rsvps"
             referencedColumns: ["id"]
           },
         ]
