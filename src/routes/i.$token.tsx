@@ -1,77 +1,143 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  claimInviteContribution,
-  getInviteEvent,
-  proposeInviteContribution,
-  submitInviteRsvp,
+  claimContributionsAsGuest,
+  getInviteEventForGuest,
+  respondAsGuest,
 } from "@/lib/invite.functions";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Calendar, Check, Loader2, MapPin, Plus } from "lucide-react";
-import {
-  CONTRIBUTION_CATEGORIES,
-  contributionCategoryLabel,
-  type ContributionCategory,
-} from "@/lib/contribution-categories";
+import { Calendar, Check, Loader2, MapPin } from "lucide-react";
+import { contributionCategoryLabel } from "@/lib/contribution-categories";
 import { eventTypeLabel } from "@/lib/event-types";
 
 export const Route = createFileRoute("/i/$token")({
   head: () => ({ meta: [{ title: "Invitation — Kosy" }] }),
   component: InvitePage,
+  validateSearch: (s: Record<string, unknown>) => ({
+    g: typeof s.g === "string" ? s.g : "",
+  }),
 });
 
-type InviteData = Awaited<ReturnType<typeof getInviteEvent>>;
+type InviteData = Awaited<ReturnType<typeof getInviteEventForGuest>>;
 
 function InvitePage() {
   const { token } = Route.useParams();
-  const fetchEvent = useServerFn(getInviteEvent);
-  const rsvpFn = useServerFn(submitInviteRsvp);
-  const claimFn = useServerFn(claimInviteContribution);
-  const proposeFn = useServerFn(proposeInviteContribution);
+  const { g: guestId } = Route.useSearch();
+  const navigate = useNavigate();
+  const fetchEvent = useServerFn(getInviteEventForGuest);
+  const respondFn = useServerFn(respondAsGuest);
+  const claimFn = useServerFn(claimContributionsAsGuest);
 
   const [data, setData] = useState<InviteData | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-
-  // RSVP form
-  const [name, setName] = useState("");
-  const [status, setStatus] = useState<"yes" | "no" | "maybe">("yes");
-  const [message, setMessage] = useState("");
-  const [rsvpSent, setRsvpSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  // Propose form
-  const [propCategory, setPropCategory] = useState<ContributionCategory>("plat");
-  const [propLabel, setPropLabel] = useState("");
+  // UI states
+  const [showContribStep, setShowContribStep] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [thankMessage, setThankMessage] = useState<string | null>(null);
 
-  const reload = async () => {
-    try {
-      const r = await fetchEvent({ data: { token } });
-      setData(r);
-    } catch {
+  useEffect(() => {
+    if (!guestId) {
       setNotFound(true);
-    } finally {
       setLoading(false);
+      return;
+    }
+    fetchEvent({ data: { token, guestId } })
+      .then((r) => setData(r))
+      .catch(() => setNotFound(true))
+      .finally(() => setLoading(false));
+  }, [token, guestId, fetchEvent]);
+
+  const alreadyResponded = !!data?.guest.responded_at;
+  const freeContribs = useMemo(
+    () => (data?.contributions ?? []).filter((c) => !c.claimed),
+    [data],
+  );
+
+  const onAccept = async () => {
+    if (!data) return;
+    setSubmitting(true);
+    try {
+      await respondFn({ data: { token, guestId, status: "yes" } });
+      // If there are free contributions, ask which ones they bring.
+      if (freeContribs.length > 0) {
+        setShowContribStep(true);
+      } else {
+        setThankMessage("Merci, votre participation a été enregistrée. À bientôt !");
+      }
+    } catch {
+      toast.error("Enregistrement impossible.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  useEffect(() => {
-    reload();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  const onDecline = async () => {
+    if (!data) return;
+    setSubmitting(true);
+    try {
+      await respondFn({ data: { token, guestId, status: "no" } });
+      setThankMessage("Merci pour votre réponse, à bientôt !");
+    } catch {
+      toast.error("Enregistrement impossible.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const toggle = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const validateContribs = async () => {
+    if (selected.size === 0) {
+      setThankMessage("Merci, votre participation a été enregistrée. À bientôt !");
+      setShowContribStep(false);
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await claimFn({
+        data: { token, guestId, contributionIds: Array.from(selected) },
+      });
+      setShowContribStep(false);
+      setThankMessage("Merci, votre participation a été enregistrée. À bientôt !");
+    } catch {
+      toast.error("Mise à jour impossible.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const closeAndGoHome = () => {
+    setThankMessage(null);
+    // Try to close the tab; fall back to navigating home.
+    try {
+      window.close();
+    } catch {
+      /* ignore */
+    }
+    navigate({ to: "/" });
+  };
 
   if (loading) {
     return (
@@ -99,70 +165,6 @@ function InvitePage() {
 
   const e = data.event;
 
-  const submitRsvp = async (ev: React.FormEvent) => {
-    ev.preventDefault();
-    if (!name.trim()) {
-      toast.error("Indique ton prénom.");
-      return;
-    }
-    setSubmitting(true);
-    try {
-      await rsvpFn({
-        data: {
-          token,
-          name: name.trim(),
-          status,
-          message: message.trim() || undefined,
-        },
-      });
-      setRsvpSent(true);
-      toast.success("Réponse envoyée. Merci !");
-    } catch {
-      toast.error("Envoi impossible.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const claim = async (id: string) => {
-    if (!name.trim()) {
-      toast.error("Indique d'abord ton prénom.");
-      return;
-    }
-    try {
-      await claimFn({ data: { token, contributionId: id, guestName: name.trim() } });
-      toast.success("C'est noté, merci !");
-      await reload();
-    } catch {
-      toast.error("Cet item vient d'être pris.");
-      await reload();
-    }
-  };
-
-  const propose = async (ev: React.FormEvent) => {
-    ev.preventDefault();
-    if (!name.trim()) {
-      toast.error("Indique d'abord ton prénom.");
-      return;
-    }
-    if (!propLabel.trim()) return;
-    try {
-      await proposeFn({
-        data: {
-          token,
-          category: propCategory,
-          label: propLabel.trim(),
-          guestName: name.trim(),
-        },
-      });
-      setPropLabel("");
-      toast.success("Proposition ajoutée.");
-      await reload();
-    } catch {
-      toast.error("Ajout impossible.");
-    }
-  };
-
   return (
     <div className="min-h-screen bg-muted/30">
       <div className="max-w-2xl mx-auto px-4 py-10 space-y-6">
@@ -178,7 +180,10 @@ function InvitePage() {
         </header>
 
         <Card>
-          <CardContent className="pt-6 space-y-2 text-sm">
+          <CardHeader>
+            <CardTitle className="font-serif text-xl">Détails</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
             <div className="flex items-start gap-2">
               <Calendar className="h-4 w-4 mt-0.5 text-muted-foreground" />
               <span>
@@ -210,112 +215,71 @@ function InvitePage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="font-serif">Votre réponse</CardTitle>
+            <CardTitle className="font-serif text-xl">Invités</CardTitle>
           </CardHeader>
           <CardContent>
-            {rsvpSent ? (
-              <p className="text-sm text-muted-foreground">
-                Merci {name}, votre réponse a bien été envoyée à l'organisateur·rice.
-              </p>
-            ) : (
-              <form onSubmit={submitRsvp} className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label>Votre prénom</Label>
-                  <Input
-                    value={name}
-                    onChange={(ev) => setName(ev.target.value)}
-                    placeholder="Camille"
-                    maxLength={60}
-                    required
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Vous venez ?</Label>
-                  <Select value={status} onValueChange={(v) => setStatus(v as typeof status)}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="yes">Oui, avec plaisir</SelectItem>
-                      <SelectItem value="maybe">Peut-être</SelectItem>
-                      <SelectItem value="no">Non, désolé·e</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-1.5">
-                  <Label>Petit mot (optionnel)</Label>
-                  <Textarea
-                    value={message}
-                    onChange={(ev) => setMessage(ev.target.value)}
-                    maxLength={500}
-                    rows={3}
-                  />
-                </div>
-                <Button type="submit" disabled={submitting} className="w-full">
-                  {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                  Envoyer ma réponse
-                </Button>
-              </form>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-serif">Que puis-je apporter ?</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {data.contributions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                Rien de demandé pour l'instant. Vous pouvez proposer quelque chose ci-dessous.
-              </p>
-            ) : (
-              <ul className="space-y-2">
-                {data.contributions.map((c) => (
+            <ul className="divide-y">
+              {data.guests.map((g) => {
+                const isMe = g.id === data.guest.id;
+                return (
                   <li
-                    key={c.id}
-                    className="flex items-center justify-between gap-3 rounded-md border bg-background px-3 py-2"
+                    key={g.id}
+                    className="py-3 flex items-center justify-between gap-3"
                   >
                     <div className="min-w-0">
-                      <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                        {contributionCategoryLabel(c.category)}
+                      <p className="text-sm font-medium truncate">
+                        {g.name}
+                        {isMe && (
+                          <span className="ml-2 text-xs text-muted-foreground">
+                            (vous)
+                          </span>
+                        )}
                       </p>
-                      <p className="text-sm truncate">{c.label}</p>
+                      {g.responded_at && (
+                        <p className="text-xs text-muted-foreground">
+                          {g.rsvp_status === "yes"
+                            ? "A accepté"
+                            : g.rsvp_status === "no"
+                              ? "A décliné"
+                              : "A répondu"}
+                        </p>
+                      )}
                     </div>
-                    {c.claimed ? (
-                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
-                        <Check className="h-3.5 w-3.5" /> Pris
+                    {isMe && !alreadyResponded ? (
+                      <div className="flex gap-2 shrink-0">
+                        <Button
+                          size="sm"
+                          onClick={onAccept}
+                          disabled={submitting}
+                        >
+                          {submitting && (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          )}
+                          Accepter
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={onDecline}
+                          disabled={submitting}
+                        >
+                          Refuser
+                        </Button>
+                      </div>
+                    ) : isMe && alreadyResponded ? (
+                      <span className="text-xs text-muted-foreground shrink-0">
+                        Réponse envoyée
                       </span>
-                    ) : (
-                      <Button size="sm" variant="outline" onClick={() => claim(c.id)}>
-                        Je l'apporte
-                      </Button>
-                    )}
+                    ) : null}
                   </li>
-                ))}
-              </ul>
+                );
+              })}
+            </ul>
+            {alreadyResponded && (
+              <p className="mt-4 text-sm text-muted-foreground text-center">
+                Ce lien d'invitation a déjà été utilisé.
+              </p>
             )}
-
-            <form onSubmit={propose} className="pt-4 border-t space-y-3">
-              <p className="text-sm font-medium">Proposer un item</p>
-              <div className="grid sm:grid-cols-[140px_1fr_auto] gap-2">
-                <Select value={propCategory} onValueChange={(v) => setPropCategory(v as ContributionCategory)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {CONTRIBUTION_CATEGORIES.map((c) => (
-                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Input
-                  placeholder="Ex. Tarte au citron"
-                  value={propLabel}
-                  onChange={(ev) => setPropLabel(ev.target.value)}
-                  maxLength={120}
-                />
-                <Button type="submit" variant="secondary">
-                  <Plus className="h-4 w-4" /> Ajouter
-                </Button>
-              </div>
-            </form>
           </CardContent>
         </Card>
 
@@ -323,6 +287,63 @@ function InvitePage() {
           Propulsé par Kosy
         </p>
       </div>
+
+      {/* Step: choose contributions after accepting */}
+      <Dialog open={showContribStep} onOpenChange={(o) => !o && validateContribs()}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="font-serif">Que souhaitez-vous apporter ?</DialogTitle>
+            <DialogDescription>
+              Sélectionnez un ou plusieurs éléments. Vous pouvez aussi valider sans rien choisir.
+            </DialogDescription>
+          </DialogHeader>
+          <ul className="space-y-2 max-h-72 overflow-y-auto">
+            {freeContribs.map((c) => (
+              <li
+                key={c.id}
+                className="flex items-start gap-3 rounded-md border bg-background p-3"
+              >
+                <Checkbox
+                  id={`c-${c.id}`}
+                  checked={selected.has(c.id)}
+                  onCheckedChange={() => toggle(c.id)}
+                />
+                <label htmlFor={`c-${c.id}`} className="flex-1 cursor-pointer">
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                    {contributionCategoryLabel(c.category)}
+                  </p>
+                  <p className="text-sm">{c.label}</p>
+                </label>
+              </li>
+            ))}
+          </ul>
+          <DialogFooter>
+            <Button onClick={validateContribs} disabled={submitting}>
+              {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              <Check className="h-4 w-4" />
+              Valider
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Final thank-you */}
+      <Dialog
+        open={!!thankMessage}
+        onOpenChange={(o) => {
+          if (!o) closeAndGoHome();
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="font-serif">Merci !</DialogTitle>
+            <DialogDescription>{thankMessage}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={closeAndGoHome}>Fermer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

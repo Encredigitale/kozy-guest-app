@@ -59,7 +59,7 @@ export const sendEventInvitation = createServerFn({ method: "POST" })
       process.env.SITE_URL ||
       process.env.VITE_SITE_URL ||
       "https://friendly-guest-buddy.lovable.app";
-    const inviteUrl = `${origin}/i/${event.invite_token}`;
+    const inviteUrl = `${origin}/i/${event.invite_token}?g=${guest.id}`;
 
     const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
     const BREVO_API_KEY = process.env.BREVO_API_KEY;
