@@ -109,6 +109,8 @@ function SignUpForm() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [accepted, setAccepted] = useState(false);
@@ -134,7 +136,12 @@ function SignUpForm() {
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/app`,
-        data: { first_name: firstName, last_name: lastName },
+        data: {
+          first_name: firstName,
+          last_name: lastName,
+          phone: phone.trim() || null,
+          birth_date: birthDate || null,
+        },
       },
     });
     setLoading(false);
@@ -166,6 +173,16 @@ function SignUpForm() {
         <Label htmlFor="signup-email">Adresse e-mail</Label>
         <Input id="signup-email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
       </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-2">
+          <Label htmlFor="signup-phone">Téléphone</Label>
+          <Input id="signup-phone" type="tel" autoComplete="tel" placeholder="+33 6 12 34 56 78" value={phone} onChange={(e) => setPhone(e.target.value)} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="signup-birthdate">Date de naissance</Label>
+          <Input id="signup-birthdate" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} max={new Date().toISOString().split("T")[0]} />
+        </div>
+      </div>
       <div className="space-y-2">
         <Label htmlFor="signup-password">Mot de passe</Label>
         <Input id="signup-password" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
@@ -186,6 +203,7 @@ function SignUpForm() {
     </form>
   );
 }
+
 
 function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
   const [email, setEmail] = useState("");
