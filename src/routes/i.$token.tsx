@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   claimContributionsAsGuest,
   getInviteEventForGuest,
+  INVITE_ERROR,
   respondAsGuest,
 } from "@/lib/invite.functions";
 import { Button } from "@/components/ui/button";
