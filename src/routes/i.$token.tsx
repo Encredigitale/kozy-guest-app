@@ -152,17 +152,30 @@ function InvitePage() {
       </div>
     );
   }
-  if (notFound || !data) {
+  if (errorCode || !data) {
+    const title =
+      errorCode === "USED"
+        ? "Lien déjà utilisé"
+        : errorCode === "OTHER"
+          ? "Une erreur est survenue"
+          : "Invitation introuvable";
+    const message =
+      errorCode === "USED"
+        ? "Vous avez déjà répondu à cette invitation. Merci, à bientôt !"
+        : errorCode === "OTHER"
+          ? "Impossible de charger cette invitation pour le moment. Veuillez réessayer plus tard."
+          : "Ce lien n'est plus valide ou a été supprimé par l'organisateur.";
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="max-w-md">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="max-w-md w-full">
           <CardHeader>
-            <CardTitle className="font-serif">Invitation introuvable</CardTitle>
+            <CardTitle className="font-serif">{title}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Ce lien n'est plus valide ou a été supprimé par l'organisateur.
-            </p>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">{message}</p>
+            <Button onClick={() => navigate({ to: "/" })} className="w-full">
+              Retour à l'accueil
+            </Button>
           </CardContent>
         </Card>
       </div>
