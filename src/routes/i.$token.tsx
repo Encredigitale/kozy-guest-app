@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   claimContributionsAsGuest,
   getInviteEventForGuest,
+  INVITE_ERROR,
   respondAsGuest,
 } from "@/lib/invite.functions";
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,7 @@ function InvitePage() {
 
   const [data, setData] = useState<InviteData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
+  const [errorCode, setErrorCode] = useState<null | "INVALID" | "USED" | "OTHER">(null);
   const [submitting, setSubmitting] = useState(false);
 
   // UI states
@@ -52,13 +53,18 @@ function InvitePage() {
 
   useEffect(() => {
     if (!guestId) {
-      setNotFound(true);
+      setErrorCode("INVALID");
       setLoading(false);
       return;
     }
     fetchEvent({ data: { token, guestId } })
       .then((r) => setData(r))
-      .catch(() => setNotFound(true))
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes(INVITE_ERROR.USED)) setErrorCode("USED");
+        else if (msg.includes(INVITE_ERROR.INVALID)) setErrorCode("INVALID");
+        else setErrorCode("OTHER");
+      })
       .finally(() => setLoading(false));
   }, [token, guestId, fetchEvent]);
 
@@ -146,17 +152,30 @@ function InvitePage() {
       </div>
     );
   }
-  if (notFound || !data) {
+  if (errorCode || !data) {
+    const title =
+      errorCode === "USED"
+        ? "Lien déjà utilisé"
+        : errorCode === "OTHER"
+          ? "Une erreur est survenue"
+          : "Invitation introuvable";
+    const message =
+      errorCode === "USED"
+        ? "Vous avez déjà répondu à cette invitation. Merci, à bientôt !"
+        : errorCode === "OTHER"
+          ? "Impossible de charger cette invitation pour le moment. Veuillez réessayer plus tard."
+          : "Ce lien n'est plus valide ou a été supprimé par l'organisateur.";
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="max-w-md">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="max-w-md w-full">
           <CardHeader>
-            <CardTitle className="font-serif">Invitation introuvable</CardTitle>
+            <CardTitle className="font-serif">{title}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Ce lien n'est plus valide ou a été supprimé par l'organisateur.
-            </p>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">{message}</p>
+            <Button onClick={() => navigate({ to: "/" })} className="w-full">
+              Retour à l'accueil
+            </Button>
           </CardContent>
         </Card>
       </div>
