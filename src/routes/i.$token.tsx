@@ -43,7 +43,7 @@ function InvitePage() {
 
   const [data, setData] = useState<InviteData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
+  const [errorCode, setErrorCode] = useState<null | "INVALID" | "USED" | "OTHER">(null);
   const [submitting, setSubmitting] = useState(false);
 
   // UI states
@@ -53,13 +53,18 @@ function InvitePage() {
 
   useEffect(() => {
     if (!guestId) {
-      setNotFound(true);
+      setErrorCode("INVALID");
       setLoading(false);
       return;
     }
     fetchEvent({ data: { token, guestId } })
       .then((r) => setData(r))
-      .catch(() => setNotFound(true))
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.includes(INVITE_ERROR.USED)) setErrorCode("USED");
+        else if (msg.includes(INVITE_ERROR.INVALID)) setErrorCode("INVALID");
+        else setErrorCode("OTHER");
+      })
       .finally(() => setLoading(false));
   }, [token, guestId, fetchEvent]);
 
