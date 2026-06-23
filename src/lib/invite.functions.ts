@@ -1,10 +1,11 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-// Public server functions for invitees accessing an event via a share link
-// tied to a specific guest id. The token gates the event; the guest id
-// identifies which row in event_guests is responding. We use the admin
-// client inside handlers AFTER verifying both.
+// Public server functions for invitees accessing an event via a share link.
+// Two modes:
+// - Personal link (/i/<token>?g=<guestId>): the guest is pre-selected.
+// - Generic link (/i/<token>): the visitor enters name/email so we can find
+//   or create the matching event_guests row before they respond.
 
 const tokenSchema = z.string().min(8).max(64).regex(/^[a-f0-9]+$/i);
 const uuidSchema = z.string().uuid();
@@ -20,11 +21,7 @@ export const INVITE_ERROR = {
   USED: "INVITE_USED",
 } as const;
 
-async function resolveEventAndGuest(
-  token: string,
-  guestId: string,
-  opts: { requireUnused: boolean },
-) {
+async function resolveEvent(token: string) {
   const sb = await admin();
   const { data: ev, error: evErr } = await sb
     .from("events")
@@ -34,6 +31,16 @@ async function resolveEventAndGuest(
     .eq("invite_token", token)
     .maybeSingle();
   if (evErr || !ev) throw new Error(INVITE_ERROR.INVALID);
+  return ev;
+}
+
+async function resolveEventAndGuest(
+  token: string,
+  guestId: string,
+  opts: { requireUnused: boolean },
+) {
+  const ev = await resolveEvent(token);
+  const sb = await admin();
   const { data: guest, error: gErr } = await sb
     .from("event_guests")
     .select("id, name, email, event_id, responded_at, rsvp_status")
@@ -48,6 +55,100 @@ async function resolveEventAndGuest(
   return { ev, guest };
 }
 
+function mapEvent(ev: {
+  id: string;
+  title: string;
+  event_type: string;
+  event_subtype: string | null;
+  event_at: string;
+  location: string | null;
+  description: string | null;
+  menu_or_theme: string | null;
+}) {
+  return {
+    id: ev.id,
+    title: ev.title,
+    event_type: ev.event_type,
+    event_subtype: ev.event_subtype,
+    event_at: ev.event_at,
+    location: ev.location,
+    description: ev.description,
+    menu_or_theme: ev.menu_or_theme,
+  };
+}
+
+export const getInviteEventByToken = createServerFn({ method: "GET" })
+  .inputValidator((d) => z.object({ token: tokenSchema }).parse(d))
+  .handler(async ({ data }) => {
+    const ev = await resolveEvent(data.token);
+    const sb = await admin();
+
+    const [{ data: guests }, { data: items }] = await Promise.all([
+      sb
+        .from("event_guests")
+        .select("id, name, responded_at, rsvp_status")
+        .eq("event_id", ev.id)
+        .order("created_at", { ascending: true }),
+      sb
+        .from("event_contributions")
+        .select("id, category, label, claimed_by_name")
+        .eq("event_id", ev.id)
+        .order("created_at", { ascending: true }),
+    ]);
+
+    return {
+      event: mapEvent(ev),
+      guests: (guests ?? []).map((g) => ({
+        id: g.id,
+        name: g.name,
+        responded_at: g.responded_at,
+        rsvp_status: g.rsvp_status,
+      })),
+      contributions: (items ?? []).map((i) => ({
+        id: i.id,
+        category: i.category,
+        label: i.label,
+        claimed: i.claimed_by_name !== null && i.claimed_by_name !== "",
+      })),
+    };
+  });
+
+export const identifyGuestForEvent = createServerFn({ method: "POST" })
+  .inputValidator((d) =>
+    z
+      .object({
+        token: tokenSchema,
+        name: z.string().trim().min(1).max(60),
+        email: z.string().trim().email().max(160),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const ev = await resolveEvent(data.token);
+    const sb = await admin();
+
+    // Try to find an existing guest with the same email for this event.
+    const { data: existing } = await sb
+      .from("event_guests")
+      .select("id, name, email, event_id, responded_at, rsvp_status")
+      .eq("event_id", ev.id)
+      .eq("email", data.email)
+      .maybeSingle();
+
+    if (existing) {
+      return { guestId: existing.id };
+    }
+
+    // Otherwise create a new guest.
+    const { data: inserted, error: insErr } = await sb
+      .from("event_guests")
+      .insert({ event_id: ev.id, name: data.name, email: data.email })
+      .select("id")
+      .single();
+
+    if (insErr || !inserted) throw new Error("Ajout impossible");
+    return { guestId: inserted.id };
+  });
 
 export const getInviteEventForGuest = createServerFn({ method: "GET" })
   .inputValidator((d) =>
@@ -72,16 +173,7 @@ export const getInviteEventForGuest = createServerFn({ method: "GET" })
       .order("created_at", { ascending: true });
 
     return {
-      event: {
-        id: ev.id,
-        title: ev.title,
-        event_type: ev.event_type,
-        event_subtype: ev.event_subtype,
-        event_at: ev.event_at,
-        location: ev.location,
-        description: ev.description,
-        menu_or_theme: ev.menu_or_theme,
-      },
+      event: mapEvent(ev),
       guest: {
         id: guest.id,
         name: guest.name,
