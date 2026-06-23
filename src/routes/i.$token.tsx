@@ -73,6 +73,7 @@ function InvitePage() {
   };
 
   useEffect(() => {
+    setLoading(true);
     if (!guestId) {
       // Generic link: load public event data only.
       fetchEventByToken({ data: { token } })
