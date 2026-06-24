@@ -323,8 +323,8 @@ function EventDetailPage() {
           <p className="text-sm text-muted-foreground">
             Partage ce lien pour que tes invités répondent et proposent ce qu'ils apportent — sans créer de compte.
           </p>
-          <Button type="button" variant="outline" onClick={copyInvite} disabled={!inviteUrl}>
-            <Copy className="h-4 w-4" /> Cliquer pour copier le lien
+          <Button type="button" variant="outline" onClick={() => copyInvite(inviteUrl)} disabled={!inviteUrl}>
+            <Copy className="h-4 w-4" /> Cliquer pour copier le lien générique
           </Button>
         </CardContent>
       </Card>
@@ -444,14 +444,27 @@ function EventDetailPage() {
                       <p className="text-xs text-muted-foreground truncate">{g.email}</p>
                     )}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => removeGuest(g.id)}
-                    className="text-muted-foreground hover:text-destructive"
-                    aria-label={`Retirer ${g.name}`}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
+                  <div className="flex items-center gap-1">
+                    {g.email && (
+                      <button
+                        type="button"
+                        onClick={() => copyInvite(personalInviteUrl(g.id))}
+                        className="p-1 text-muted-foreground hover:text-primary"
+                        title="Copier le lien personnel"
+                        aria-label={`Copier le lien personnel pour ${g.name}`}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeGuest(g.id)}
+                      className="p-1 text-muted-foreground hover:text-destructive"
+                      aria-label={`Retirer ${g.name}`}
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
                 </li>
               ))}
             </ul>
