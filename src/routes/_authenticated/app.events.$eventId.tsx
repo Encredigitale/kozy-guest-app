@@ -231,14 +231,18 @@ function EventDetailPage() {
       ? `${window.location.origin}/i/${inviteToken}`
       : "";
 
-  const copyInvite = async () => {
+  const personalInviteUrl = (guestId: string) =>
+    inviteUrl ? `${inviteUrl}?g=${guestId}` : "";
+
+  const copyInvite = async (url: string) => {
     try {
-      await navigator.clipboard.writeText(inviteUrl);
+      await navigator.clipboard.writeText(url);
       toast.success("Lien copié !");
     } catch {
       toast.error("Copie impossible.");
     }
   };
+
 
   const addContribution = async (e: React.FormEvent) => {
     e.preventDefault();
