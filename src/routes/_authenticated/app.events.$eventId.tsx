@@ -120,9 +120,10 @@ function EventDetailPage() {
         supabase.from("events").select("*").eq("id", eventId).maybeSingle(),
         supabase
           .from("event_guests")
-          .select("id, name, email")
+          .select("id, name, email, invite_token")
           .eq("event_id", eventId)
           .order("created_at", { ascending: true }),
+
       ]);
       if (error || !ev) {
         toast.error("Moment introuvable.");
