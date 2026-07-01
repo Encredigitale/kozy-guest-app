@@ -100,6 +100,8 @@ function NewEventPage() {
   // Step 3
   const [guests, setGuests] = useState<Guest[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [contactsLoading, setContactsLoading] = useState(true);
+  const [contactsError, setContactsError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [newContactOpen, setNewContactOpen] = useState(false);
@@ -110,6 +112,11 @@ function NewEventPage() {
     phone: "",
     group_type: "friends",
   });
+  const [newContactErrors, setNewContactErrors] = useState<{
+    email?: string;
+    phone?: string;
+    general?: string;
+  }>({});
   const [creatingContact, setCreatingContact] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -124,17 +131,38 @@ function NewEventPage() {
   useEffect(() => {
     let cancel = false;
     (async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("contacts")
         .select("id,first_name,last_name,email,phone,group_type,linked_user_id")
         .eq("owner_id", user.id)
         .order("first_name", { ascending: true });
-      if (!cancel && data) setContacts(data as Contact[]);
+      if (cancel) return;
+      if (error) {
+        setContactsError("Impossible de charger vos contacts. Réessayez.");
+      } else if (data) {
+        setContacts(data as Contact[]);
+      }
+      setContactsLoading(false);
     })();
     return () => {
       cancel = true;
     };
   }, [user.id]);
+
+  // Detect if the raw query looks like an email or phone attempt
+  const trimmedSearch = search.trim();
+  const looksLikeEmail = trimmedSearch.includes("@");
+  const looksLikePhone = /^[\d+\s().-]+$/.test(trimmedSearch) && /\d/.test(trimmedSearch);
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const PHONE_RE = /^\+?[\d\s().-]{6,}$/;
+  const searchFormatError =
+    trimmedSearch.length > 2
+      ? looksLikeEmail && !EMAIL_RE.test(trimmedSearch)
+        ? "Format d'email invalide."
+        : looksLikePhone && !PHONE_RE.test(trimmedSearch)
+          ? "Format de téléphone invalide."
+          : null
+      : null;
 
   const goNext = () => {
     if (step === 1 && !canNextFromStep1) {
