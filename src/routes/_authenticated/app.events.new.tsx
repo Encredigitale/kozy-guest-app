@@ -667,9 +667,96 @@ function NewEventPage() {
           </button>
         </div>
       )}
+
+      <Dialog open={newContactOpen} onOpenChange={setNewContactOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Créer un nouveau contact</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              <Field label="Prénom">
+                <Input
+                  autoFocus
+                  value={newContact.first_name}
+                  onChange={(e) =>
+                    setNewContact((n) => ({ ...n, first_name: e.target.value }))
+                  }
+                  className="h-11 rounded-2xl"
+                />
+              </Field>
+              <Field label="Nom">
+                <Input
+                  value={newContact.last_name}
+                  onChange={(e) =>
+                    setNewContact((n) => ({ ...n, last_name: e.target.value }))
+                  }
+                  className="h-11 rounded-2xl"
+                />
+              </Field>
+            </div>
+            <Field label="Email">
+              <Input
+                type="email"
+                value={newContact.email}
+                onChange={(e) =>
+                  setNewContact((n) => ({ ...n, email: e.target.value }))
+                }
+                className="h-11 rounded-2xl"
+              />
+            </Field>
+            <Field label="Téléphone">
+              <Input
+                value={newContact.phone}
+                onChange={(e) =>
+                  setNewContact((n) => ({ ...n, phone: e.target.value }))
+                }
+                className="h-11 rounded-2xl"
+              />
+            </Field>
+            <Field label="Groupe">
+              <Select
+                value={newContact.group_type}
+                onValueChange={(v) =>
+                  setNewContact((n) => ({ ...n, group_type: v }))
+                }
+              >
+                <SelectTrigger className="h-11 rounded-2xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="family">Famille</SelectItem>
+                  <SelectItem value="friends">Amis</SelectItem>
+                  <SelectItem value="colleagues">Collègues</SelectItem>
+                  <SelectItem value="neighbors">Voisins</SelectItem>
+                  <SelectItem value="other">Autre</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setNewContactOpen(false)}
+              disabled={creatingContact}
+            >
+              Annuler
+            </Button>
+            <Button onClick={createContact} disabled={creatingContact}>
+              {creatingContact ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <UserPlus className="h-4 w-4" />
+              )}
+              Créer et ajouter
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
 
 function ProgressHeader({
   progress,
