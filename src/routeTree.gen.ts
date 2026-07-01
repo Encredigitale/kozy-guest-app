@@ -21,8 +21,11 @@ import { Route as AuthenticatedAppWelcomeRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
 import { Route as AuthenticatedAppMemoriesRouteImport } from './routes/_authenticated/app.memories'
 import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/app.events.index'
+import { Route as AuthenticatedAppContactsIndexRouteImport } from './routes/_authenticated/app.contacts.index'
 import { Route as AuthenticatedAppEventsNewRouteImport } from './routes/_authenticated/app.events.new'
 import { Route as AuthenticatedAppEventsEventIdRouteImport } from './routes/_authenticated/app.events.$eventId'
+import { Route as AuthenticatedAppContactsNewRouteImport } from './routes/_authenticated/app.contacts.new'
+import { Route as AuthenticatedAppContactsContactIdRouteImport } from './routes/_authenticated/app.contacts.$contactId'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -85,6 +88,12 @@ const AuthenticatedAppEventsIndexRoute =
     path: '/events/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppContactsIndexRoute =
+  AuthenticatedAppContactsIndexRouteImport.update({
+    id: '/contacts/',
+    path: '/contacts/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppEventsNewRoute =
   AuthenticatedAppEventsNewRouteImport.update({
     id: '/events/new',
@@ -95,6 +104,18 @@ const AuthenticatedAppEventsEventIdRoute =
   AuthenticatedAppEventsEventIdRouteImport.update({
     id: '/events/$eventId',
     path: '/events/$eventId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppContactsNewRoute =
+  AuthenticatedAppContactsNewRouteImport.update({
+    id: '/contacts/new',
+    path: '/contacts/new',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppContactsContactIdRoute =
+  AuthenticatedAppContactsContactIdRouteImport.update({
+    id: '/contacts/$contactId',
+    path: '/contacts/$contactId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 
@@ -109,8 +130,11 @@ export interface FileRoutesByFullPath {
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/welcome': typeof AuthenticatedAppWelcomeRoute
   '/app/': typeof AuthenticatedAppIndexRoute
+  '/app/contacts/$contactId': typeof AuthenticatedAppContactsContactIdRoute
+  '/app/contacts/new': typeof AuthenticatedAppContactsNewRoute
   '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
+  '/app/contacts/': typeof AuthenticatedAppContactsIndexRoute
   '/app/events/': typeof AuthenticatedAppEventsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -123,8 +147,11 @@ export interface FileRoutesByTo {
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/welcome': typeof AuthenticatedAppWelcomeRoute
   '/app': typeof AuthenticatedAppIndexRoute
+  '/app/contacts/$contactId': typeof AuthenticatedAppContactsContactIdRoute
+  '/app/contacts/new': typeof AuthenticatedAppContactsNewRoute
   '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
+  '/app/contacts': typeof AuthenticatedAppContactsIndexRoute
   '/app/events': typeof AuthenticatedAppEventsIndexRoute
 }
 export interface FileRoutesById {
@@ -140,8 +167,11 @@ export interface FileRoutesById {
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
   '/_authenticated/app/welcome': typeof AuthenticatedAppWelcomeRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
+  '/_authenticated/app/contacts/$contactId': typeof AuthenticatedAppContactsContactIdRoute
+  '/_authenticated/app/contacts/new': typeof AuthenticatedAppContactsNewRoute
   '/_authenticated/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
   '/_authenticated/app/events/new': typeof AuthenticatedAppEventsNewRoute
+  '/_authenticated/app/contacts/': typeof AuthenticatedAppContactsIndexRoute
   '/_authenticated/app/events/': typeof AuthenticatedAppEventsIndexRoute
 }
 export interface FileRouteTypes {
@@ -157,8 +187,11 @@ export interface FileRouteTypes {
     | '/app/profile'
     | '/app/welcome'
     | '/app/'
+    | '/app/contacts/$contactId'
+    | '/app/contacts/new'
     | '/app/events/$eventId'
     | '/app/events/new'
+    | '/app/contacts/'
     | '/app/events/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -171,8 +204,11 @@ export interface FileRouteTypes {
     | '/app/profile'
     | '/app/welcome'
     | '/app'
+    | '/app/contacts/$contactId'
+    | '/app/contacts/new'
     | '/app/events/$eventId'
     | '/app/events/new'
+    | '/app/contacts'
     | '/app/events'
   id:
     | '__root__'
@@ -187,8 +223,11 @@ export interface FileRouteTypes {
     | '/_authenticated/app/profile'
     | '/_authenticated/app/welcome'
     | '/_authenticated/app/'
+    | '/_authenticated/app/contacts/$contactId'
+    | '/_authenticated/app/contacts/new'
     | '/_authenticated/app/events/$eventId'
     | '/_authenticated/app/events/new'
+    | '/_authenticated/app/contacts/'
     | '/_authenticated/app/events/'
   fileRoutesById: FileRoutesById
 }
@@ -287,6 +326,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppEventsIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/contacts/': {
+      id: '/_authenticated/app/contacts/'
+      path: '/contacts'
+      fullPath: '/app/contacts/'
+      preLoaderRoute: typeof AuthenticatedAppContactsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/events/new': {
       id: '/_authenticated/app/events/new'
       path: '/events/new'
@@ -301,6 +347,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppEventsEventIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/contacts/new': {
+      id: '/_authenticated/app/contacts/new'
+      path: '/contacts/new'
+      fullPath: '/app/contacts/new'
+      preLoaderRoute: typeof AuthenticatedAppContactsNewRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/contacts/$contactId': {
+      id: '/_authenticated/app/contacts/$contactId'
+      path: '/contacts/$contactId'
+      fullPath: '/app/contacts/$contactId'
+      preLoaderRoute: typeof AuthenticatedAppContactsContactIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
   }
 }
 
@@ -309,8 +369,11 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
   AuthenticatedAppWelcomeRoute: typeof AuthenticatedAppWelcomeRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+  AuthenticatedAppContactsContactIdRoute: typeof AuthenticatedAppContactsContactIdRoute
+  AuthenticatedAppContactsNewRoute: typeof AuthenticatedAppContactsNewRoute
   AuthenticatedAppEventsEventIdRoute: typeof AuthenticatedAppEventsEventIdRoute
   AuthenticatedAppEventsNewRoute: typeof AuthenticatedAppEventsNewRoute
+  AuthenticatedAppContactsIndexRoute: typeof AuthenticatedAppContactsIndexRoute
   AuthenticatedAppEventsIndexRoute: typeof AuthenticatedAppEventsIndexRoute
 }
 
@@ -319,8 +382,12 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
   AuthenticatedAppWelcomeRoute: AuthenticatedAppWelcomeRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+  AuthenticatedAppContactsContactIdRoute:
+    AuthenticatedAppContactsContactIdRoute,
+  AuthenticatedAppContactsNewRoute: AuthenticatedAppContactsNewRoute,
   AuthenticatedAppEventsEventIdRoute: AuthenticatedAppEventsEventIdRoute,
   AuthenticatedAppEventsNewRoute: AuthenticatedAppEventsNewRoute,
+  AuthenticatedAppContactsIndexRoute: AuthenticatedAppContactsIndexRoute,
   AuthenticatedAppEventsIndexRoute: AuthenticatedAppEventsIndexRoute,
 }
 

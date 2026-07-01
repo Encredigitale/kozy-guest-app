@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      contacts: {
+        Row: {
+          allergies: string | null
+          avatar_url: string | null
+          birth_date: string | null
+          created_at: string
+          dietary_preferences: string | null
+          email: string | null
+          favorite_drinks: string | null
+          first_name: string
+          group_type: Database["public"]["Enums"]["contact_group"]
+          id: string
+          invited_count: number
+          last_attended_at: string | null
+          last_contribution: string | null
+          last_invited_at: string | null
+          last_name: string | null
+          linked_user_id: string | null
+          notes: string | null
+          owner_id: string
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          allergies?: string | null
+          avatar_url?: string | null
+          birth_date?: string | null
+          created_at?: string
+          dietary_preferences?: string | null
+          email?: string | null
+          favorite_drinks?: string | null
+          first_name: string
+          group_type?: Database["public"]["Enums"]["contact_group"]
+          id?: string
+          invited_count?: number
+          last_attended_at?: string | null
+          last_contribution?: string | null
+          last_invited_at?: string | null
+          last_name?: string | null
+          linked_user_id?: string | null
+          notes?: string | null
+          owner_id: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          allergies?: string | null
+          avatar_url?: string | null
+          birth_date?: string | null
+          created_at?: string
+          dietary_preferences?: string | null
+          email?: string | null
+          favorite_drinks?: string | null
+          first_name?: string
+          group_type?: Database["public"]["Enums"]["contact_group"]
+          id?: string
+          invited_count?: number
+          last_attended_at?: string | null
+          last_contribution?: string | null
+          last_invited_at?: string | null
+          last_name?: string | null
+          linked_user_id?: string | null
+          notes?: string | null
+          owner_id?: string
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       event_contributions: {
         Row: {
           category: string
@@ -283,6 +352,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      contact_group: "family" | "friends" | "colleagues" | "neighbors" | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -411,6 +481,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      contact_group: ["family", "friends", "colleagues", "neighbors", "other"],
     },
   },
 } as const
