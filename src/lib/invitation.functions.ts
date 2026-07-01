@@ -1,15 +1,24 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
 // Public server functions for the dynamic invitation link:
 // /invitation/:eventId/:invitationId?token=<token>
+//
+// These call SECURITY DEFINER RPCs that validate the (event, invitation, token)
+// triple internally, so no service role key is required.
 
 const uuidSchema = z.string().uuid();
 const tokenSchema = z.string().min(8).max(128).regex(/^[a-zA-Z0-9_-]+$/);
 
-async function admin() {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  return supabaseAdmin;
+function publicClient() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) throw new Error("Supabase non configuré");
+  return createClient<Database>(url, key, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
 }
 
 export const INVITATION_ERROR = {
@@ -19,51 +28,49 @@ export const INVITATION_ERROR = {
   EVENT_MISSING: "EVENT_MISSING",
 } as const;
 
-async function resolveInvitation(
-  eventId: string,
-  invitationId: string,
-  token: string,
-  opts: { touch?: boolean } = {},
-) {
-  const sb = await admin();
-
-  const { data: guest } = await sb
-    .from("event_guests")
-    .select(
-      "id, event_id, name, email, invite_token, status, expires_at, last_opened_at, responded_at, rsvp_status",
-    )
-    .eq("id", invitationId)
-    .maybeSingle();
-
-  if (!guest || guest.event_id !== eventId || guest.invite_token !== token) {
-    throw new Error(INVITATION_ERROR.INVALID);
-  }
-  if (guest.status !== "active") {
-    throw new Error(INVITATION_ERROR.REVOKED);
-  }
-  if (guest.expires_at && new Date(guest.expires_at).getTime() < Date.now()) {
-    throw new Error(INVITATION_ERROR.EXPIRED);
-  }
-
-  const { data: ev } = await sb
-    .from("events")
-    .select(
-      "id, owner_id, title, event_type, event_subtype, event_at, location, description, menu_or_theme",
-    )
-    .eq("id", eventId)
-    .maybeSingle();
-
-  if (!ev) throw new Error(INVITATION_ERROR.EVENT_MISSING);
-
-  if (opts.touch) {
-    await sb
-      .from("event_guests")
-      .update({ last_opened_at: new Date().toISOString() })
-      .eq("id", guest.id);
-  }
-
-  return { ev, guest };
+function mapPgError(msg: string | undefined): string {
+  if (!msg) return "OTHER";
+  if (msg.includes("INVITATION_EXPIRED")) return INVITATION_ERROR.EXPIRED;
+  if (msg.includes("INVITATION_REVOKED")) return INVITATION_ERROR.REVOKED;
+  if (msg.includes("INVITATION_INVALID")) return INVITATION_ERROR.INVALID;
+  if (msg.includes("EVENT_MISSING")) return INVITATION_ERROR.EVENT_MISSING;
+  return msg;
 }
+
+type InvitationPayload = {
+  event: {
+    id: string;
+    title: string;
+    event_type: string;
+    event_subtype: string | null;
+    event_at: string;
+    location: string | null;
+    description: string | null;
+    menu_or_theme: string | null;
+  };
+  organizer: { first_name: string | null; last_name: string | null };
+  guest: {
+    id: string;
+    name: string;
+    responded_at: string | null;
+    rsvp_status: string | null;
+  };
+  contributions: Array<{
+    id: string;
+    category: string;
+    label: string;
+    claimed: boolean;
+    claimed_by_me: boolean;
+  }>;
+  stats: {
+    totalGuests: number;
+    confirmedGuests: number;
+    claimedContributions: number;
+    openContributions: number;
+  };
+  finished: boolean;
+  locked: boolean;
+};
 
 export const getInvitation = createServerFn({ method: "GET" })
   .inputValidator((d) =>
@@ -71,79 +78,16 @@ export const getInvitation = createServerFn({ method: "GET" })
       .object({ eventId: uuidSchema, invitationId: uuidSchema, token: tokenSchema })
       .parse(d),
   )
-  .handler(async ({ data }) => {
-    const { ev, guest } = await resolveInvitation(
-      data.eventId,
-      data.invitationId,
-      data.token,
-      { touch: true },
-    );
-    const sb = await admin();
-
-    const [{ data: guests }, { data: items }, { data: organizer }] = await Promise.all([
-      sb
-        .from("event_guests")
-        .select("id, rsvp_status")
-        .eq("event_id", ev.id),
-      sb
-        .from("event_contributions")
-        .select("id, category, label, claimed_by_name")
-        .eq("event_id", ev.id)
-        .order("created_at", { ascending: true }),
-      sb
-        .from("profiles")
-        .select("first_name, last_name")
-        .eq("id", ev.owner_id)
-        .maybeSingle(),
-    ]);
-
-    const now = Date.now();
-    const eventTime = new Date(ev.event_at).getTime();
-    const finished = eventTime < now - 12 * 3600 * 1000;
-
-    const total = guests?.length ?? 0;
-    const confirmed = (guests ?? []).filter((g) => g.rsvp_status === "yes").length;
-    const contribs = items ?? [];
-    const claimedCount = contribs.filter((c) => !!c.claimed_by_name).length;
-    const openCount = contribs.length - claimedCount;
-
-    return {
-      event: {
-        id: ev.id,
-        title: ev.title,
-        event_type: ev.event_type,
-        event_subtype: ev.event_subtype,
-        event_at: ev.event_at,
-        location: ev.location,
-        description: ev.description,
-        menu_or_theme: ev.menu_or_theme,
-      },
-      organizer: {
-        first_name: organizer?.first_name ?? null,
-        last_name: organizer?.last_name ?? null,
-      },
-      guest: {
-        id: guest.id,
-        name: guest.name,
-        responded_at: guest.responded_at,
-        rsvp_status: guest.rsvp_status,
-      },
-      contributions: contribs.map((i) => ({
-        id: i.id,
-        category: i.category,
-        label: i.label,
-        claimed: i.claimed_by_name !== null && i.claimed_by_name !== "",
-        claimed_by_me: i.claimed_by_name === guest.name,
-      })),
-      stats: {
-        totalGuests: total,
-        confirmedGuests: confirmed,
-        claimedContributions: claimedCount,
-        openContributions: openCount,
-      },
-      finished,
-      locked: finished,
-    };
+  .handler(async ({ data }): Promise<InvitationPayload> => {
+    const sb = publicClient();
+    // rpc typed via generated types
+    const { data: result, error } = await sb.rpc("invitation_get", {
+      p_event_id: data.eventId,
+      p_invitation_id: data.invitationId,
+      p_token: data.token,
+    });
+    if (error) throw new Error(mapPgError(error.message));
+    return result as unknown as InvitationPayload;
   });
 
 export const respondToInvitation = createServerFn({ method: "POST" })
@@ -158,33 +102,15 @@ export const respondToInvitation = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const { ev, guest } = await resolveInvitation(
-      data.eventId,
-      data.invitationId,
-      data.token,
-    );
-    if (new Date(ev.event_at).getTime() < Date.now() - 12 * 3600 * 1000) {
-      throw new Error(INVITATION_ERROR.EXPIRED);
-    }
-    const sb = await admin();
-
-    const { data: rsvp, error: rErr } = await sb
-      .from("event_rsvps")
-      .insert({ event_id: ev.id, guest_name: guest.name, status: data.status })
-      .select("id")
-      .single();
-    if (rErr || !rsvp) throw new Error("Enregistrement impossible");
-
-    const { error: uErr } = await sb
-      .from("event_guests")
-      .update({
-        responded_at: new Date().toISOString(),
-        rsvp_status: data.status,
-        rsvp_id: rsvp.id,
-      })
-      .eq("id", guest.id);
-    if (uErr) throw new Error("Mise à jour impossible");
-
+    const sb = publicClient();
+    // rpc typed via generated types
+    const { error } = await sb.rpc("invitation_respond", {
+      p_event_id: data.eventId,
+      p_invitation_id: data.invitationId,
+      p_token: data.token,
+      p_status: data.status,
+    });
+    if (error) throw new Error(mapPgError(error.message));
     return { ok: true };
   });
 
@@ -195,35 +121,20 @@ export const claimInvitationContribution = createServerFn({ method: "POST" })
         eventId: uuidSchema,
         invitationId: uuidSchema,
         token: tokenSchema,
-        // null = unclaim any current pick
         contributionId: uuidSchema.nullable(),
       })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const { ev, guest } = await resolveInvitation(
-      data.eventId,
-      data.invitationId,
-      data.token,
-    );
-    const sb = await admin();
-
-    // Release previous claims for this guest (single-select model)
-    await sb
-      .from("event_contributions")
-      .update({ claimed_by_name: null })
-      .eq("event_id", ev.id)
-      .eq("claimed_by_name", guest.name);
-
-    if (data.contributionId) {
-      const { error } = await sb
-        .from("event_contributions")
-        .update({ claimed_by_name: guest.name })
-        .eq("id", data.contributionId)
-        .eq("event_id", ev.id)
-        .is("claimed_by_name", null);
-      if (error) throw new Error("Mise à jour impossible");
-    }
+    const sb = publicClient();
+    // rpc typed via generated types
+    const { error } = await sb.rpc("invitation_claim_contribution", {
+      p_event_id: data.eventId,
+      p_invitation_id: data.invitationId,
+      p_token: data.token,
+      p_contribution_id: data.contributionId,
+    } as never);
+    if (error) throw new Error(mapPgError(error.message));
     return { ok: true };
   });
 
@@ -239,28 +150,14 @@ export const addCustomContribution = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const { ev, guest } = await resolveInvitation(
-      data.eventId,
-      data.invitationId,
-      data.token,
-    );
-    const sb = await admin();
-
-    // Release previous picks
-    await sb
-      .from("event_contributions")
-      .update({ claimed_by_name: null })
-      .eq("event_id", ev.id)
-      .eq("claimed_by_name", guest.name);
-
-    const { error } = await sb.from("event_contributions").insert({
-      event_id: ev.id,
-      category: "autre",
-      label: data.label,
-      claimed_by_name: guest.name,
-      proposed_by_name: guest.name,
+    const sb = publicClient();
+    // rpc typed via generated types
+    const { error } = await sb.rpc("invitation_add_custom_contribution", {
+      p_event_id: data.eventId,
+      p_invitation_id: data.invitationId,
+      p_token: data.token,
+      p_label: data.label,
     });
-    if (error) throw new Error("Ajout impossible");
-
+    if (error) throw new Error(mapPgError(error.message));
     return { ok: true };
   });
