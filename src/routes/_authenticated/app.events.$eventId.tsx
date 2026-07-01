@@ -197,7 +197,7 @@ function EventDetailPage() {
     const { data, error } = await supabase
       .from("event_guests")
       .insert({ event_id: eventId, name, email: null })
-      .select("id, name, email")
+      .select("id, name, email, invite_token")
       .single();
     if (error || !data) {
       toast.error("Ajout impossible.");
@@ -207,6 +207,7 @@ function EventDetailPage() {
     setGuestInput("");
     setGuestEmailInput("");
   };
+
 
   const removeGuest = async (id: string) => {
     const { error } = await supabase.from("event_guests").delete().eq("id", id);
