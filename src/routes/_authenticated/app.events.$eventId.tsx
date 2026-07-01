@@ -451,15 +451,31 @@ function EventDetailPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     {g.email && (
-                      <button
-                        type="button"
-                        onClick={() => copyInvite(personalInviteUrl(g))}
-                        className="p-1 text-muted-foreground hover:text-primary"
-                        title="Copier le lien personnel"
-                        aria-label={`Copier le lien personnel pour ${g.name}`}
-                      >
-                        <Copy className="h-4 w-4" />
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => copyInvite(personalInviteUrl(g))}
+                          className="p-1 text-muted-foreground hover:text-primary"
+                          title="Copier le lien personnel"
+                          aria-label={`Copier le lien personnel pour ${g.name}`}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => resendInvite(g)}
+                          disabled={resendingId === g.id}
+                          className="p-1 text-muted-foreground hover:text-primary disabled:opacity-50"
+                          title="Renvoyer l'invitation par email"
+                          aria-label={`Renvoyer l'invitation à ${g.name}`}
+                        >
+                          {resendingId === g.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Mail className="h-4 w-4" />
+                          )}
+                        </button>
+                      </>
                     )}
                     <button
                       type="button"
