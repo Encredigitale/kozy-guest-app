@@ -100,6 +100,8 @@ function NewEventPage() {
   // Step 3
   const [guests, setGuests] = useState<Guest[]>([]);
   const [contacts, setContacts] = useState<Contact[]>([]);
+  const [contactsLoading, setContactsLoading] = useState(true);
+  const [contactsError, setContactsError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [newContactOpen, setNewContactOpen] = useState(false);
@@ -110,6 +112,11 @@ function NewEventPage() {
     phone: "",
     group_type: "friends",
   });
+  const [newContactErrors, setNewContactErrors] = useState<{
+    email?: string;
+    phone?: string;
+    general?: string;
+  }>({});
   const [creatingContact, setCreatingContact] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -124,17 +131,38 @@ function NewEventPage() {
   useEffect(() => {
     let cancel = false;
     (async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("contacts")
         .select("id,first_name,last_name,email,phone,group_type,linked_user_id")
         .eq("owner_id", user.id)
         .order("first_name", { ascending: true });
-      if (!cancel && data) setContacts(data as Contact[]);
+      if (cancel) return;
+      if (error) {
+        setContactsError("Impossible de charger vos contacts. Réessayez.");
+      } else if (data) {
+        setContacts(data as Contact[]);
+      }
+      setContactsLoading(false);
     })();
     return () => {
       cancel = true;
     };
   }, [user.id]);
+
+  // Detect if the raw query looks like an email or phone attempt
+  const trimmedSearch = search.trim();
+  const looksLikeEmail = trimmedSearch.includes("@");
+  const looksLikePhone = /^[\d+\s().-]+$/.test(trimmedSearch) && /\d/.test(trimmedSearch);
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const PHONE_RE = /^\+?[\d\s().-]{6,}$/;
+  const searchFormatError =
+    trimmedSearch.length > 2
+      ? looksLikeEmail && !EMAIL_RE.test(trimmedSearch)
+        ? "Format d'email invalide."
+        : looksLikePhone && !PHONE_RE.test(trimmedSearch)
+          ? "Format de téléphone invalide."
+          : null
+      : null;
 
   const goNext = () => {
     if (step === 1 && !canNextFromStep1) {
@@ -186,23 +214,40 @@ function NewEventPage() {
 
   const openCreateContact = () => {
     const q = search.trim();
-    // Guess: if contains @, use as email, else as first name
+    setNewContactErrors({});
+    // Guess: if contains @, use as email; if digits, phone; else first name
     if (q.includes("@")) {
-      setNewContact((n) => ({ ...n, email: q, first_name: "" }));
+      setNewContact((n) => ({ ...n, email: q, phone: "", first_name: "" }));
+    } else if (looksLikePhone) {
+      setNewContact((n) => ({ ...n, phone: q, email: "", first_name: "" }));
     } else {
-      setNewContact((n) => ({ ...n, first_name: q, email: "" }));
+      setNewContact((n) => ({ ...n, first_name: q, email: "", phone: "" }));
     }
     setSearchOpen(false);
     setNewContactOpen(true);
   };
 
+
   const createContact = async () => {
     const first = newContact.first_name.trim();
     const email = newContact.email.trim();
-    if (!first && !email) {
-      toast.error("Ajoutez au moins un prénom ou un email.");
+    const phone = newContact.phone.trim();
+    const errors: typeof newContactErrors = {};
+    if (email && !EMAIL_RE.test(email)) {
+      errors.email = "Format d'email invalide.";
+    }
+    if (phone && !PHONE_RE.test(phone)) {
+      errors.phone = "Format de téléphone invalide (6 chiffres minimum).";
+    }
+    if (!first && !email && !phone) {
+      errors.general =
+        "Ajoutez au moins un prénom, un email ou un téléphone.";
+    }
+    if (Object.keys(errors).length > 0) {
+      setNewContactErrors(errors);
       return;
     }
+    setNewContactErrors({});
     setCreatingContact(true);
     const { data, error } = await supabase
       .from("contacts")
@@ -211,14 +256,19 @@ function NewEventPage() {
         first_name: first || (email ? email.split("@")[0] : "Invité"),
         last_name: newContact.last_name.trim() || null,
         email: email || null,
-        phone: newContact.phone.trim() || null,
+        phone: phone || null,
         group_type: (newContact.group_type || null) as never,
       })
       .select("id,first_name,last_name,email,phone,group_type,linked_user_id")
       .single();
     setCreatingContact(false);
     if (error || !data) {
-      toast.error("Impossible de créer le contact.");
+      setNewContactErrors({
+        general:
+          error?.message?.includes("duplicate")
+            ? "Un contact avec cet email ou téléphone existe déjà."
+            : "Impossible de créer le contact. Réessayez.",
+      });
       return;
     }
     const c = data as Contact;
@@ -234,6 +284,7 @@ function NewEventPage() {
     setNewContactOpen(false);
     toast.success("Contact ajouté à votre carnet.");
   };
+
 
 
   const createEvent = async () => {
@@ -506,12 +557,51 @@ function NewEventPage() {
                   onOpenAutoFocus={(e) => e.preventDefault()}
                   className="p-0 w-[--radix-popover-trigger-width] max-h-72 overflow-y-auto"
                 >
-                  {filteredContacts.length === 0 ? (
+                  {contactsLoading ? (
+                    <div className="p-6 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <p className="text-sm">Chargement de votre carnet…</p>
+                    </div>
+                  ) : contactsError ? (
                     <div className="p-3 space-y-2">
-                      <p className="text-sm text-muted-foreground">
-                        {search.trim()
-                          ? "Aucun contact trouvé."
-                          : "Votre carnet est vide."}
+                      <p className="text-sm text-destructive">{contactsError}</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full rounded-2xl"
+                        onClick={() => {
+                          setContactsLoading(true);
+                          setContactsError(null);
+                          supabase
+                            .from("contacts")
+                            .select(
+                              "id,first_name,last_name,email,phone,group_type,linked_user_id",
+                            )
+                            .eq("owner_id", user.id)
+                            .order("first_name", { ascending: true })
+                            .then(({ data, error }) => {
+                              if (error) {
+                                setContactsError(
+                                  "Impossible de charger vos contacts. Réessayez.",
+                                );
+                              } else if (data) {
+                                setContacts(data as Contact[]);
+                              }
+                              setContactsLoading(false);
+                            });
+                        }}
+                      >
+                        Réessayer
+                      </Button>
+                    </div>
+                  ) : searchFormatError ? (
+                    <div className="p-3 space-y-2">
+                      <p className="text-sm text-destructive">
+                        {searchFormatError}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Vous pouvez tout de même créer un contact avec ces
+                        informations.
                       </p>
                       <Button
                         type="button"
@@ -521,6 +611,38 @@ function NewEventPage() {
                       >
                         <UserPlus className="h-4 w-4" /> Créer un nouveau
                         contact
+                      </Button>
+                    </div>
+                  ) : filteredContacts.length === 0 ? (
+                    <div className="p-4 space-y-3 text-center">
+                      <div className="mx-auto w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                        <Search className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium">
+                          {trimmedSearch
+                            ? "Aucun contact trouvé"
+                            : contacts.length === 0
+                              ? "Votre carnet est vide"
+                              : "Commencez à taper pour rechercher"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {trimmedSearch
+                            ? `Aucun contact ne correspond à « ${trimmedSearch} ».`
+                            : contacts.length === 0
+                              ? "Créez votre premier contact pour l'ajouter à ce moment."
+                              : "Nom, email ou téléphone."}
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full rounded-2xl"
+                        onClick={openCreateContact}
+                      >
+                        <UserPlus className="h-4 w-4" /> Créer un nouveau
+                        contact
+                        {trimmedSearch ? ` « ${trimmedSearch} »` : ""}
                       </Button>
                     </div>
                   ) : (
@@ -585,12 +707,13 @@ function NewEventPage() {
                         >
                           <UserPlus className="h-4 w-4" /> Créer un nouveau
                           contact
-                          {search.trim() ? ` « ${search.trim()} »` : ""}
+                          {trimmedSearch ? ` « ${trimmedSearch} »` : ""}
                         </Button>
                       </div>
                     </div>
                   )}
                 </PopoverContent>
+
               </Popover>
               <p className="text-xs text-muted-foreground">
                 Un lien d'invitation sera généré après création — vous pourrez
@@ -699,21 +822,44 @@ function NewEventPage() {
               <Input
                 type="email"
                 value={newContact.email}
-                onChange={(e) =>
-                  setNewContact((n) => ({ ...n, email: e.target.value }))
-                }
-                className="h-11 rounded-2xl"
+                onChange={(e) => {
+                  setNewContact((n) => ({ ...n, email: e.target.value }));
+                  if (newContactErrors.email)
+                    setNewContactErrors((er) => ({ ...er, email: undefined }));
+                }}
+                aria-invalid={!!newContactErrors.email}
+                className={cn(
+                  "h-11 rounded-2xl",
+                  newContactErrors.email && "border-destructive",
+                )}
               />
+              {newContactErrors.email && (
+                <p className="text-xs text-destructive mt-1">
+                  {newContactErrors.email}
+                </p>
+              )}
             </Field>
             <Field label="Téléphone">
               <Input
                 value={newContact.phone}
-                onChange={(e) =>
-                  setNewContact((n) => ({ ...n, phone: e.target.value }))
-                }
-                className="h-11 rounded-2xl"
+                onChange={(e) => {
+                  setNewContact((n) => ({ ...n, phone: e.target.value }));
+                  if (newContactErrors.phone)
+                    setNewContactErrors((er) => ({ ...er, phone: undefined }));
+                }}
+                aria-invalid={!!newContactErrors.phone}
+                className={cn(
+                  "h-11 rounded-2xl",
+                  newContactErrors.phone && "border-destructive",
+                )}
               />
+              {newContactErrors.phone && (
+                <p className="text-xs text-destructive mt-1">
+                  {newContactErrors.phone}
+                </p>
+              )}
             </Field>
+
             <Field label="Groupe">
               <Select
                 value={newContact.group_type}
@@ -733,6 +879,11 @@ function NewEventPage() {
                 </SelectContent>
               </Select>
             </Field>
+            {newContactErrors.general && (
+              <div className="rounded-xl bg-destructive/10 text-destructive text-sm px-3 py-2">
+                {newContactErrors.general}
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button
