@@ -818,21 +818,44 @@ function NewEventPage() {
               <Input
                 type="email"
                 value={newContact.email}
-                onChange={(e) =>
-                  setNewContact((n) => ({ ...n, email: e.target.value }))
-                }
-                className="h-11 rounded-2xl"
+                onChange={(e) => {
+                  setNewContact((n) => ({ ...n, email: e.target.value }));
+                  if (newContactErrors.email)
+                    setNewContactErrors((er) => ({ ...er, email: undefined }));
+                }}
+                aria-invalid={!!newContactErrors.email}
+                className={cn(
+                  "h-11 rounded-2xl",
+                  newContactErrors.email && "border-destructive",
+                )}
               />
+              {newContactErrors.email && (
+                <p className="text-xs text-destructive mt-1">
+                  {newContactErrors.email}
+                </p>
+              )}
             </Field>
             <Field label="Téléphone">
               <Input
                 value={newContact.phone}
-                onChange={(e) =>
-                  setNewContact((n) => ({ ...n, phone: e.target.value }))
-                }
-                className="h-11 rounded-2xl"
+                onChange={(e) => {
+                  setNewContact((n) => ({ ...n, phone: e.target.value }));
+                  if (newContactErrors.phone)
+                    setNewContactErrors((er) => ({ ...er, phone: undefined }));
+                }}
+                aria-invalid={!!newContactErrors.phone}
+                className={cn(
+                  "h-11 rounded-2xl",
+                  newContactErrors.phone && "border-destructive",
+                )}
               />
+              {newContactErrors.phone && (
+                <p className="text-xs text-destructive mt-1">
+                  {newContactErrors.phone}
+                </p>
+              )}
             </Field>
+
             <Field label="Groupe">
               <Select
                 value={newContact.group_type}
