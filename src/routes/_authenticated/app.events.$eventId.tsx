@@ -316,16 +316,6 @@ function EventDetailPage() {
         </AlertDialog>
       </div>
 
-      <Card className="mb-6 border-primary/40">
-        <CardHeader>
-          <CardTitle className="text-base">Liens d'invitation</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Chaque invité·e reçoit un lien personnel et sécurisé. Retrouve-les dans la liste ci-dessous.
-          </p>
-        </CardContent>
-      </Card>
 
 
       <form onSubmit={onSave} className="space-y-6">
