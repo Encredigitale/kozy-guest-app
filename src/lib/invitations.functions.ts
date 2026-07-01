@@ -28,18 +28,23 @@ export const sendEventInvitation = createServerFn({ method: "POST" })
 
     const { data: event, error: evErr } = await supabase
       .from("events")
-      .select("id, title, event_at, location, invite_token, owner_id")
+      .select("id, title, event_at, location, owner_id")
       .eq("id", data.eventId)
       .maybeSingle();
     if (evErr || !event || event.owner_id !== userId) {
       throw new Error("Moment introuvable");
     }
 
-    type GuestRow = { id: string; name: string; email: string | null };
+    type GuestRow = {
+      id: string;
+      name: string;
+      email: string | null;
+      invite_token: string;
+    };
     let guest: GuestRow;
     const { data: existing } = await supabase
       .from("event_guests")
-      .select("id, name, email")
+      .select("id, name, email, invite_token")
       .eq("event_id", data.eventId)
       .eq("email", data.email)
       .maybeSingle();
@@ -49,7 +54,7 @@ export const sendEventInvitation = createServerFn({ method: "POST" })
       const { data: inserted, error: insErr } = await supabase
         .from("event_guests")
         .insert({ event_id: data.eventId, name: data.name, email: data.email })
-        .select("id, name, email")
+        .select("id, name, email, invite_token")
         .single();
       if (insErr || !inserted) throw new Error("Ajout impossible");
       guest = inserted as GuestRow;
@@ -59,7 +64,8 @@ export const sendEventInvitation = createServerFn({ method: "POST" })
       process.env.SITE_URL ||
       process.env.VITE_SITE_URL ||
       "https://friendly-guest-buddy.lovable.app";
-    const inviteUrl = `${origin}/i/${event.invite_token}?g=${guest.id}`;
+    const inviteUrl = `${origin}/invitation/${event.id}/${guest.id}?token=${guest.invite_token}`;
+
 
     const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
     const BREVO_API_KEY = process.env.BREVO_API_KEY;

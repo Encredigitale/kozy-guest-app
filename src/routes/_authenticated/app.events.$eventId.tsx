@@ -46,7 +46,7 @@ export const Route = createFileRoute("/_authenticated/app/events/$eventId")({
   component: EventDetailPage,
 });
 
-type Guest = { id: string; name: string; email: string | null };
+type Guest = { id: string; name: string; email: string | null; invite_token: string };
 type Rsvp = {
   id: string;
   guest_name: string;
@@ -120,9 +120,10 @@ function EventDetailPage() {
         supabase.from("events").select("*").eq("id", eventId).maybeSingle(),
         supabase
           .from("event_guests")
-          .select("id, name, email")
+          .select("id, name, email, invite_token")
           .eq("event_id", eventId)
           .order("created_at", { ascending: true }),
+
       ]);
       if (error || !ev) {
         toast.error("Moment introuvable.");
@@ -196,7 +197,7 @@ function EventDetailPage() {
     const { data, error } = await supabase
       .from("event_guests")
       .insert({ event_id: eventId, name, email: null })
-      .select("id, name, email")
+      .select("id, name, email, invite_token")
       .single();
     if (error || !data) {
       toast.error("Ajout impossible.");
@@ -206,6 +207,7 @@ function EventDetailPage() {
     setGuestInput("");
     setGuestEmailInput("");
   };
+
 
   const removeGuest = async (id: string) => {
     const { error } = await supabase.from("event_guests").delete().eq("id", id);
@@ -226,13 +228,11 @@ function EventDetailPage() {
     navigate({ to: "/app" });
   };
 
-  const inviteUrl =
-    typeof window !== "undefined" && inviteToken
-      ? `${window.location.origin}/i/${inviteToken}`
-      : "";
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
 
-  const personalInviteUrl = (guestId: string) =>
-    inviteUrl ? `${inviteUrl}?g=${guestId}` : "";
+  const personalInviteUrl = (guest: Guest) =>
+    origin ? `${origin}/invitation/${eventId}/${guest.id}?token=${guest.invite_token}` : "";
+
 
   const copyInvite = async (url: string) => {
     try {
@@ -317,17 +317,15 @@ function EventDetailPage() {
 
       <Card className="mb-6 border-primary/40">
         <CardHeader>
-          <CardTitle className="text-base">Lien d'invitation</CardTitle>
+          <CardTitle className="text-base">Liens d'invitation</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent>
           <p className="text-sm text-muted-foreground">
-            Partage ce lien pour que tes invités répondent et proposent ce qu'ils apportent — sans créer de compte.
+            Chaque invité·e reçoit un lien personnel et sécurisé. Retrouve-les dans la liste ci-dessous.
           </p>
-          <Button type="button" variant="outline" onClick={() => copyInvite(inviteUrl)} disabled={!inviteUrl}>
-            <Copy className="h-4 w-4" /> Cliquer pour copier le lien générique
-          </Button>
         </CardContent>
       </Card>
+
 
       <form onSubmit={onSave} className="space-y-6">
         <Card>
@@ -448,7 +446,7 @@ function EventDetailPage() {
                     {g.email && (
                       <button
                         type="button"
-                        onClick={() => copyInvite(personalInviteUrl(g.id))}
+                        onClick={() => copyInvite(personalInviteUrl(g))}
                         className="p-1 text-muted-foreground hover:text-primary"
                         title="Copier le lien personnel"
                         aria-label={`Copier le lien personnel pour ${g.name}`}
