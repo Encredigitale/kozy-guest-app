@@ -228,13 +228,11 @@ function EventDetailPage() {
     navigate({ to: "/app" });
   };
 
-  const inviteUrl =
-    typeof window !== "undefined" && inviteToken
-      ? `${window.location.origin}/i/${inviteToken}`
-      : "";
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
 
-  const personalInviteUrl = (guestId: string) =>
-    inviteUrl ? `${inviteUrl}?g=${guestId}` : "";
+  const personalInviteUrl = (guest: Guest) =>
+    origin ? `${origin}/invitation/${eventId}/${guest.id}?token=${guest.invite_token}` : "";
+
 
   const copyInvite = async (url: string) => {
     try {
