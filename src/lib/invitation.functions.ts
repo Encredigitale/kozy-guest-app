@@ -3,9 +3,6 @@ import { z } from "zod";
 
 // Public server functions for the dynamic invitation link:
 // /invitation/:eventId/:invitationId?token=<token>
-//
-// invitationId = event_guests.id
-// token        = event_guests.invite_token (unique)
 
 const uuidSchema = z.string().uuid();
 const tokenSchema = z.string().min(8).max(128).regex(/^[a-zA-Z0-9_-]+$/);
@@ -51,7 +48,7 @@ async function resolveInvitation(
   const { data: ev } = await sb
     .from("events")
     .select(
-      "id, title, event_type, event_subtype, event_at, location, description, menu_or_theme",
+      "id, owner_id, title, event_type, event_subtype, event_at, location, description, menu_or_theme",
     )
     .eq("id", eventId)
     .maybeSingle();
@@ -83,20 +80,32 @@ export const getInvitation = createServerFn({ method: "GET" })
     );
     const sb = await admin();
 
-    const [{ data: guests }, { data: items }] = await Promise.all([
+    const [{ data: guests }, { data: items }, { data: organizer }] = await Promise.all([
       sb
         .from("event_guests")
-        .select("id, name, responded_at, rsvp_status")
-        .eq("event_id", ev.id)
-        .order("created_at", { ascending: true }),
+        .select("id, rsvp_status")
+        .eq("event_id", ev.id),
       sb
         .from("event_contributions")
         .select("id, category, label, claimed_by_name")
         .eq("event_id", ev.id)
         .order("created_at", { ascending: true }),
+      sb
+        .from("profiles")
+        .select("first_name, last_name")
+        .eq("id", ev.owner_id)
+        .maybeSingle(),
     ]);
 
-    const eventEndPassed = new Date(ev.event_at).getTime() < Date.now() - 24 * 3600 * 1000;
+    const now = Date.now();
+    const eventTime = new Date(ev.event_at).getTime();
+    const finished = eventTime < now - 12 * 3600 * 1000;
+
+    const total = guests?.length ?? 0;
+    const confirmed = (guests ?? []).filter((g) => g.rsvp_status === "yes").length;
+    const contribs = items ?? [];
+    const claimedCount = contribs.filter((c) => !!c.claimed_by_name).length;
+    const openCount = contribs.length - claimedCount;
 
     return {
       event: {
@@ -109,26 +118,31 @@ export const getInvitation = createServerFn({ method: "GET" })
         description: ev.description,
         menu_or_theme: ev.menu_or_theme,
       },
+      organizer: {
+        first_name: organizer?.first_name ?? null,
+        last_name: organizer?.last_name ?? null,
+      },
       guest: {
         id: guest.id,
         name: guest.name,
         responded_at: guest.responded_at,
         rsvp_status: guest.rsvp_status,
       },
-      guests: (guests ?? []).map((g) => ({
-        id: g.id,
-        name: g.name,
-        responded_at: g.responded_at,
-        rsvp_status: g.rsvp_status,
-      })),
-      contributions: (items ?? []).map((i) => ({
+      contributions: contribs.map((i) => ({
         id: i.id,
         category: i.category,
         label: i.label,
         claimed: i.claimed_by_name !== null && i.claimed_by_name !== "",
         claimed_by_me: i.claimed_by_name === guest.name,
       })),
-      locked: eventEndPassed,
+      stats: {
+        totalGuests: total,
+        confirmedGuests: confirmed,
+        claimedContributions: claimedCount,
+        openContributions: openCount,
+      },
+      finished,
+      locked: finished,
     };
   });
 
@@ -149,20 +163,14 @@ export const respondToInvitation = createServerFn({ method: "POST" })
       data.invitationId,
       data.token,
     );
-    // Event finished more than 24h ago -> lock
-    if (new Date(ev.event_at).getTime() < Date.now() - 24 * 3600 * 1000) {
+    if (new Date(ev.event_at).getTime() < Date.now() - 12 * 3600 * 1000) {
       throw new Error(INVITATION_ERROR.EXPIRED);
     }
     const sb = await admin();
 
-    // Insert or update an RSVP row for this guest.
     const { data: rsvp, error: rErr } = await sb
       .from("event_rsvps")
-      .insert({
-        event_id: ev.id,
-        guest_name: guest.name,
-        status: data.status,
-      })
+      .insert({ event_id: ev.id, guest_name: guest.name, status: data.status })
       .select("id")
       .single();
     if (rErr || !rsvp) throw new Error("Enregistrement impossible");
@@ -180,14 +188,15 @@ export const respondToInvitation = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const claimInvitationContributions = createServerFn({ method: "POST" })
+export const claimInvitationContribution = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z
       .object({
         eventId: uuidSchema,
         invitationId: uuidSchema,
         token: tokenSchema,
-        contributionIds: z.array(uuidSchema).max(50),
+        // null = unclaim any current pick
+        contributionId: uuidSchema.nullable(),
       })
       .parse(d),
   )
@@ -199,21 +208,59 @@ export const claimInvitationContributions = createServerFn({ method: "POST" })
     );
     const sb = await admin();
 
-    // Release my previous claims for this event, then claim the selected ones.
+    // Release previous claims for this guest (single-select model)
     await sb
       .from("event_contributions")
       .update({ claimed_by_name: null })
       .eq("event_id", ev.id)
       .eq("claimed_by_name", guest.name);
 
-    if (data.contributionIds.length > 0) {
+    if (data.contributionId) {
       const { error } = await sb
         .from("event_contributions")
         .update({ claimed_by_name: guest.name })
-        .in("id", data.contributionIds)
+        .eq("id", data.contributionId)
         .eq("event_id", ev.id)
         .is("claimed_by_name", null);
       if (error) throw new Error("Mise à jour impossible");
     }
+    return { ok: true };
+  });
+
+export const addCustomContribution = createServerFn({ method: "POST" })
+  .inputValidator((d) =>
+    z
+      .object({
+        eventId: uuidSchema,
+        invitationId: uuidSchema,
+        token: tokenSchema,
+        label: z.string().trim().min(2).max(80),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { ev, guest } = await resolveInvitation(
+      data.eventId,
+      data.invitationId,
+      data.token,
+    );
+    const sb = await admin();
+
+    // Release previous picks
+    await sb
+      .from("event_contributions")
+      .update({ claimed_by_name: null })
+      .eq("event_id", ev.id)
+      .eq("claimed_by_name", guest.name);
+
+    const { error } = await sb.from("event_contributions").insert({
+      event_id: ev.id,
+      category: "autre",
+      label: data.label,
+      claimed_by_name: guest.name,
+      proposed_by_name: guest.name,
+    });
+    if (error) throw new Error("Ajout impossible");
+
     return { ok: true };
   });

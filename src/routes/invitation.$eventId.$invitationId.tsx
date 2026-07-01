@@ -1,27 +1,32 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  claimInvitationContributions,
+  addCustomContribution,
+  claimInvitationContribution,
   getInvitation,
   INVITATION_ERROR,
   respondToInvitation,
 } from "@/lib/invitation.functions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Calendar, Check, Loader2, MapPin } from "lucide-react";
-import { contributionCategoryLabel } from "@/lib/contribution-categories";
+import {
+  Calendar,
+  CalendarX2,
+  Check,
+  Gift,
+  Loader2,
+  MapPin,
+  PartyPopper,
+  Sparkles,
+  Users,
+  X,
+} from "lucide-react";
 import { eventTypeLabel } from "@/lib/event-types";
+import { contributionCategoryLabel } from "@/lib/contribution-categories";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/invitation/$eventId/$invitationId")({
   head: () => ({ meta: [{ title: "Invitation — Kosy" }] }),
@@ -34,21 +39,49 @@ export const Route = createFileRoute("/invitation/$eventId/$invitationId")({
 type InvitationData = Awaited<ReturnType<typeof getInvitation>>;
 type ErrorKind = "INVALID" | "EXPIRED" | "REVOKED" | "EVENT_MISSING" | "OTHER";
 
+// Emoji + gradient per event type — a lightweight "illustration"
+const HERO: Record<string, { emoji: string; from: string; to: string }> = {
+  diner: { emoji: "🍽️", from: "from-amber-200", to: "to-rose-200" },
+  dejeuner: { emoji: "🥗", from: "from-lime-200", to: "to-amber-200" },
+  brunch: { emoji: "🥐", from: "from-orange-200", to: "to-yellow-100" },
+  apero: { emoji: "🥂", from: "from-rose-200", to: "to-orange-200" },
+  apero_dinatoire: { emoji: "🍾", from: "from-rose-200", to: "to-amber-200" },
+  cremaillere: { emoji: "🏡", from: "from-emerald-200", to: "to-amber-100" },
+  anniv_adulte: { emoji: "🎉", from: "from-fuchsia-200", to: "to-orange-200" },
+  anniv_enfant: { emoji: "🎈", from: "from-sky-200", to: "to-rose-200" },
+  noel: { emoji: "🎄", from: "from-emerald-200", to: "to-rose-200" },
+  nouvel_an: { emoji: "✨", from: "from-indigo-200", to: "to-amber-200" },
+  pro: { emoji: "🤝", from: "from-slate-200", to: "to-sky-100" },
+  autre: { emoji: "🌿", from: "from-emerald-100", to: "to-amber-100" },
+};
+
+function heroFor(type: string) {
+  return HERO[type] ?? HERO.autre;
+}
+
+function organizerName(o: InvitationData["organizer"]): string {
+  const f = (o.first_name ?? "").trim();
+  const l = (o.last_name ?? "").trim();
+  if (f && l) return `${f} ${l.charAt(0)}.`;
+  return f || l || "Votre hôte";
+}
+
 function InvitationPage() {
   const { eventId, invitationId } = Route.useParams();
   const { token } = Route.useSearch();
   const navigate = useNavigate();
   const fetchInvitation = useServerFn(getInvitation);
   const respondFn = useServerFn(respondToInvitation);
-  const claimFn = useServerFn(claimInvitationContributions);
+  const claimFn = useServerFn(claimInvitationContribution);
+  const addCustomFn = useServerFn(addCustomContribution);
 
   const [data, setData] = useState<InvitationData | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorCode, setErrorCode] = useState<null | ErrorKind>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [showContribStep, setShowContribStep] = useState(false);
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [thankMessage, setThankMessage] = useState<string | null>(null);
+  const [pulse, setPulse] = useState<"yes" | "no" | null>(null);
+  const [customMode, setCustomMode] = useState(false);
+  const [customLabel, setCustomLabel] = useState("");
 
   const load = () => {
     if (!token) {
@@ -58,12 +91,7 @@ function InvitationPage() {
     }
     setLoading(true);
     fetchInvitation({ data: { eventId, invitationId, token } })
-      .then((r) => {
-        setData(r);
-        setSelected(
-          new Set(r.contributions.filter((c) => c.claimed_by_me).map((c) => c.id)),
-        );
-      })
+      .then((r) => setData(r))
       .catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : "";
         if (msg.includes(INVITATION_ERROR.EXPIRED)) setErrorCode("EXPIRED");
@@ -78,63 +106,35 @@ function InvitationPage() {
 
   useEffect(load, [eventId, invitationId, token, fetchInvitation]);
 
-  const freeContribs = useMemo(
+  const myContribution = useMemo(
+    () => data?.contributions.find((c) => c.claimed_by_me) ?? null,
+    [data],
+  );
+  const availableContributions = useMemo(
     () => (data?.contributions ?? []).filter((c) => !c.claimed || c.claimed_by_me),
     [data],
   );
 
-  const onAccept = async () => {
-    if (!data) return;
+  const respond = async (status: "yes" | "no") => {
+    if (!data || submitting) return;
+    setPulse(status);
     setSubmitting(true);
     try {
-      await respondFn({ data: { eventId, invitationId, token, status: "yes" } });
-      if (freeContribs.length > 0) setShowContribStep(true);
-      else {
-        setThankMessage("Merci, votre participation a été enregistrée. À bientôt !");
-        load();
-      }
-    } catch {
-      toast.error("Enregistrement impossible.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const onDecline = async () => {
-    if (!data) return;
-    setSubmitting(true);
-    try {
-      await respondFn({ data: { eventId, invitationId, token, status: "no" } });
-      setThankMessage("Merci pour votre réponse, à bientôt !");
+      await respondFn({ data: { eventId, invitationId, token, status } });
       load();
     } catch {
       toast.error("Enregistrement impossible.");
     } finally {
       setSubmitting(false);
+      setTimeout(() => setPulse(null), 800);
     }
   };
 
-  const toggle = (id: string) =>
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-
-  const validateContribs = async () => {
+  const pickContribution = async (id: string | null) => {
+    if (!data || submitting) return;
     setSubmitting(true);
     try {
-      await claimFn({
-        data: {
-          eventId,
-          invitationId,
-          token,
-          contributionIds: Array.from(selected),
-        },
-      });
-      setShowContribStep(false);
-      setThankMessage("Merci, votre participation a été enregistrée. À bientôt !");
+      await claimFn({ data: { eventId, invitationId, token, contributionId: id } });
       load();
     } catch {
       toast.error("Mise à jour impossible.");
@@ -143,39 +143,81 @@ function InvitationPage() {
     }
   };
 
+  const submitCustom = async () => {
+    if (!customLabel.trim() || submitting) return;
+    setSubmitting(true);
+    try {
+      await addCustomFn({
+        data: { eventId, invitationId, token, label: customLabel.trim() },
+      });
+      setCustomMode(false);
+      setCustomLabel("");
+      load();
+    } catch {
+      toast.error("Ajout impossible.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // ─── Loading ───
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-muted-foreground">
-        Chargement…
+        <Loader2 className="h-5 w-5 animate-spin mr-2" /> Chargement…
       </div>
     );
   }
 
+  // ─── Error states ───
   if (errorCode) {
-    const title =
-      errorCode === "EVENT_MISSING"
-        ? "Événement indisponible"
-        : errorCode === "EXPIRED" || errorCode === "REVOKED"
-          ? "Lien expiré"
-          : "Invitation introuvable";
-    const message =
-      errorCode === "EVENT_MISSING"
-        ? "Cet événement n'est plus disponible."
-        : errorCode === "EXPIRED" || errorCode === "REVOKED"
-          ? "Ce lien d'invitation n'est plus valide."
-          : errorCode === "OTHER"
-            ? "Impossible de charger cette invitation pour le moment. Veuillez réessayer plus tard."
-            : "Ce lien d'invitation n'est plus valide.";
+    const map: Record<
+      ErrorKind,
+      { emoji: string; title: string; message: string }
+    > = {
+      INVALID: {
+        emoji: "🔒",
+        title: "Invitation indisponible",
+        message: "Ce lien n'est plus valide.",
+      },
+      REVOKED: {
+        emoji: "🔒",
+        title: "Invitation indisponible",
+        message: "Ce lien n'est plus valide.",
+      },
+      EXPIRED: {
+        emoji: "⏳",
+        title: "Cet événement est terminé",
+        message: "Merci d'avoir été des nôtres — à très bientôt.",
+      },
+      EVENT_MISSING: {
+        emoji: "🗑️",
+        title: "Événement indisponible",
+        message: "Cet événement n'est plus accessible.",
+      },
+      OTHER: {
+        emoji: "⚠️",
+        title: "Impossible d'ouvrir cette invitation",
+        message: "Réessayez dans un instant.",
+      },
+    };
+    const s = map[errorCode];
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <Card className="max-w-md w-full">
-          <CardHeader>
-            <CardTitle className="font-serif">{title}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-muted-foreground">{message}</p>
-            <Button onClick={() => navigate({ to: "/" })} className="w-full">
-              Retour à l'accueil
+      <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-b from-background to-muted/40">
+        <Card className="max-w-md w-full text-center animate-fade-in">
+          <CardContent className="pt-10 pb-8 px-6 space-y-4">
+            <div className="text-6xl">{s.emoji}</div>
+            <h1 className="font-serif text-2xl">{s.title}</h1>
+            <p className="text-sm text-muted-foreground">{s.message}</p>
+            <Button
+              onClick={() =>
+                errorCode === "EXPIRED"
+                  ? navigate({ to: "/" })
+                  : navigate({ to: "/" })
+              }
+              className="w-full mt-2"
+            >
+              {errorCode === "EXPIRED" ? "Découvrir l'application" : "Retour à l'accueil"}
             </Button>
           </CardContent>
         </Card>
@@ -185,183 +227,298 @@ function InvitationPage() {
 
   if (!data) return null;
   const e = data.event;
-  const alreadyResponded = !!data.guest.responded_at;
+  const hero = heroFor(e.event_type);
   const canEdit = !data.locked;
+  const alreadyResponded = !!data.guest.responded_at;
+  const attending = data.guest.rsvp_status === "yes";
+  const dateStr = new Date(e.event_at).toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+  const timeStr = new Date(e.event_at).toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const org = organizerName(data.organizer);
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <div className="max-w-2xl mx-auto px-4 py-10 space-y-6">
-        <header className="text-center">
-          <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">
-            Bonjour {data.guest.name}, vous êtes invité·e
-          </p>
-          <h1 className="font-serif text-4xl mb-2">{e.title}</h1>
-          <p className="text-sm text-muted-foreground">
-            {eventTypeLabel(e.event_type)}
-            {e.event_subtype ? ` · ${e.event_subtype}` : ""}
-          </p>
-        </header>
+    <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      {/* ─── Hero ─── */}
+      <header
+        className={cn(
+          "relative w-full h-56 sm:h-72 bg-gradient-to-br overflow-hidden",
+          hero.from,
+          hero.to,
+        )}
+      >
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span
+            className="text-[7rem] sm:text-[9rem] drop-shadow-sm animate-fade-in"
+            aria-hidden
+          >
+            {hero.emoji}
+          </span>
+        </div>
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent" />
+      </header>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-serif text-xl">Détails</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <div className="flex items-start gap-2">
-              <Calendar className="h-4 w-4 mt-0.5 text-muted-foreground" />
-              <span>
-                {new Date(e.event_at).toLocaleString("fr-FR", {
-                  dateStyle: "full",
-                  timeStyle: "short",
-                })}
-              </span>
+      <main className="max-w-xl mx-auto px-4 -mt-10 pb-24 space-y-4">
+        {/* ─── Main card ─── */}
+        <Card className="animate-fade-in shadow-lg">
+          <CardContent className="p-6 space-y-5 text-center">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              {org} vous invite
+            </p>
+            <h1 className="font-serif text-3xl sm:text-4xl leading-tight">
+              {e.title}
+            </h1>
+            <div className="inline-flex items-center gap-2 text-xs px-3 py-1 rounded-full bg-accent text-accent-foreground">
+              <Sparkles className="h-3 w-3" />
+              {eventTypeLabel(e.event_type)}
+              {e.event_subtype ? ` · ${e.event_subtype}` : ""}
             </div>
-            {e.location && (
-              <div className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                <span>{e.location}</span>
+
+            <div className="pt-2 space-y-3 text-sm text-left">
+              <div className="flex items-start gap-3">
+                <Calendar className="h-4 w-4 mt-0.5 text-primary" />
+                <div>
+                  <p className="capitalize">{dateStr}</p>
+                  <p className="text-muted-foreground">{timeStr}</p>
+                </div>
               </div>
-            )}
-            {e.description && (
-              <p className="pt-2 whitespace-pre-wrap">{e.description}</p>
-            )}
-            {e.menu_or_theme && (
-              <div className="pt-2">
-                <p className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
-                  Menu / thème
-                </p>
-                <p className="whitespace-pre-wrap">{e.menu_or_theme}</p>
-              </div>
-            )}
+              {e.location && (
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-4 w-4 mt-0.5 text-primary" />
+                  <p className="whitespace-pre-wrap">{e.location}</p>
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-serif text-xl">Votre réponse</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {alreadyResponded && (
-              <p className="text-sm">
-                {data.guest.rsvp_status === "yes"
-                  ? "Vous avez accepté cette invitation."
-                  : "Vous avez décliné cette invitation."}
+        {/* ─── Welcome message ─── */}
+        {e.description && (
+          <Card className="animate-fade-in">
+            <CardContent className="p-5">
+              <p className="text-sm italic text-foreground/80 whitespace-pre-wrap leading-relaxed">
+                « {e.description} »
               </p>
-            )}
-            {canEdit ? (
-              <div className="flex gap-2">
-                <Button onClick={onAccept} disabled={submitting}>
-                  {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                  {alreadyResponded && data.guest.rsvp_status === "yes"
-                    ? "Confirmer ma présence"
-                    : "Accepter"}
-                </Button>
-                <Button variant="outline" onClick={onDecline} disabled={submitting}>
-                  {alreadyResponded && data.guest.rsvp_status === "no"
-                    ? "Toujours indisponible"
-                    : "Refuser"}
-                </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* ─── Menu / theme ─── */}
+        {e.menu_or_theme && (
+          <Card className="animate-fade-in">
+            <CardContent className="p-5 space-y-1">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                Menu / thème
+              </p>
+              <p className="text-sm whitespace-pre-wrap">{e.menu_or_theme}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* ─── Progress card ─── */}
+        <Card className="animate-fade-in">
+          <CardContent className="p-5">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">
+              L'événement en un coup d'œil
+            </p>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div>
+                <Users className="h-5 w-5 mx-auto text-primary mb-1" />
+                <p className="text-lg font-semibold">{data.stats.totalGuests}</p>
+                <p className="text-[11px] text-muted-foreground">invités</p>
               </div>
-            ) : (
-              <p className="text-xs text-muted-foreground">
+              <div>
+                <Check className="h-5 w-5 mx-auto text-primary mb-1" />
+                <p className="text-lg font-semibold">{data.stats.confirmedGuests}</p>
+                <p className="text-[11px] text-muted-foreground">ont confirmé</p>
+              </div>
+              <div>
+                <Gift className="h-5 w-5 mx-auto text-primary mb-1" />
+                <p className="text-lg font-semibold">{data.stats.claimedContributions}</p>
+                <p className="text-[11px] text-muted-foreground">contributions</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ─── RSVP ─── */}
+        <Card className="animate-fade-in">
+          <CardContent className="p-5 space-y-4">
+            <h2 className="font-serif text-xl text-center">Votre présence</h2>
+            {!canEdit ? (
+              <p className="text-center text-sm text-muted-foreground">
                 L'événement est terminé, votre réponse ne peut plus être modifiée.
               </p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => respond("yes")}
+                  disabled={submitting}
+                  className={cn(
+                    "rounded-2xl border-2 p-4 flex flex-col items-center gap-2 transition-all",
+                    "hover:scale-[1.02] active:scale-[0.98]",
+                    attending
+                      ? "border-primary bg-primary text-primary-foreground shadow-md"
+                      : "border-border bg-card hover:border-primary/50",
+                    pulse === "yes" && "animate-scale-in",
+                  )}
+                >
+                  <Check className="h-6 w-6" />
+                  <span className="text-sm font-medium">Je participe</span>
+                </button>
+                <button
+                  onClick={() => respond("no")}
+                  disabled={submitting}
+                  className={cn(
+                    "rounded-2xl border-2 p-4 flex flex-col items-center gap-2 transition-all",
+                    "hover:scale-[1.02] active:scale-[0.98]",
+                    data.guest.rsvp_status === "no"
+                      ? "border-foreground bg-foreground text-background shadow-md"
+                      : "border-border bg-card hover:border-foreground/40",
+                    pulse === "no" && "animate-scale-in",
+                  )}
+                >
+                  <X className="h-6 w-6" />
+                  <span className="text-sm font-medium">Je ne pourrai pas</span>
+                </button>
+              </div>
+            )}
+            {alreadyResponded && (
+              <p className="text-center text-xs text-muted-foreground">
+                {attending
+                  ? "Votre présence est enregistrée. Merci !"
+                  : "Merci pour votre réponse."}
+              </p>
             )}
           </CardContent>
         </Card>
 
-        {data.contributions.length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-serif text-xl">À apporter</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="divide-y">
-                {data.contributions.map((c) => (
-                  <li key={c.id} className="py-2 text-sm">
-                    <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                      {contributionCategoryLabel(c.category)}
-                    </p>
-                    <p>{c.label}</p>
-                    {c.claimed && !c.claimed_by_me && (
-                      <p className="text-xs text-muted-foreground">Déjà pris</p>
-                    )}
-                    {c.claimed_by_me && (
-                      <p className="text-xs text-primary">Vous l'apportez</p>
-                    )}
-                  </li>
-                ))}
+        {/* ─── Contributions ─── */}
+        {canEdit && attending && (availableContributions.length > 0 || true) && (
+          <Card className="animate-fade-in">
+            <CardContent className="p-5 space-y-3">
+              <h2 className="font-serif text-xl text-center">
+                Que souhaitez-vous apporter&nbsp;?
+              </h2>
+              <p className="text-xs text-center text-muted-foreground">
+                Une seule contribution suffit.
+              </p>
+
+              <ul className="space-y-2">
+                {availableContributions.map((c) => {
+                  const selected = c.claimed_by_me;
+                  return (
+                    <li key={c.id}>
+                      <button
+                        onClick={() => pickContribution(selected ? null : c.id)}
+                        disabled={submitting}
+                        className={cn(
+                          "w-full text-left rounded-xl border p-3 flex items-center gap-3 transition-all",
+                          "hover:border-primary/50 active:scale-[0.99]",
+                          selected
+                            ? "border-primary bg-primary/5"
+                            : "border-border bg-card",
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0",
+                            selected
+                              ? "border-primary bg-primary"
+                              : "border-muted-foreground/40",
+                          )}
+                        >
+                          {selected && (
+                            <Check className="h-3 w-3 text-primary-foreground" />
+                          )}
+                        </span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                            {contributionCategoryLabel(c.category)}
+                          </p>
+                          <p className="text-sm truncate">{c.label}</p>
+                        </div>
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
-              {canEdit && data.guest.rsvp_status === "yes" && (
-                <Button
-                  variant="outline"
-                  className="mt-4"
-                  onClick={() => setShowContribStep(true)}
+
+              {!customMode ? (
+                <button
+                  onClick={() => setCustomMode(true)}
+                  className="w-full text-sm text-primary hover:underline mt-1"
                 >
-                  Modifier ma contribution
-                </Button>
+                  + Je souhaite apporter autre chose
+                </button>
+              ) : (
+                <div className="space-y-2 pt-1">
+                  <Input
+                    placeholder="Ex : une salade, des fleurs…"
+                    value={customLabel}
+                    onChange={(e) => setCustomLabel(e.target.value)}
+                    maxLength={80}
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={submitCustom}
+                      disabled={submitting || customLabel.trim().length < 2}
+                      className="flex-1"
+                    >
+                      {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                      Ajouter
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setCustomMode(false);
+                        setCustomLabel("");
+                      }}
+                    >
+                      Annuler
+                    </Button>
+                  </div>
+                </div>
               )}
             </CardContent>
           </Card>
         )}
 
-        <p className="text-center text-xs text-muted-foreground py-4">
-          Propulsé par Kosy
-        </p>
-      </div>
+        {/* ─── Summary ─── */}
+        {attending && myContribution && (
+          <Card className="animate-fade-in border-primary/40 bg-primary/5">
+            <CardContent className="p-5 text-center space-y-2">
+              <PartyPopper className="h-6 w-6 text-primary mx-auto" />
+              <h3 className="font-serif text-lg">Merci&nbsp;!</h3>
+              <p className="text-sm">Votre participation est confirmée.</p>
+              <p className="text-sm">
+                Vous apporterez&nbsp;: <strong>{myContribution.label}</strong>
+              </p>
+              <p className="text-xs text-muted-foreground">À bientôt&nbsp;!</p>
+            </CardContent>
+          </Card>
+        )}
 
-      <Dialog open={showContribStep} onOpenChange={setShowContribStep}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="font-serif">Que souhaitez-vous apporter ?</DialogTitle>
-            <DialogDescription>
-              Sélectionnez un ou plusieurs éléments. Vous pouvez aussi valider sans rien choisir.
-            </DialogDescription>
-          </DialogHeader>
-          <ul className="space-y-2 max-h-72 overflow-y-auto">
-            {freeContribs.map((c) => (
-              <li
-                key={c.id}
-                className="flex items-start gap-3 rounded-md border bg-background p-3"
-              >
-                <Checkbox
-                  id={`c-${c.id}`}
-                  checked={selected.has(c.id)}
-                  onCheckedChange={() => toggle(c.id)}
-                />
-                <label htmlFor={`c-${c.id}`} className="flex-1 cursor-pointer">
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                    {contributionCategoryLabel(c.category)}
-                  </p>
-                  <p className="text-sm">{c.label}</p>
-                </label>
-              </li>
-            ))}
-          </ul>
-          <DialogFooter>
-            <Button onClick={validateContribs} disabled={submitting}>
-              {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              <Check className="h-4 w-4" />
-              Valider
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog
-        open={!!thankMessage}
-        onOpenChange={(o) => !o && setThankMessage(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="font-serif">Merci !</DialogTitle>
-            <DialogDescription>{thankMessage}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => setThankMessage(null)}>Fermer</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        {/* ─── Account CTA ─── */}
+        <div className="pt-4 text-center space-y-3">
+          <p className="text-xs text-muted-foreground">
+            Retrouvez facilement vos prochaines invitations.
+          </p>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/auth">Créer gratuitement mon compte</Link>
+          </Button>
+          <p className="text-[11px] text-muted-foreground pt-4">Propulsé par Kosy</p>
+        </div>
+      </main>
     </div>
   );
 }
+
+// Icon shim for the "ended" empty-state (unused inline but kept for clarity)
+export { CalendarX2 };
