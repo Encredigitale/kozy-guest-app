@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, Users, Wine, Heart, Bell } from "lucide-react";
-import heroImg from "@/assets/hero-gathering.jpg";
+import heroAsset from "@/assets/friends-party.jpg.asset.json";
+import clinkingAsset from "@/assets/friends-clinking.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -100,7 +101,7 @@ function Landing() {
             <div className="relative">
               <div className="absolute -inset-8 bg-accent/40 rounded-[3rem] blur-3xl -z-10" />
               <img
-                src={heroImg}
+                src={heroAsset.url}
                 alt="Famille et amis partageant un repas convivial autour d'une table."
                 width={1600}
                 height={1200}
@@ -139,16 +140,30 @@ function Landing() {
         </section>
 
         {/* CTA */}
-        <section className="max-w-3xl mx-auto px-6 pb-24 text-center">
-          <h2 className="font-serif text-3xl sm:text-4xl tracking-tight mb-4">
-            Prêt à créer votre prochain moment ?
-          </h2>
-          <p className="text-muted-foreground mb-8">
-            Rejoignez Kosy et rassemblez ceux qui comptent.
-          </p>
-          <Button asChild size="lg" className="rounded-full px-10">
-            <Link to="/auth">Commencer</Link>
-          </Button>
+        <section className="max-w-6xl mx-auto px-6 pb-24">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="relative order-2 lg:order-1">
+              <div className="absolute -inset-8 bg-accent/40 rounded-[3rem] blur-3xl -z-10" />
+              <img
+                src={clinkingAsset.url}
+                alt="Amis trinquant ensemble autour d'un repas."
+                width={1600}
+                height={1067}
+                className="w-full h-auto rounded-[2rem] shadow-sm"
+              />
+            </div>
+            <div className="order-1 lg:order-2 text-center lg:text-left">
+              <h2 className="font-serif text-3xl sm:text-4xl tracking-tight mb-4">
+                Prêt à créer votre prochain moment ?
+              </h2>
+              <p className="text-muted-foreground mb-8">
+                Rejoignez Kosy et rassemblez ceux qui comptent.
+              </p>
+              <Button asChild size="lg" className="rounded-full px-10">
+                <Link to="/auth">Commencer</Link>
+              </Button>
+            </div>
+          </div>
         </section>
       </main>
 
