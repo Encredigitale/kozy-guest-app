@@ -534,12 +534,51 @@ function NewEventPage() {
                   onOpenAutoFocus={(e) => e.preventDefault()}
                   className="p-0 w-[--radix-popover-trigger-width] max-h-72 overflow-y-auto"
                 >
-                  {filteredContacts.length === 0 ? (
+                  {contactsLoading ? (
+                    <div className="p-6 flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <p className="text-sm">Chargement de votre carnet…</p>
+                    </div>
+                  ) : contactsError ? (
                     <div className="p-3 space-y-2">
-                      <p className="text-sm text-muted-foreground">
-                        {search.trim()
-                          ? "Aucun contact trouvé."
-                          : "Votre carnet est vide."}
+                      <p className="text-sm text-destructive">{contactsError}</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full rounded-2xl"
+                        onClick={() => {
+                          setContactsLoading(true);
+                          setContactsError(null);
+                          supabase
+                            .from("contacts")
+                            .select(
+                              "id,first_name,last_name,email,phone,group_type,linked_user_id",
+                            )
+                            .eq("owner_id", user.id)
+                            .order("first_name", { ascending: true })
+                            .then(({ data, error }) => {
+                              if (error) {
+                                setContactsError(
+                                  "Impossible de charger vos contacts. Réessayez.",
+                                );
+                              } else if (data) {
+                                setContacts(data as Contact[]);
+                              }
+                              setContactsLoading(false);
+                            });
+                        }}
+                      >
+                        Réessayer
+                      </Button>
+                    </div>
+                  ) : searchFormatError ? (
+                    <div className="p-3 space-y-2">
+                      <p className="text-sm text-destructive">
+                        {searchFormatError}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Vous pouvez tout de même créer un contact avec ces
+                        informations.
                       </p>
                       <Button
                         type="button"
@@ -549,6 +588,38 @@ function NewEventPage() {
                       >
                         <UserPlus className="h-4 w-4" /> Créer un nouveau
                         contact
+                      </Button>
+                    </div>
+                  ) : filteredContacts.length === 0 ? (
+                    <div className="p-4 space-y-3 text-center">
+                      <div className="mx-auto w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                        <Search className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium">
+                          {trimmedSearch
+                            ? "Aucun contact trouvé"
+                            : contacts.length === 0
+                              ? "Votre carnet est vide"
+                              : "Commencez à taper pour rechercher"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {trimmedSearch
+                            ? `Aucun contact ne correspond à « ${trimmedSearch} ».`
+                            : contacts.length === 0
+                              ? "Créez votre premier contact pour l'ajouter à ce moment."
+                              : "Nom, email ou téléphone."}
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full rounded-2xl"
+                        onClick={openCreateContact}
+                      >
+                        <UserPlus className="h-4 w-4" /> Créer un nouveau
+                        contact
+                        {trimmedSearch ? ` « ${trimmedSearch} »` : ""}
                       </Button>
                     </div>
                   ) : (
@@ -613,12 +684,13 @@ function NewEventPage() {
                         >
                           <UserPlus className="h-4 w-4" /> Créer un nouveau
                           contact
-                          {search.trim() ? ` « ${search.trim()} »` : ""}
+                          {trimmedSearch ? ` « ${trimmedSearch} »` : ""}
                         </Button>
                       </div>
                     </div>
                   )}
                 </PopoverContent>
+
               </Popover>
               <p className="text-xs text-muted-foreground">
                 Un lien d'invitation sera généré après création — vous pourrez
