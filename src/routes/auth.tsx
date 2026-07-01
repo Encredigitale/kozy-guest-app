@@ -67,7 +67,7 @@ function AuthPage() {
   );
 }
 
-function SignInForm({ onForgot }: { onForgot: () => void }) {
+function SignInForm({ onForgot, onSwitchSignup }: { onForgot: () => void; onSwitchSignup: () => void }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -96,26 +96,30 @@ function SignInForm({ onForgot }: { onForgot: () => void }) {
         <Label htmlFor="signin-password">Mot de passe</Label>
         <Input id="signin-password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
+      <Button type="submit" className="w-full rounded-full" disabled={loading}>
         {loading ? "Connexion..." : "Se connecter"}
       </Button>
-      <button type="button" onClick={onForgot} className="text-sm text-muted-foreground hover:text-foreground w-full text-center">
-        Mot de passe oublié ?
-      </button>
+      <div className="flex items-center justify-between text-sm pt-2">
+        <button type="button" onClick={onForgot} className="text-muted-foreground hover:text-foreground">
+          Mot de passe oublié
+        </button>
+        <button type="button" onClick={onSwitchSignup} className="text-primary hover:underline">
+          Créer un compte
+        </button>
+      </div>
     </form>
   );
 }
 
-function SignUpForm() {
+function SignUpForm({ onSwitchSignin }: { onSwitchSignin: () => void }) {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [birthDate, setBirthDate] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [accepted, setAccepted] = useState(false);
+  const [cgu, setCgu] = useState(false);
+  const [privacy, setPrivacy] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -128,43 +132,8 @@ function SignUpForm() {
       toast.error("Les mots de passe ne correspondent pas.");
       return;
     }
-    const phoneTrimmed = phone.trim();
-    if (phoneTrimmed) {
-      const digits = phoneTrimmed.replace(/[\s().-]/g, "");
-      // E.164-compatible : optionnel +, 8 à 15 chiffres
-      if (!/^\+?[0-9]{8,15}$/.test(digits)) {
-        toast.error("Numéro de téléphone invalide. Ex. +33 6 12 34 56 78.");
-        return;
-      }
-    }
-    if (birthDate) {
-      const d = new Date(birthDate);
-      if (Number.isNaN(d.getTime())) {
-        toast.error("Date de naissance invalide.");
-        return;
-      }
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (d > today) {
-        toast.error("La date de naissance ne peut pas être dans le futur.");
-        return;
-      }
-      const minDate = new Date();
-      minDate.setFullYear(minDate.getFullYear() - 120);
-      if (d < minDate) {
-        toast.error("Date de naissance invalide.");
-        return;
-      }
-      let age = today.getFullYear() - d.getFullYear();
-      const m = today.getMonth() - d.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
-      if (age < 13) {
-        toast.error("Vous devez avoir au moins 13 ans pour créer un compte.");
-        return;
-      }
-    }
-    if (!accepted) {
-      toast.error("Vous devez accepter les CGU et la politique de confidentialité.");
+    if (!cgu || !privacy) {
+      toast.error("Veuillez accepter les CGU et la politique de confidentialité.");
       return;
     }
     setLoading(true);
@@ -172,12 +141,10 @@ function SignUpForm() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/app`,
+        emailRedirectTo: `${window.location.origin}/app/welcome`,
         data: {
           first_name: firstName,
           last_name: lastName,
-          phone: phoneTrimmed || null,
-          birth_date: birthDate || null,
         },
       },
     });
@@ -191,9 +158,8 @@ function SignUpForm() {
       return;
     }
     toast.success("Compte créé !");
-    navigate({ to: "/app" });
+    navigate({ to: "/app/welcome" });
   };
-
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
@@ -211,17 +177,6 @@ function SignUpForm() {
         <Label htmlFor="signup-email">Adresse e-mail</Label>
         <Input id="signup-email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-2">
-          <Label htmlFor="signup-phone">Téléphone</Label>
-          <Input id="signup-phone" type="tel" autoComplete="tel" inputMode="tel" placeholder="+33 6 12 34 56 78" pattern="^[+0-9\s().-]{8,20}$" value={phone} onChange={(e) => setPhone(e.target.value)} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="signup-birthdate">Date de naissance</Label>
-          <Input id="signup-birthdate" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} min="1900-01-01" max={new Date().toISOString().split("T")[0]} />
-        </div>
-      </div>
-
       <div className="space-y-2">
         <Label htmlFor="signup-password">Mot de passe</Label>
         <Input id="signup-password" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} />
@@ -230,18 +185,35 @@ function SignUpForm() {
         <Label htmlFor="confirm-password">Confirmation</Label>
         <Input id="confirm-password" type="password" autoComplete="new-password" required value={confirm} onChange={(e) => setConfirm(e.target.value)} />
       </div>
-      <div className="flex items-start gap-2">
-        <Checkbox id="cgu" checked={accepted} onCheckedChange={(v) => setAccepted(v === true)} />
-        <Label htmlFor="cgu" className="text-xs text-muted-foreground leading-relaxed">
-          J'accepte les CGU et la politique de confidentialité.
-        </Label>
+      <div className="space-y-2 pt-1">
+        <div className="flex items-start gap-2">
+          <Checkbox id="cgu" checked={cgu} onCheckedChange={(v) => setCgu(v === true)} />
+          <Label htmlFor="cgu" className="text-xs text-muted-foreground leading-relaxed font-normal">
+            J'accepte les Conditions Générales d'Utilisation.
+          </Label>
+        </div>
+        <div className="flex items-start gap-2">
+          <Checkbox id="privacy" checked={privacy} onCheckedChange={(v) => setPrivacy(v === true)} />
+          <Label htmlFor="privacy" className="text-xs text-muted-foreground leading-relaxed font-normal">
+            J'accepte la Politique de confidentialité.
+          </Label>
+        </div>
       </div>
-      <Button type="submit" className="w-full" disabled={loading}>
+      <Button type="submit" className="w-full rounded-full" disabled={loading}>
         {loading ? "Création..." : "Créer mon compte"}
       </Button>
+      <button
+        type="button"
+        onClick={onSwitchSignin}
+        className="text-sm text-primary hover:underline w-full text-center"
+      >
+        J'ai déjà un compte
+      </button>
     </form>
   );
 }
+
+
 
 
 function ForgotPasswordForm({ onBack }: { onBack: () => void }) {
