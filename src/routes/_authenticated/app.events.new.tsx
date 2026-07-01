@@ -227,10 +227,23 @@ function NewEventPage() {
   const createContact = async () => {
     const first = newContact.first_name.trim();
     const email = newContact.email.trim();
-    if (!first && !email) {
-      toast.error("Ajoutez au moins un prénom ou un email.");
+    const phone = newContact.phone.trim();
+    const errors: typeof newContactErrors = {};
+    if (email && !EMAIL_RE.test(email)) {
+      errors.email = "Format d'email invalide.";
+    }
+    if (phone && !PHONE_RE.test(phone)) {
+      errors.phone = "Format de téléphone invalide (6 chiffres minimum).";
+    }
+    if (!first && !email && !phone) {
+      errors.general =
+        "Ajoutez au moins un prénom, un email ou un téléphone.";
+    }
+    if (Object.keys(errors).length > 0) {
+      setNewContactErrors(errors);
       return;
     }
+    setNewContactErrors({});
     setCreatingContact(true);
     const { data, error } = await supabase
       .from("contacts")
@@ -239,14 +252,19 @@ function NewEventPage() {
         first_name: first || (email ? email.split("@")[0] : "Invité"),
         last_name: newContact.last_name.trim() || null,
         email: email || null,
-        phone: newContact.phone.trim() || null,
+        phone: phone || null,
         group_type: (newContact.group_type || null) as never,
       })
       .select("id,first_name,last_name,email,phone,group_type,linked_user_id")
       .single();
     setCreatingContact(false);
     if (error || !data) {
-      toast.error("Impossible de créer le contact.");
+      setNewContactErrors({
+        general:
+          error?.message?.includes("duplicate")
+            ? "Un contact avec cet email ou téléphone existe déjà."
+            : "Impossible de créer le contact. Réessayez.",
+      });
       return;
     }
     const c = data as Contact;
@@ -262,6 +280,7 @@ function NewEventPage() {
     setNewContactOpen(false);
     toast.success("Contact ajouté à votre carnet.");
   };
+
 
 
   const createEvent = async () => {
