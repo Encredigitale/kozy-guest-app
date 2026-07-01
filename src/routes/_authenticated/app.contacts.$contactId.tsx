@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, Sparkles, Trash2 } from "lucide-react";
+import { ArrowLeft, CalendarPlus, Loader2, Sparkles, Trash2 } from "lucide-react";
 import { CONTACT_GROUPS, contactGroupLabel } from "@/lib/contact-groups";
 
 export const Route = createFileRoute("/_authenticated/app/contacts/$contactId")({
@@ -246,6 +246,16 @@ function ContactDetail() {
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
+
+          <Button
+            variant="secondary"
+            className="w-full"
+            onClick={() => navigate({ to: "/app/events/new" })}
+          >
+            <CalendarPlus className="h-4 w-4" />
+            Inviter à un événement
+          </Button>
+
         </CardContent>
       </Card>
     </div>

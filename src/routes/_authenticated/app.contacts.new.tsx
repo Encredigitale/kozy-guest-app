@@ -33,8 +33,11 @@ function NewContact() {
     group_type: "friends" as ContactGroup,
     birth_date: "",
     dietary_preferences: "",
+    allergies: "",
+    favorite_drinks: "",
     notes: "",
   });
+
 
   const update = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
@@ -63,10 +66,13 @@ function NewContact() {
         group_type: form.group_type,
         birth_date: form.birth_date || null,
         dietary_preferences: form.dietary_preferences.trim() || null,
+        allergies: form.allergies.trim() || null,
+        favorite_drinks: form.favorite_drinks.trim() || null,
         notes: form.notes.trim() || null,
       })
       .select("id")
       .single();
+
     setSaving(false);
     if (error) {
       toast.error(error.message);
@@ -174,8 +180,32 @@ function NewContact() {
                 value={form.dietary_preferences}
                 onChange={(e) => update("dietary_preferences", e.target.value)}
                 maxLength={200}
+                placeholder="Végétarien, sans porc…"
               />
             </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="allergies">Allergies</Label>
+              <Input
+                id="allergies"
+                value={form.allergies}
+                onChange={(e) => update("allergies", e.target.value)}
+                maxLength={200}
+                placeholder="Arachides, gluten…"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="drinks">Boisson préférée</Label>
+              <Input
+                id="drinks"
+                value={form.favorite_drinks}
+                onChange={(e) => update("favorite_drinks", e.target.value)}
+                maxLength={200}
+                placeholder="Vin rouge, thé glacé…"
+              />
+            </div>
+
 
             <div className="space-y-1.5">
               <Label htmlFor="notes">Notes privées</Label>
