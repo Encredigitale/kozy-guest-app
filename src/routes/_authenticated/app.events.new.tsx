@@ -99,8 +99,19 @@ function NewEventPage() {
 
   // Step 3
   const [guests, setGuests] = useState<Guest[]>([]);
-  const [guestName, setGuestName] = useState("");
-  const [guestEmail, setGuestEmail] = useState("");
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [search, setSearch] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [newContactOpen, setNewContactOpen] = useState(false);
+  const [newContact, setNewContact] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    phone: "",
+    group_type: "friends",
+  });
+  const [creatingContact, setCreatingContact] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const [saving, setSaving] = useState(false);
   const [createdEventId, setCreatedEventId] = useState<string | null>(null);
@@ -109,6 +120,21 @@ function NewEventPage() {
   const progress = createdEventId ? 100 : (step / totalSteps) * 100;
 
   const canNextFromStep1 = title.trim().length > 0 && !!date;
+
+  useEffect(() => {
+    let cancel = false;
+    (async () => {
+      const { data } = await supabase
+        .from("contacts")
+        .select("id,first_name,last_name,email,phone,group_type,linked_user_id")
+        .eq("owner_id", user.id)
+        .order("first_name", { ascending: true });
+      if (!cancel && data) setContacts(data as Contact[]);
+    })();
+    return () => {
+      cancel = true;
+    };
+  }, [user.id]);
 
   const goNext = () => {
     if (step === 1 && !canNextFromStep1) {
@@ -123,14 +149,92 @@ function NewEventPage() {
     setStep((s) => Math.max(1, s - 1));
   };
 
-  const addGuest = () => {
-    const name = guestName.trim();
-    const email = guestEmail.trim();
-    if (!name && !email) return;
-    setGuests((g) => [...g, { name: name || email.split("@")[0], email }]);
-    setGuestName("");
-    setGuestEmail("");
+  const contactFullName = (c: Contact) =>
+    [c.first_name, c.last_name].filter(Boolean).join(" ").trim();
+
+  const filteredContacts = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return contacts.slice(0, 8);
+    return contacts
+      .filter((c) => {
+        const name = contactFullName(c).toLowerCase();
+        const email = (c.email ?? "").toLowerCase();
+        const phone = (c.phone ?? "").toLowerCase();
+        return name.includes(q) || email.includes(q) || phone.includes(q);
+      })
+      .slice(0, 8);
+  }, [contacts, search]);
+
+  const isContactAdded = (id: string) =>
+    guests.some((g) => g.contactId === id);
+
+  const addContactAsGuest = (c: Contact) => {
+    if (isContactAdded(c.id)) return;
+    setGuests((g) => [
+      ...g,
+      {
+        contactId: c.id,
+        name: contactFullName(c) || c.email || "Invité",
+        email: c.email ?? "",
+        isMember: !!c.linked_user_id,
+      },
+    ]);
+    setSearch("");
+    setSearchOpen(false);
+    searchInputRef.current?.focus();
   };
+
+  const openCreateContact = () => {
+    const q = search.trim();
+    // Guess: if contains @, use as email, else as first name
+    if (q.includes("@")) {
+      setNewContact((n) => ({ ...n, email: q, first_name: "" }));
+    } else {
+      setNewContact((n) => ({ ...n, first_name: q, email: "" }));
+    }
+    setSearchOpen(false);
+    setNewContactOpen(true);
+  };
+
+  const createContact = async () => {
+    const first = newContact.first_name.trim();
+    const email = newContact.email.trim();
+    if (!first && !email) {
+      toast.error("Ajoutez au moins un prénom ou un email.");
+      return;
+    }
+    setCreatingContact(true);
+    const { data, error } = await supabase
+      .from("contacts")
+      .insert({
+        owner_id: user.id,
+        first_name: first || (email ? email.split("@")[0] : "Invité"),
+        last_name: newContact.last_name.trim() || null,
+        email: email || null,
+        phone: newContact.phone.trim() || null,
+        group_type: newContact.group_type || null,
+      })
+      .select("id,first_name,last_name,email,phone,group_type,linked_user_id")
+      .single();
+    setCreatingContact(false);
+    if (error || !data) {
+      toast.error("Impossible de créer le contact.");
+      return;
+    }
+    const c = data as Contact;
+    setContacts((prev) => [...prev, c]);
+    addContactAsGuest(c);
+    setNewContact({
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone: "",
+      group_type: "friends",
+    });
+    setNewContactOpen(false);
+    toast.success("Contact ajouté à votre carnet.");
+  };
+
 
   const createEvent = async () => {
     if (!date) return;
