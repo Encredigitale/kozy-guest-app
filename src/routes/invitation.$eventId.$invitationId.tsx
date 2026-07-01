@@ -169,56 +169,97 @@ function InvitationPage() {
     );
   }
 
-  // ─── Error states ───
+  // ─── Error states (distinct screens per cause) ───
   if (errorCode) {
-    const map: Record<
-      ErrorKind,
-      { emoji: string; title: string; message: string }
-    > = {
+    type Screen = {
+      emoji: string;
+      title: string;
+      message: string;
+      hint?: string;
+      cta: string;
+      tone: "muted" | "warm" | "cool";
+    };
+    const map: Record<ErrorKind, Screen> = {
       INVALID: {
         emoji: "🔒",
-        title: "Invitation indisponible",
-        message: "Ce lien n'est plus valide.",
+        title: "Lien d'invitation invalide",
+        message:
+          "Ce lien semble incorrect ou incomplet. Vérifiez qu'il n'a pas été tronqué en le copiant.",
+        hint: "Astuce : recopiez le lien complet reçu par email ou message.",
+        cta: "Retour à l'accueil",
+        tone: "muted",
       },
       REVOKED: {
-        emoji: "🔒",
-        title: "Invitation indisponible",
-        message: "Ce lien n'est plus valide.",
+        emoji: "🚫",
+        title: "Invitation retirée",
+        message:
+          "L'organisateur a retiré cette invitation. Contactez-le directement si c'est une erreur.",
+        cta: "Retour à l'accueil",
+        tone: "muted",
       },
       EXPIRED: {
         emoji: "⏳",
-        title: "Cet événement est terminé",
-        message: "Merci d'avoir été des nôtres — à très bientôt.",
+        title: "Ce lien a expiré",
+        message:
+          "La période de réponse est terminée. Demandez à votre hôte de renvoyer une invitation si besoin.",
+        cta: "Retour à l'accueil",
+        tone: "warm",
       },
       EVENT_MISSING: {
         emoji: "🗑️",
-        title: "Événement indisponible",
-        message: "Cet événement n'est plus accessible.",
+        title: "Événement supprimé",
+        message:
+          "L'organisateur a supprimé cet événement. Il n'est plus accessible.",
+        cta: "Découvrir Kosy",
+        tone: "cool",
       },
       OTHER: {
         emoji: "⚠️",
         title: "Impossible d'ouvrir cette invitation",
-        message: "Réessayez dans un instant.",
+        message: "Une erreur inattendue est survenue. Réessayez dans un instant.",
+        cta: "Retour à l'accueil",
+        tone: "muted",
       },
     };
     const s = map[errorCode];
+    const toneBg =
+      s.tone === "warm"
+        ? "from-amber-100 to-rose-100"
+        : s.tone === "cool"
+        ? "from-slate-100 to-sky-100"
+        : "from-background to-muted/40";
     return (
-      <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-b from-background to-muted/40">
+      <div
+        className={cn(
+          "min-h-screen flex items-center justify-center p-6 bg-gradient-to-b",
+          toneBg,
+        )}
+      >
         <Card className="max-w-md w-full text-center animate-fade-in">
           <CardContent className="pt-10 pb-8 px-6 space-y-4">
-            <div className="text-6xl">{s.emoji}</div>
+            <div className="text-6xl" aria-hidden>
+              {s.emoji}
+            </div>
             <h1 className="font-serif text-2xl">{s.title}</h1>
             <p className="text-sm text-muted-foreground">{s.message}</p>
-            <Button
-              onClick={() =>
-                errorCode === "EXPIRED"
-                  ? navigate({ to: "/" })
-                  : navigate({ to: "/" })
-              }
-              className="w-full mt-2"
-            >
-              {errorCode === "EXPIRED" ? "Découvrir l'application" : "Retour à l'accueil"}
-            </Button>
+            {s.hint && (
+              <p className="text-xs text-muted-foreground/80 italic">{s.hint}</p>
+            )}
+            <div className="flex flex-col gap-2 pt-2">
+              {errorCode === "OTHER" && (
+                <Button onClick={load} className="w-full">
+                  <Loader2 className="h-4 w-4 mr-2" />
+                  Réessayer
+                </Button>
+              )}
+              <Button
+                variant={errorCode === "OTHER" ? "outline" : "default"}
+                onClick={() => navigate({ to: "/" })}
+                className="w-full"
+              >
+                {s.cta}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -226,6 +267,65 @@ function InvitationPage() {
   }
 
   if (!data) return null;
+
+  // ─── Finished event — dedicated screen ───
+  if (data.finished) {
+    const eEnded = data.event;
+    const heroEnded = heroFor(eEnded.event_type);
+    const dateEnded = new Date(eEnded.event_at).toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+        <header
+          className={cn(
+            "relative w-full h-40 sm:h-56 bg-gradient-to-br overflow-hidden opacity-90",
+            heroEnded.from,
+            heroEnded.to,
+          )}
+        >
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-[6rem] sm:text-[8rem]" aria-hidden>
+              {heroEnded.emoji}
+            </span>
+          </div>
+          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background to-transparent" />
+        </header>
+        <main className="max-w-md mx-auto px-4 -mt-8 pb-16 space-y-4">
+          <Card className="animate-fade-in shadow-md text-center">
+            <CardContent className="pt-8 pb-6 px-6 space-y-3">
+              <CalendarX2 className="h-6 w-6 mx-auto text-muted-foreground" />
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                Événement terminé
+              </p>
+              <h1 className="font-serif text-2xl">{eEnded.title}</h1>
+              <p className="text-sm text-muted-foreground capitalize">
+                {dateEnded}
+              </p>
+              <p className="text-sm pt-2">
+                Merci d'avoir fait partie de ce moment&nbsp;— les réponses et
+                contributions sont désormais figées.
+              </p>
+              <div className="pt-4 space-y-2">
+                <Button asChild className="w-full">
+                  <Link to="/auth">Créer mon compte pour l'historique</Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => navigate({ to: "/" })}
+                >
+                  Retour à l'accueil
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+    );
+  }
   const e = data.event;
   const hero = heroFor(e.event_type);
   const canEdit = !data.locked;
