@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +21,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -32,7 +39,9 @@ import {
   Mail,
   MapPin,
   Plus,
+  Search,
   Sparkles,
+  UserPlus,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -41,13 +50,31 @@ import {
   GUEST_CIRCLES,
   type EventTypeValue,
 } from "@/lib/event-types";
+import { contactGroupLabel } from "@/lib/contact-groups";
 
 export const Route = createFileRoute("/_authenticated/app/events/new")({
   head: () => ({ meta: [{ title: "Créer un moment — Kosy" }] }),
   component: NewEventPage,
 });
 
-type Guest = { name: string; email: string };
+type Guest = {
+  name: string;
+  email: string;
+  contactId?: string;
+  isMember?: boolean;
+};
+
+type Contact = {
+  id: string;
+  first_name: string;
+  last_name: string | null;
+  email: string | null;
+  phone: string | null;
+  group_type: string | null;
+  linked_user_id: string | null;
+};
+
+
 
 const STEP_ILLUSTRATIONS = ["🍽️", "🍷", "👥"];
 
