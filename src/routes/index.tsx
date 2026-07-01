@@ -118,7 +118,7 @@ function Landing() {
               Tout ce qu'il faut, rien de plus.
             </h2>
             <p className="mt-3 text-muted-foreground">
-              Pensé pour se concentrer sur l'essentiel : les gens.
+              Pensé pour se concentrer sur l'essentiel : vos proches.
             </p>
           </div>
 
