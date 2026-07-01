@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { Home, CalendarDays, Sparkles, User, Plus } from "lucide-react";
+import { Home, CalendarDays, Users, User, Plus } from "lucide-react";
 
 const leftTabs = [
   { to: "/app", label: "Accueil", icon: Home, exact: true },
@@ -7,7 +7,7 @@ const leftTabs = [
 ] as const;
 
 const rightTabs = [
-  { to: "/app/memories", label: "Souvenirs", icon: Sparkles, exact: false },
+  { to: "/app/contacts", label: "Contacts", icon: Users, exact: false },
   { to: "/app/profile", label: "Profil", icon: User, exact: false },
 ] as const;
 
