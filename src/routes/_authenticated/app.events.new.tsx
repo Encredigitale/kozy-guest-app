@@ -471,40 +471,127 @@ function NewEventPage() {
             subtitle="Ajoutez vos invités maintenant ou faites-le plus tard. Vous pourrez toujours modifier votre liste."
           >
             <div className="rounded-3xl border bg-card p-4 space-y-3">
-              <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
-                <Input
-                  placeholder="Prénom"
-                  value={guestName}
-                  onChange={(e) => setGuestName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addGuest();
-                    }
-                  }}
-                  className="h-11 rounded-2xl"
-                />
-                <Input
-                  type="email"
-                  placeholder="Email"
-                  value={guestEmail}
-                  onChange={(e) => setGuestEmail(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      addGuest();
-                    }
-                  }}
-                  className="h-11 rounded-2xl"
-                />
-                <Button
-                  type="button"
-                  onClick={addGuest}
-                  className="h-11 rounded-2xl"
+              <Popover open={searchOpen} onOpenChange={setSearchOpen}>
+                <PopoverTrigger asChild>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      ref={searchInputRef}
+                      value={search}
+                      onFocus={() => setSearchOpen(true)}
+                      onChange={(e) => {
+                        setSearch(e.target.value);
+                        setSearchOpen(true);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          if (filteredContacts.length === 1) {
+                            addContactAsGuest(filteredContacts[0]);
+                          } else if (
+                            search.trim() &&
+                            filteredContacts.length === 0
+                          ) {
+                            openCreateContact();
+                          }
+                        }
+                      }}
+                      placeholder="Rechercher un contact par nom ou email…"
+                      className="pl-9 h-11 rounded-2xl"
+                    />
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent
+                  align="start"
+                  onOpenAutoFocus={(e) => e.preventDefault()}
+                  className="p-0 w-[--radix-popover-trigger-width] max-h-72 overflow-y-auto"
                 >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
+                  {filteredContacts.length === 0 ? (
+                    <div className="p-3 space-y-2">
+                      <p className="text-sm text-muted-foreground">
+                        {search.trim()
+                          ? "Aucun contact trouvé."
+                          : "Votre carnet est vide."}
+                      </p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full rounded-2xl"
+                        onClick={openCreateContact}
+                      >
+                        <UserPlus className="h-4 w-4" /> Créer un nouveau
+                        contact
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="py-1">
+                      {filteredContacts.map((c) => {
+                        const added = isContactAdded(c.id);
+                        const isMember = !!c.linked_user_id;
+                        const label = isMember ? "Inviter" : "Ajouter";
+                        return (
+                          <div
+                            key={c.id}
+                            className="flex items-center gap-3 px-3 py-2 hover:bg-accent/50"
+                          >
+                            <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium uppercase shrink-0">
+                              {(c.first_name?.[0] ?? "") +
+                                (c.last_name?.[0] ?? "")}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-medium truncate">
+                                  {contactFullName(c) || c.email}
+                                </p>
+                                {isMember && (
+                                  <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
+                                    Membre
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {c.email ??
+                                  c.phone ??
+                                  contactGroupLabel(c.group_type)}
+                              </p>
+                            </div>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant={added ? "ghost" : "default"}
+                              disabled={added}
+                              onClick={() => addContactAsGuest(c)}
+                              className="rounded-full h-8"
+                            >
+                              {added ? (
+                                <>
+                                  <Check className="h-3.5 w-3.5" /> Ajouté
+                                </>
+                              ) : (
+                                <>
+                                  <Plus className="h-3.5 w-3.5" /> {label}
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        );
+                      })}
+                      <div className="border-t p-2">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="w-full justify-start rounded-xl text-sm"
+                          onClick={openCreateContact}
+                        >
+                          <UserPlus className="h-4 w-4" /> Créer un nouveau
+                          contact
+                          {search.trim() ? ` « ${search.trim()} »` : ""}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </PopoverContent>
+              </Popover>
               <p className="text-xs text-muted-foreground">
                 Un lien d'invitation sera généré après création — vous pourrez
                 le partager par email ou en direct.
@@ -524,6 +611,7 @@ function NewEventPage() {
                 ))}
               </div>
             )}
+
           </StepShell>
         )}
       </div>
