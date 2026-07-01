@@ -317,17 +317,15 @@ function EventDetailPage() {
 
       <Card className="mb-6 border-primary/40">
         <CardHeader>
-          <CardTitle className="text-base">Lien d'invitation</CardTitle>
+          <CardTitle className="text-base">Liens d'invitation</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent>
           <p className="text-sm text-muted-foreground">
-            Partage ce lien pour que tes invités répondent et proposent ce qu'ils apportent — sans créer de compte.
+            Chaque invité·e reçoit un lien personnel et sécurisé. Retrouve-les dans la liste ci-dessous.
           </p>
-          <Button type="button" variant="outline" onClick={() => copyInvite(inviteUrl)} disabled={!inviteUrl}>
-            <Copy className="h-4 w-4" /> Cliquer pour copier le lien générique
-          </Button>
         </CardContent>
       </Card>
+
 
       <form onSubmit={onSave} className="space-y-6">
         <Card>
