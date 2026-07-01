@@ -25,6 +25,8 @@ function AuthPage() {
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("mode") === "signup") setMode("signup");
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: "/app" });
     });
@@ -33,9 +35,9 @@ function AuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="font-serif text-4xl text-primary">Kosy</h1>
-          <p className="text-muted-foreground mt-2">
+        <div className="text-center mb-10">
+          <h1 className="font-serif text-4xl tracking-tight text-primary">Kosy</h1>
+          <p className="text-muted-foreground mt-3 text-sm">
             Organisez vos moments et gardez-en le souvenir.
           </p>
         </div>
@@ -43,18 +45,18 @@ function AuthPage() {
         {mode === "forgot" ? (
           <ForgotPasswordForm onBack={() => setMode("signin")} />
         ) : (
-          <Card>
+          <Card className="rounded-3xl border-border/60 shadow-none">
             <CardHeader>
               <Tabs value={mode} onValueChange={(v) => setMode(v as "signin" | "signup")}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="signin">Se connecter</TabsTrigger>
-                  <TabsTrigger value="signup">Créer un compte</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 rounded-full">
+                  <TabsTrigger value="signin" className="rounded-full">Se connecter</TabsTrigger>
+                  <TabsTrigger value="signup" className="rounded-full">Créer un compte</TabsTrigger>
                 </TabsList>
                 <TabsContent value="signin" className="mt-6">
-                  <SignInForm onForgot={() => setMode("forgot")} />
+                  <SignInForm onForgot={() => setMode("forgot")} onSwitchSignup={() => setMode("signup")} />
                 </TabsContent>
                 <TabsContent value="signup" className="mt-6">
-                  <SignUpForm />
+                  <SignUpForm onSwitchSignin={() => setMode("signin")} />
                 </TabsContent>
               </Tabs>
             </CardHeader>
