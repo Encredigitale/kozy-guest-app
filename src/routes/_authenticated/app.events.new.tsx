@@ -875,6 +875,11 @@ function NewEventPage() {
                 </SelectContent>
               </Select>
             </Field>
+            {newContactErrors.general && (
+              <div className="rounded-xl bg-destructive/10 text-destructive text-sm px-3 py-2">
+                {newContactErrors.general}
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button
