@@ -244,6 +244,22 @@ function EventDetailPage() {
     }
   };
 
+  const [resendingId, setResendingId] = useState<string | null>(null);
+  const resendInvite = async (guest: Guest) => {
+    if (!guest.email) return;
+    setResendingId(guest.id);
+    try {
+      const { sendEventInvitation } = await import("@/lib/invitations.functions");
+      await sendEventInvitation({ data: { eventId, name: guest.name, email: guest.email } });
+      toast.success(`Invitation renvoyée à ${guest.name}.`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Envoi impossible.";
+      toast.error(msg);
+    } finally {
+      setResendingId(null);
+    }
+  };
+
 
   const addContribution = async (e: React.FormEvent) => {
     e.preventDefault();
