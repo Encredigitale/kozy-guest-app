@@ -132,8 +132,8 @@ export const claimInvitationContribution = createServerFn({ method: "POST" })
       p_event_id: data.eventId,
       p_invitation_id: data.invitationId,
       p_token: data.token,
-      p_contribution_id: data.contributionId as string | null,
-    });
+      p_contribution_id: data.contributionId,
+    } as never);
     if (error) throw new Error(mapPgError(error.message));
     return { ok: true };
   });
