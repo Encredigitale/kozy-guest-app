@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, Users, Wine, Heart, Bell } from "lucide-react";
-import heroImg from "@/assets/hero-gathering.jpg";
+import heroAsset from "@/assets/friends-party.jpg.asset.json";
+import clinkingAsset from "@/assets/friends-clinking.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({
