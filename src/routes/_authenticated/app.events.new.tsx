@@ -212,7 +212,7 @@ function NewEventPage() {
         last_name: newContact.last_name.trim() || null,
         email: email || null,
         phone: newContact.phone.trim() || null,
-        group_type: newContact.group_type || null,
+        group_type: (newContact.group_type || null) as never,
       })
       .select("id,first_name,last_name,email,phone,group_type,linked_user_id")
       .single();
