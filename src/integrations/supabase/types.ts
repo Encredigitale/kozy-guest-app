@@ -364,6 +364,37 @@ export type Database = {
         }
         Returns: boolean
       }
+      invitation_add_custom_contribution: {
+        Args: {
+          p_event_id: string
+          p_invitation_id: string
+          p_label: string
+          p_token: string
+        }
+        Returns: undefined
+      }
+      invitation_claim_contribution: {
+        Args: {
+          p_contribution_id: string
+          p_event_id: string
+          p_invitation_id: string
+          p_token: string
+        }
+        Returns: undefined
+      }
+      invitation_get: {
+        Args: { p_event_id: string; p_invitation_id: string; p_token: string }
+        Returns: Json
+      }
+      invitation_respond: {
+        Args: {
+          p_event_id: string
+          p_invitation_id: string
+          p_status: string
+          p_token: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
