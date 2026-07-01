@@ -81,7 +81,7 @@ function Landing() {
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
                 <Button asChild size="lg" className="rounded-full px-8">
-                  <Link to="/auth" search={{ mode: "signup" } as never}>Créer un compte</Link>
+                  <a href="/auth?mode=signup">Créer un compte</a>
                 </Button>
                 <Button asChild size="lg" variant="outline" className="rounded-full px-8">
                   <Link to="/auth">Se connecter</Link>

@@ -98,7 +98,7 @@ function OnboardingPage() {
           {last ? (
             <>
               <Button asChild size="lg" className="w-full rounded-full">
-                <Link to="/auth" search={{ mode: "signup" } as never}>Créer un compte</Link>
+                <a href="/auth?mode=signup">Créer un compte</a>
               </Button>
               <Button asChild size="lg" variant="outline" className="w-full rounded-full">
                 <Link to="/auth">Se connecter</Link>
