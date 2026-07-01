@@ -80,7 +80,7 @@ function ContactDetail() {
         email: c.email?.trim() || null,
         phone: c.phone?.trim() || null,
         birth_date: c.birth_date || null,
-        group_type: c.group_type,
+        group_type: c.group_type as "family" | "friends" | "colleagues" | "neighbors" | "other",
         notes: c.notes?.trim() || null,
         dietary_preferences: c.dietary_preferences?.trim() || null,
         allergies: c.allergies?.trim() || null,
