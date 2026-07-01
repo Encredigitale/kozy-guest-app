@@ -101,7 +101,7 @@ function Landing() {
             <div className="relative">
               <div className="absolute -inset-8 bg-accent/40 rounded-[3rem] blur-3xl -z-10" />
               <img
-                src={heroImg}
+                src={heroAsset.url}
                 alt="Famille et amis partageant un repas convivial autour d'une table."
                 width={1600}
                 height={1200}
