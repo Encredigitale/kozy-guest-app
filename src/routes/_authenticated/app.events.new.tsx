@@ -846,12 +846,22 @@ function GuestCard({
         {initials || "?"}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="font-medium truncate">{guest.name}</p>
+        <div className="flex items-center gap-2">
+          <p className="font-medium truncate">{guest.name}</p>
+          {guest.isMember && (
+            <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-primary/10 text-primary shrink-0">
+              Membre
+            </span>
+          )}
+        </div>
         <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
-          <Check className="h-3 w-3" /> Invitation à envoyer
-          {guest.email ? ` · ${guest.email}` : ""}
+          <Check className="h-3 w-3" />
+          {guest.email
+            ? `Invitation à envoyer · ${guest.email}`
+            : "Ajouté sans email"}
         </p>
       </div>
+
       <button
         type="button"
         onClick={onRemove}
