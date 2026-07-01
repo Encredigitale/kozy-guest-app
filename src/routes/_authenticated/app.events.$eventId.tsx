@@ -30,6 +30,7 @@ import {
   Check,
   Copy,
   Loader2,
+  Mail,
   Plus,
   Trash2,
   X,
@@ -243,6 +244,22 @@ function EventDetailPage() {
     }
   };
 
+  const [resendingId, setResendingId] = useState<string | null>(null);
+  const resendInvite = async (guest: Guest) => {
+    if (!guest.email) return;
+    setResendingId(guest.id);
+    try {
+      const { sendEventInvitation } = await import("@/lib/invitations.functions");
+      await sendEventInvitation({ data: { eventId, name: guest.name, email: guest.email } });
+      toast.success(`Invitation renvoyée à ${guest.name}.`);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Envoi impossible.";
+      toast.error(msg);
+    } finally {
+      setResendingId(null);
+    }
+  };
+
 
   const addContribution = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -315,16 +332,6 @@ function EventDetailPage() {
         </AlertDialog>
       </div>
 
-      <Card className="mb-6 border-primary/40">
-        <CardHeader>
-          <CardTitle className="text-base">Liens d'invitation</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Chaque invité·e reçoit un lien personnel et sécurisé. Retrouve-les dans la liste ci-dessous.
-          </p>
-        </CardContent>
-      </Card>
 
 
       <form onSubmit={onSave} className="space-y-6">
@@ -444,15 +451,31 @@ function EventDetailPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     {g.email && (
-                      <button
-                        type="button"
-                        onClick={() => copyInvite(personalInviteUrl(g))}
-                        className="p-1 text-muted-foreground hover:text-primary"
-                        title="Copier le lien personnel"
-                        aria-label={`Copier le lien personnel pour ${g.name}`}
-                      >
-                        <Copy className="h-4 w-4" />
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => copyInvite(personalInviteUrl(g))}
+                          className="p-1 text-muted-foreground hover:text-primary"
+                          title="Copier le lien personnel"
+                          aria-label={`Copier le lien personnel pour ${g.name}`}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => resendInvite(g)}
+                          disabled={resendingId === g.id}
+                          className="p-1 text-muted-foreground hover:text-primary disabled:opacity-50"
+                          title="Renvoyer l'invitation par email"
+                          aria-label={`Renvoyer l'invitation à ${g.name}`}
+                        >
+                          {resendingId === g.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Mail className="h-4 w-4" />
+                          )}
+                        </button>
+                      </>
                     )}
                     <button
                       type="button"
