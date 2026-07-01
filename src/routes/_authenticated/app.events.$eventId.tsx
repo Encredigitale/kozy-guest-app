@@ -446,7 +446,7 @@ function EventDetailPage() {
                     {g.email && (
                       <button
                         type="button"
-                        onClick={() => copyInvite(personalInviteUrl(g.id))}
+                        onClick={() => copyInvite(personalInviteUrl(g))}
                         className="p-1 text-muted-foreground hover:text-primary"
                         title="Copier le lien personnel"
                         aria-label={`Copier le lien personnel pour ${g.name}`}
