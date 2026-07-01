@@ -214,15 +214,19 @@ function NewEventPage() {
 
   const openCreateContact = () => {
     const q = search.trim();
-    // Guess: if contains @, use as email, else as first name
+    setNewContactErrors({});
+    // Guess: if contains @, use as email; if digits, phone; else first name
     if (q.includes("@")) {
-      setNewContact((n) => ({ ...n, email: q, first_name: "" }));
+      setNewContact((n) => ({ ...n, email: q, phone: "", first_name: "" }));
+    } else if (looksLikePhone) {
+      setNewContact((n) => ({ ...n, phone: q, email: "", first_name: "" }));
     } else {
-      setNewContact((n) => ({ ...n, first_name: q, email: "" }));
+      setNewContact((n) => ({ ...n, first_name: q, email: "", phone: "" }));
     }
     setSearchOpen(false);
     setNewContactOpen(true);
   };
+
 
   const createContact = async () => {
     const first = newContact.first_name.trim();
