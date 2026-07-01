@@ -80,7 +80,7 @@ export const getInvitation = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }): Promise<InvitationPayload> => {
     const sb = publicClient();
-    // @ts-expect-error rpc name added via migration; types file may lag
+    // rpc typed via generated types
     const { data: result, error } = await sb.rpc("invitation_get", {
       p_event_id: data.eventId,
       p_invitation_id: data.invitationId,
@@ -103,7 +103,7 @@ export const respondToInvitation = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const sb = publicClient();
-    // @ts-expect-error rpc name added via migration
+    // rpc typed via generated types
     const { error } = await sb.rpc("invitation_respond", {
       p_event_id: data.eventId,
       p_invitation_id: data.invitationId,
@@ -127,7 +127,7 @@ export const claimInvitationContribution = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const sb = publicClient();
-    // @ts-expect-error rpc name added via migration
+    // rpc typed via generated types
     const { error } = await sb.rpc("invitation_claim_contribution", {
       p_event_id: data.eventId,
       p_invitation_id: data.invitationId,
@@ -151,7 +151,7 @@ export const addCustomContribution = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const sb = publicClient();
-    // @ts-expect-error rpc name added via migration
+    // rpc typed via generated types
     const { error } = await sb.rpc("invitation_add_custom_contribution", {
       p_event_id: data.eventId,
       p_invitation_id: data.invitationId,
