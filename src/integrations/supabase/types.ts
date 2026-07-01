@@ -142,31 +142,43 @@ export type Database = {
           created_at: string
           email: string | null
           event_id: string
+          expires_at: string | null
           id: string
+          invite_token: string
+          last_opened_at: string | null
           name: string
           responded_at: string | null
           rsvp_id: string | null
           rsvp_status: string | null
+          status: string
         }
         Insert: {
           created_at?: string
           email?: string | null
           event_id: string
+          expires_at?: string | null
           id?: string
+          invite_token?: string
+          last_opened_at?: string | null
           name: string
           responded_at?: string | null
           rsvp_id?: string | null
           rsvp_status?: string | null
+          status?: string
         }
         Update: {
           created_at?: string
           email?: string | null
           event_id?: string
+          expires_at?: string | null
           id?: string
+          invite_token?: string
+          last_opened_at?: string | null
           name?: string
           responded_at?: string | null
           rsvp_id?: string | null
           rsvp_status?: string | null
+          status?: string
         }
         Relationships: [
           {
