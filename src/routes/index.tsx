@@ -73,7 +73,7 @@ function Landing() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="animate-fade-in">
               <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-foreground">
-                Les plus beaux souvenirs commencent autour d'une&nbsp;table.
+                Vos plus beaux souvenirs sont les moments partagés.
               </h1>
               <p className="mt-6 text-lg text-muted-foreground max-w-xl leading-relaxed">
                 Organisez facilement vos repas, anniversaires et moments entre proches.
