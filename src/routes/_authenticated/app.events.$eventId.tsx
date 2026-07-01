@@ -30,6 +30,7 @@ import {
   Check,
   Copy,
   Loader2,
+  Mail,
   Plus,
   Trash2,
   X,
