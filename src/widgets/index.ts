@@ -14,6 +14,9 @@ import { EventInfoWidget } from "./event-info/EventInfoWidget";
 import { EventGuestsWidget } from "./event-guests/EventGuestsWidget";
 import { EventRsvpsWidget } from "./event-rsvps/EventRsvpsWidget";
 import { EventContributionsWidget } from "./event-contributions/EventContributionsWidget";
+import { ContactHeaderWidget } from "./contact-header/ContactHeaderWidget";
+import { ContactProfileWidget } from "./contact-profile/ContactProfileWidget";
+import { ContactActionsWidget } from "./contact-actions/ContactActionsWidget";
 
 let bootstrapped = false;
 
@@ -65,5 +68,40 @@ export function bootstrapWidgets() {
     enabled: true,
     category: "core",
     component: EventContributionsWidget,
+  });
+
+  registerWidget({
+    id: "contact.header",
+    name: "En-tête contact",
+    description: "Avatar, nom, groupe et statistiques de sollicitation.",
+    surface: "contact.detail",
+    order: 10,
+    enabled: true,
+    required: true,
+    category: "core",
+    component: ContactHeaderWidget,
+  });
+
+  registerWidget({
+    id: "contact.profile",
+    name: "Profil éditable",
+    description: "Identité, coordonnées, préférences et notes du contact.",
+    surface: "contact.detail",
+    order: 20,
+    enabled: true,
+    required: true,
+    category: "core",
+    component: ContactProfileWidget,
+  });
+
+  registerWidget({
+    id: "contact.actions",
+    name: "Actions",
+    description: "Inviter à un événement ou supprimer le contact.",
+    surface: "contact.detail",
+    order: 30,
+    enabled: true,
+    category: "core",
+    component: ContactActionsWidget,
   });
 }
