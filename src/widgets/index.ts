@@ -14,6 +14,9 @@ import { EventInfoWidget } from "./event-info/EventInfoWidget";
 import { EventGuestsWidget } from "./event-guests/EventGuestsWidget";
 import { EventRsvpsWidget } from "./event-rsvps/EventRsvpsWidget";
 import { EventContributionsWidget } from "./event-contributions/EventContributionsWidget";
+import { ContactHeaderWidget } from "./contact-header/ContactHeaderWidget";
+import { ContactProfileWidget } from "./contact-profile/ContactProfileWidget";
+import { ContactActionsWidget } from "./contact-actions/ContactActionsWidget";
 
 let bootstrapped = false;
 
