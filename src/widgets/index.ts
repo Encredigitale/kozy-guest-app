@@ -106,6 +106,8 @@ export function bootstrapWidgets() {
     enabled: true,
     category: "core",
     component: ContactActionsWidget,
+  });
+
 
   registerWidget({
     id: "dashboard.header",
