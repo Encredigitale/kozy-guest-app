@@ -69,4 +69,39 @@ export function bootstrapWidgets() {
     category: "core",
     component: EventContributionsWidget,
   });
+
+  registerWidget({
+    id: "contact.header",
+    name: "En-tête contact",
+    description: "Avatar, nom, groupe et statistiques de sollicitation.",
+    surface: "contact.detail",
+    order: 10,
+    enabled: true,
+    required: true,
+    category: "core",
+    component: ContactHeaderWidget,
+  });
+
+  registerWidget({
+    id: "contact.profile",
+    name: "Profil éditable",
+    description: "Identité, coordonnées, préférences et notes du contact.",
+    surface: "contact.detail",
+    order: 20,
+    enabled: true,
+    required: true,
+    category: "core",
+    component: ContactProfileWidget,
+  });
+
+  registerWidget({
+    id: "contact.actions",
+    name: "Actions",
+    description: "Inviter à un événement ou supprimer le contact.",
+    surface: "contact.detail",
+    order: 30,
+    enabled: true,
+    category: "core",
+    component: ContactActionsWidget,
+  });
 }
