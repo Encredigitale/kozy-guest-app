@@ -17,6 +17,9 @@ import { EventContributionsWidget } from "./event-contributions/EventContributio
 import { ContactHeaderWidget } from "./contact-header/ContactHeaderWidget";
 import { ContactProfileWidget } from "./contact-profile/ContactProfileWidget";
 import { ContactActionsWidget } from "./contact-actions/ContactActionsWidget";
+import { DashboardHeaderWidget } from "./dashboard-header/DashboardHeaderWidget";
+import { DashboardCreateCtaWidget } from "./dashboard-create-cta/DashboardCreateCtaWidget";
+import { DashboardEventsWidget } from "./dashboard-events/DashboardEventsWidget";
 
 let bootstrapped = false;
 
@@ -103,5 +106,41 @@ export function bootstrapWidgets() {
     enabled: true,
     category: "core",
     component: ContactActionsWidget,
+  });
+
+
+  registerWidget({
+    id: "dashboard.header",
+    name: "En-tête tableau de bord",
+    description: "Salutation personnalisée et déconnexion.",
+    surface: "dashboard",
+    order: 10,
+    enabled: true,
+    required: true,
+    category: "core",
+    component: DashboardHeaderWidget,
+  });
+
+  registerWidget({
+    id: "dashboard.create-cta",
+    name: "Créer un événement",
+    description: "Bouton d'accès rapide au formulaire de création.",
+    surface: "dashboard",
+    order: 20,
+    enabled: true,
+    category: "core",
+    component: DashboardCreateCtaWidget,
+  });
+
+  registerWidget({
+    id: "dashboard.events",
+    name: "Mes événements",
+    description: "Recherche, filtres et sections (mes moments, invitations, souvenirs).",
+    surface: "dashboard",
+    order: 30,
+    enabled: true,
+    required: true,
+    category: "core",
+    component: DashboardEventsWidget,
   });
 }
