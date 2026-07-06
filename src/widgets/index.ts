@@ -20,6 +20,9 @@ import { ContactActionsWidget } from "./contact-actions/ContactActionsWidget";
 import { DashboardHeaderWidget } from "./dashboard-header/DashboardHeaderWidget";
 import { DashboardCreateCtaWidget } from "./dashboard-create-cta/DashboardCreateCtaWidget";
 import { DashboardEventsWidget } from "./dashboard-events/DashboardEventsWidget";
+import { EventNewStep1Widget } from "./event-new/EventNewStep1Widget";
+import { EventNewStep2Widget } from "./event-new/EventNewStep2Widget";
+import { EventNewStep3Widget } from "./event-new/EventNewStep3Widget";
 
 let bootstrapped = false;
 
@@ -142,5 +145,41 @@ export function bootstrapWidgets() {
     required: true,
     category: "core",
     component: DashboardEventsWidget,
+  });
+
+  registerWidget({
+    id: "event.new.basics",
+    name: "Informations essentielles",
+    description: "Étape 1 : titre, date, heure et lieu de l'événement.",
+    surface: "event.new",
+    order: 10,
+    enabled: true,
+    required: true,
+    category: "core",
+    component: EventNewStep1Widget,
+  });
+
+  registerWidget({
+    id: "event.new.details",
+    name: "Détails et personnalisation",
+    description: "Étape 2 : type, cercle invité, menu et description.",
+    surface: "event.new",
+    order: 20,
+    enabled: true,
+    required: true,
+    category: "core",
+    component: EventNewStep2Widget,
+  });
+
+  registerWidget({
+    id: "event.new.guests",
+    name: "Invités",
+    description: "Étape 3 : sélection des invités depuis le carnet ou création rapide.",
+    surface: "event.new",
+    order: 30,
+    enabled: true,
+    required: true,
+    category: "core",
+    component: EventNewStep3Widget,
   });
 }
