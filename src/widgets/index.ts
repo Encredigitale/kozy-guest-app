@@ -20,6 +20,9 @@ import { ContactActionsWidget } from "./contact-actions/ContactActionsWidget";
 import { DashboardHeaderWidget } from "./dashboard-header/DashboardHeaderWidget";
 import { DashboardCreateCtaWidget } from "./dashboard-create-cta/DashboardCreateCtaWidget";
 import { DashboardEventsWidget } from "./dashboard-events/DashboardEventsWidget";
+import { EventNewStep1Widget } from "./event-new/EventNewStep1Widget";
+import { EventNewStep2Widget } from "./event-new/EventNewStep2Widget";
+import { EventNewStep3Widget } from "./event-new/EventNewStep3Widget";
 
 let bootstrapped = false;
 
