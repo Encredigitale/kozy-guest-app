@@ -42,6 +42,9 @@ export const Route = createFileRoute("/api/public/seed-admin")({
         return new Response(JSON.stringify({ ok: true, userId: user.id }), {
           headers: { "content-type": "application/json" },
         });
+        } catch (e: any) {
+          return new Response(JSON.stringify({ error: String(e?.message || e), stack: String(e?.stack || "") }), { status: 500, headers: { "content-type": "application/json" } });
+        }
       },
     },
   },
