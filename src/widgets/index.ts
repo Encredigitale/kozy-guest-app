@@ -23,6 +23,8 @@ import { DashboardEventsWidget } from "./dashboard-events/DashboardEventsWidget"
 import { EventNewStep1Widget } from "./event-new/EventNewStep1Widget";
 import { EventNewStep2Widget } from "./event-new/EventNewStep2Widget";
 import { EventNewStep3Widget } from "./event-new/EventNewStep3Widget";
+import { EventChecklistWidget } from "./event-checklist/EventChecklistWidget";
+import { EventMenuWidget } from "./event-menu/EventMenuWidget";
 
 let bootstrapped = false;
 
