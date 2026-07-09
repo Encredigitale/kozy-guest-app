@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/api/public/_seed-admin")({
+export const Route = createFileRoute("/api/public/seed-admin")({
   server: {
     handlers: {
       POST: async () => {
