@@ -55,3 +55,31 @@ export function setWidgetEnabled(id: string, enabled: boolean) {
   if (!w || w.required) return;
   widgets.set(id, { ...w, enabled });
 }
+
+/**
+ * Surcharge persistée (table `widget_configs`). Chaque champ est optionnel :
+ * seuls les champs présents écrasent le défaut déclaré via `registerWidget`.
+ */
+export type WidgetConfigOverride = {
+  widget_id: string;
+  enabled?: boolean | null;
+  display_order?: number | null;
+  event_types?: string[] | null;
+};
+
+/**
+ * Applique un lot de surcharges au Registry. Les widgets marqués `required`
+ * restent activés — seuls `order` et `eventTypes` peuvent être modifiés.
+ */
+export function applyWidgetConfigs(configs: WidgetConfigOverride[]) {
+  for (const cfg of configs) {
+    const w = widgets.get(cfg.widget_id);
+    if (!w) continue;
+    widgets.set(cfg.widget_id, {
+      ...w,
+      enabled: w.required ? true : cfg.enabled ?? w.enabled,
+      order: cfg.display_order ?? w.order,
+      eventTypes: cfg.event_types ?? w.eventTypes,
+    });
+  }
+}
