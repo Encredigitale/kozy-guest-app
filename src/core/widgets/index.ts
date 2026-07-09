@@ -5,5 +5,8 @@ export {
   getAllWidgets,
   getWidgetsFor,
   setWidgetEnabled,
+  applyWidgetConfigs,
+  type WidgetConfigOverride,
 } from "./registry";
 export { WidgetRenderer } from "./WidgetRenderer";
+export { loadWidgetConfigs } from "./loader";
