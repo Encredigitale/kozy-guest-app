@@ -4,6 +4,7 @@ export const Route = createFileRoute("/api/public/seed-admin")({
   server: {
     handlers: {
       POST: async () => {
+        try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const email = "contact@encredigitale.com";
         const password = "KOZY_3&3FontSix";
