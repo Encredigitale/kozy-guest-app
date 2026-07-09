@@ -352,6 +352,33 @@ export type Database = {
         }
         Relationships: []
       }
+      widget_configs: {
+        Row: {
+          created_at: string
+          display_order: number | null
+          enabled: boolean | null
+          event_types: string[] | null
+          updated_at: string
+          widget_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number | null
+          enabled?: boolean | null
+          event_types?: string[] | null
+          updated_at?: string
+          widget_id: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number | null
+          enabled?: boolean | null
+          event_types?: string[] | null
+          updated_at?: string
+          widget_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
