@@ -18,6 +18,7 @@ import { Route as ITokenRouteImport } from './routes/i.$token'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as InvitationEventIdInvitationIdRouteImport } from './routes/invitation.$eventId.$invitationId'
+import { Route as ApiPublicSeedAdminRouteImport } from './routes/api/public/_seed-admin'
 import { Route as AuthenticatedAppWelcomeRouteImport } from './routes/_authenticated/app.welcome'
 import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
 import { Route as AuthenticatedAppMemoriesRouteImport } from './routes/_authenticated/app.memories'
@@ -74,6 +75,11 @@ const InvitationEventIdInvitationIdRoute =
     path: '/invitation/$eventId/$invitationId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicSeedAdminRoute = ApiPublicSeedAdminRouteImport.update({
+  id: '/api/public/_seed-admin',
+  path: '/api/public',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAppWelcomeRoute = AuthenticatedAppWelcomeRouteImport.update({
   id: '/welcome',
   path: '/welcome',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/app/memories': typeof AuthenticatedAppMemoriesRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/welcome': typeof AuthenticatedAppWelcomeRoute
+  '/api/public': typeof ApiPublicSeedAdminRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/admin/widgets': typeof AuthenticatedAppAdminWidgetsRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/app/memories': typeof AuthenticatedAppMemoriesRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/welcome': typeof AuthenticatedAppWelcomeRoute
+  '/api/public': typeof ApiPublicSeedAdminRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/admin/widgets': typeof AuthenticatedAppAdminWidgetsRoute
@@ -184,6 +192,7 @@ export interface FileRoutesById {
   '/_authenticated/app/memories': typeof AuthenticatedAppMemoriesRoute
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
   '/_authenticated/app/welcome': typeof AuthenticatedAppWelcomeRoute
+  '/api/public/_seed-admin': typeof ApiPublicSeedAdminRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/admin/widgets': typeof AuthenticatedAppAdminWidgetsRoute
@@ -206,6 +215,7 @@ export interface FileRouteTypes {
     | '/app/memories'
     | '/app/profile'
     | '/app/welcome'
+    | '/api/public'
     | '/invitation/$eventId/$invitationId'
     | '/app/'
     | '/app/admin/widgets'
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/app/memories'
     | '/app/profile'
     | '/app/welcome'
+    | '/api/public'
     | '/invitation/$eventId/$invitationId'
     | '/app'
     | '/app/admin/widgets'
@@ -246,6 +257,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/memories'
     | '/_authenticated/app/profile'
     | '/_authenticated/app/welcome'
+    | '/api/public/_seed-admin'
     | '/invitation/$eventId/$invitationId'
     | '/_authenticated/app/'
     | '/_authenticated/app/admin/widgets'
@@ -264,6 +276,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ITokenRoute: typeof ITokenRoute
+  ApiPublicSeedAdminRoute: typeof ApiPublicSeedAdminRoute
   InvitationEventIdInvitationIdRoute: typeof InvitationEventIdInvitationIdRoute
 }
 
@@ -330,6 +343,13 @@ declare module '@tanstack/react-router' {
       path: '/invitation/$eventId/$invitationId'
       fullPath: '/invitation/$eventId/$invitationId'
       preLoaderRoute: typeof InvitationEventIdInvitationIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/_seed-admin': {
+      id: '/api/public/_seed-admin'
+      path: '/api/public'
+      fullPath: '/api/public'
+      preLoaderRoute: typeof ApiPublicSeedAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/app/welcome': {
@@ -455,6 +475,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ITokenRoute: ITokenRoute,
+  ApiPublicSeedAdminRoute: ApiPublicSeedAdminRoute,
   InvitationEventIdInvitationIdRoute: InvitationEventIdInvitationIdRoute,
 }
 export const routeTree = rootRouteImport
