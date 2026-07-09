@@ -18,7 +18,7 @@ import { Route as ITokenRouteImport } from './routes/i.$token'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as InvitationEventIdInvitationIdRouteImport } from './routes/invitation.$eventId.$invitationId'
-import { Route as ApiPublicSeedAdminRouteImport } from './routes/api/public/_seed-admin'
+import { Route as ApiPublicSeedAdminRouteImport } from './routes/api/public/seed-admin'
 import { Route as AuthenticatedAppWelcomeRouteImport } from './routes/_authenticated/app.welcome'
 import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
 import { Route as AuthenticatedAppMemoriesRouteImport } from './routes/_authenticated/app.memories'
@@ -76,8 +76,8 @@ const InvitationEventIdInvitationIdRoute =
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicSeedAdminRoute = ApiPublicSeedAdminRouteImport.update({
-  id: '/api/public/_seed-admin',
-  path: '/api/public',
+  id: '/api/public/seed-admin',
+  path: '/api/public/seed-admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAppWelcomeRoute = AuthenticatedAppWelcomeRouteImport.update({
@@ -149,7 +149,7 @@ export interface FileRoutesByFullPath {
   '/app/memories': typeof AuthenticatedAppMemoriesRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/welcome': typeof AuthenticatedAppWelcomeRoute
-  '/api/public': typeof ApiPublicSeedAdminRoute
+  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/admin/widgets': typeof AuthenticatedAppAdminWidgetsRoute
@@ -169,7 +169,7 @@ export interface FileRoutesByTo {
   '/app/memories': typeof AuthenticatedAppMemoriesRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/welcome': typeof AuthenticatedAppWelcomeRoute
-  '/api/public': typeof ApiPublicSeedAdminRoute
+  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/admin/widgets': typeof AuthenticatedAppAdminWidgetsRoute
@@ -192,7 +192,7 @@ export interface FileRoutesById {
   '/_authenticated/app/memories': typeof AuthenticatedAppMemoriesRoute
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
   '/_authenticated/app/welcome': typeof AuthenticatedAppWelcomeRoute
-  '/api/public/_seed-admin': typeof ApiPublicSeedAdminRoute
+  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/admin/widgets': typeof AuthenticatedAppAdminWidgetsRoute
@@ -215,7 +215,7 @@ export interface FileRouteTypes {
     | '/app/memories'
     | '/app/profile'
     | '/app/welcome'
-    | '/api/public'
+    | '/api/public/seed-admin'
     | '/invitation/$eventId/$invitationId'
     | '/app/'
     | '/app/admin/widgets'
@@ -235,7 +235,7 @@ export interface FileRouteTypes {
     | '/app/memories'
     | '/app/profile'
     | '/app/welcome'
-    | '/api/public'
+    | '/api/public/seed-admin'
     | '/invitation/$eventId/$invitationId'
     | '/app'
     | '/app/admin/widgets'
@@ -257,7 +257,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/memories'
     | '/_authenticated/app/profile'
     | '/_authenticated/app/welcome'
-    | '/api/public/_seed-admin'
+    | '/api/public/seed-admin'
     | '/invitation/$eventId/$invitationId'
     | '/_authenticated/app/'
     | '/_authenticated/app/admin/widgets'
@@ -345,10 +345,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvitationEventIdInvitationIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/public/_seed-admin': {
-      id: '/api/public/_seed-admin'
-      path: '/api/public'
-      fullPath: '/api/public'
+    '/api/public/seed-admin': {
+      id: '/api/public/seed-admin'
+      path: '/api/public/seed-admin'
+      fullPath: '/api/public/seed-admin'
       preLoaderRoute: typeof ApiPublicSeedAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
@@ -481,3 +481,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
