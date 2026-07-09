@@ -27,6 +27,7 @@ import { Route as AuthenticatedAppEventsNewRouteImport } from './routes/_authent
 import { Route as AuthenticatedAppEventsEventIdRouteImport } from './routes/_authenticated/app.events.$eventId'
 import { Route as AuthenticatedAppContactsNewRouteImport } from './routes/_authenticated/app.contacts.new'
 import { Route as AuthenticatedAppContactsContactIdRouteImport } from './routes/_authenticated/app.contacts.$contactId'
+import { Route as AuthenticatedAppAdminWidgetsRouteImport } from './routes/_authenticated/app.admin.widgets'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -125,6 +126,12 @@ const AuthenticatedAppContactsContactIdRoute =
     path: '/contacts/$contactId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppAdminWidgetsRoute =
+  AuthenticatedAppAdminWidgetsRouteImport.update({
+    id: '/admin/widgets',
+    path: '/admin/widgets',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/app/welcome': typeof AuthenticatedAppWelcomeRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/app/': typeof AuthenticatedAppIndexRoute
+  '/app/admin/widgets': typeof AuthenticatedAppAdminWidgetsRoute
   '/app/contacts/$contactId': typeof AuthenticatedAppContactsContactIdRoute
   '/app/contacts/new': typeof AuthenticatedAppContactsNewRoute
   '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
@@ -156,6 +164,7 @@ export interface FileRoutesByTo {
   '/app/welcome': typeof AuthenticatedAppWelcomeRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/app': typeof AuthenticatedAppIndexRoute
+  '/app/admin/widgets': typeof AuthenticatedAppAdminWidgetsRoute
   '/app/contacts/$contactId': typeof AuthenticatedAppContactsContactIdRoute
   '/app/contacts/new': typeof AuthenticatedAppContactsNewRoute
   '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
@@ -177,6 +186,7 @@ export interface FileRoutesById {
   '/_authenticated/app/welcome': typeof AuthenticatedAppWelcomeRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
+  '/_authenticated/app/admin/widgets': typeof AuthenticatedAppAdminWidgetsRoute
   '/_authenticated/app/contacts/$contactId': typeof AuthenticatedAppContactsContactIdRoute
   '/_authenticated/app/contacts/new': typeof AuthenticatedAppContactsNewRoute
   '/_authenticated/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
@@ -198,6 +208,7 @@ export interface FileRouteTypes {
     | '/app/welcome'
     | '/invitation/$eventId/$invitationId'
     | '/app/'
+    | '/app/admin/widgets'
     | '/app/contacts/$contactId'
     | '/app/contacts/new'
     | '/app/events/$eventId'
@@ -216,6 +227,7 @@ export interface FileRouteTypes {
     | '/app/welcome'
     | '/invitation/$eventId/$invitationId'
     | '/app'
+    | '/app/admin/widgets'
     | '/app/contacts/$contactId'
     | '/app/contacts/new'
     | '/app/events/$eventId'
@@ -236,6 +248,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/welcome'
     | '/invitation/$eventId/$invitationId'
     | '/_authenticated/app/'
+    | '/_authenticated/app/admin/widgets'
     | '/_authenticated/app/contacts/$contactId'
     | '/_authenticated/app/contacts/new'
     | '/_authenticated/app/events/$eventId'
@@ -382,6 +395,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppContactsContactIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/admin/widgets': {
+      id: '/_authenticated/app/admin/widgets'
+      path: '/admin/widgets'
+      fullPath: '/app/admin/widgets'
+      preLoaderRoute: typeof AuthenticatedAppAdminWidgetsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
   }
 }
 
@@ -390,6 +410,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
   AuthenticatedAppWelcomeRoute: typeof AuthenticatedAppWelcomeRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+  AuthenticatedAppAdminWidgetsRoute: typeof AuthenticatedAppAdminWidgetsRoute
   AuthenticatedAppContactsContactIdRoute: typeof AuthenticatedAppContactsContactIdRoute
   AuthenticatedAppContactsNewRoute: typeof AuthenticatedAppContactsNewRoute
   AuthenticatedAppEventsEventIdRoute: typeof AuthenticatedAppEventsEventIdRoute
@@ -403,6 +424,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
   AuthenticatedAppWelcomeRoute: AuthenticatedAppWelcomeRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+  AuthenticatedAppAdminWidgetsRoute: AuthenticatedAppAdminWidgetsRoute,
   AuthenticatedAppContactsContactIdRoute:
     AuthenticatedAppContactsContactIdRoute,
   AuthenticatedAppContactsNewRoute: AuthenticatedAppContactsNewRoute,
