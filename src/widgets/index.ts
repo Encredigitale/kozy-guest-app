@@ -79,6 +79,28 @@ export function bootstrapWidgets() {
   });
 
   registerWidget({
+    id: "event.menu.detailed",
+    name: "Menu détaillé",
+    description: "Composez le menu par service (entrée, plat, dessert, boisson).",
+    surface: "event.detail",
+    order: 50,
+    enabled: true,
+    category: "extension",
+    component: EventMenuWidget,
+  });
+
+  registerWidget({
+    id: "event.checklist",
+    name: "Checklist",
+    description: "Liste des tâches à préparer avant le moment.",
+    surface: "event.detail",
+    order: 60,
+    enabled: true,
+    category: "extension",
+    component: EventChecklistWidget,
+  });
+
+  registerWidget({
     id: "contact.header",
     name: "En-tête contact",
     description: "Avatar, nom, groupe et statistiques de sollicitation.",
