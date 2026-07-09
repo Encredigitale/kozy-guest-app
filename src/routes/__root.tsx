@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 import { bootstrapWidgets } from "@/widgets";
+import { loadWidgetConfigs } from "@/core/widgets";
 
 // Enregistre les Widgets métier dans le Registry avant tout rendu.
 bootstrapWidgets();
