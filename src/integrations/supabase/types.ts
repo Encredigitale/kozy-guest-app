@@ -86,6 +86,44 @@ export type Database = {
         }
         Relationships: []
       }
+      event_checklist_items: {
+        Row: {
+          created_at: string
+          done: boolean
+          event_id: string
+          id: string
+          label: string
+          position: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          done?: boolean
+          event_id: string
+          id?: string
+          label: string
+          position?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          done?: boolean
+          event_id?: string
+          id?: string
+          label?: string
+          position?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_checklist_items_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_contributions: {
         Row: {
           category: string
@@ -193,6 +231,44 @@ export type Database = {
             columns: ["rsvp_id"]
             isOneToOne: false
             referencedRelation: "event_rsvps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_menu_items: {
+        Row: {
+          course: string
+          created_at: string
+          event_id: string
+          id: string
+          label: string
+          position: number
+          updated_at: string
+        }
+        Insert: {
+          course?: string
+          created_at?: string
+          event_id: string
+          id?: string
+          label: string
+          position?: number
+          updated_at?: string
+        }
+        Update: {
+          course?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          label?: string
+          position?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_menu_items_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
         ]

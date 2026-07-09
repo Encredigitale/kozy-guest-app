@@ -23,6 +23,8 @@ import { DashboardEventsWidget } from "./dashboard-events/DashboardEventsWidget"
 import { EventNewStep1Widget } from "./event-new/EventNewStep1Widget";
 import { EventNewStep2Widget } from "./event-new/EventNewStep2Widget";
 import { EventNewStep3Widget } from "./event-new/EventNewStep3Widget";
+import { EventChecklistWidget } from "./event-checklist/EventChecklistWidget";
+import { EventMenuWidget } from "./event-menu/EventMenuWidget";
 
 let bootstrapped = false;
 
@@ -74,6 +76,28 @@ export function bootstrapWidgets() {
     enabled: true,
     category: "core",
     component: EventContributionsWidget,
+  });
+
+  registerWidget({
+    id: "event.menu.detailed",
+    name: "Menu détaillé",
+    description: "Composez le menu par service (entrée, plat, dessert, boisson).",
+    surface: "event.detail",
+    order: 50,
+    enabled: true,
+    category: "extension",
+    component: EventMenuWidget,
+  });
+
+  registerWidget({
+    id: "event.checklist",
+    name: "Checklist",
+    description: "Liste des tâches à préparer avant le moment.",
+    surface: "event.detail",
+    order: 60,
+    enabled: true,
+    category: "extension",
+    component: EventChecklistWidget,
   });
 
   registerWidget({
