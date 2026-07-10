@@ -10,33 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ITokenRouteImport } from './routes/i.$token'
-import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
-import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
-import { Route as InvitationEventIdInvitationIdRouteImport } from './routes/invitation.$eventId.$invitationId'
-import { Route as AuthenticatedAppWelcomeRouteImport } from './routes/_authenticated/app.welcome'
-import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
-import { Route as AuthenticatedAppMemoriesRouteImport } from './routes/_authenticated/app.memories'
-import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/app.events.index'
-import { Route as AuthenticatedAppContactsIndexRouteImport } from './routes/_authenticated/app.contacts.index'
-import { Route as AuthenticatedAppEventsNewRouteImport } from './routes/_authenticated/app.events.new'
-import { Route as AuthenticatedAppEventsEventIdRouteImport } from './routes/_authenticated/app.events.$eventId'
-import { Route as AuthenticatedAppContactsNewRouteImport } from './routes/_authenticated/app.contacts.new'
-import { Route as AuthenticatedAppContactsContactIdRouteImport } from './routes/_authenticated/app.contacts.$contactId'
-import { Route as AuthenticatedAppAdminWidgetsRouteImport } from './routes/_authenticated/app.admin.widgets'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -53,218 +34,51 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ITokenRoute = ITokenRouteImport.update({
-  id: '/i/$token',
-  path: '/i/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
-  id: '/app',
-  path: '/app',
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const InvitationEventIdInvitationIdRoute =
-  InvitationEventIdInvitationIdRouteImport.update({
-    id: '/invitation/$eventId/$invitationId',
-    path: '/invitation/$eventId/$invitationId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AuthenticatedAppWelcomeRoute = AuthenticatedAppWelcomeRouteImport.update({
-  id: '/welcome',
-  path: '/welcome',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppMemoriesRoute =
-  AuthenticatedAppMemoriesRouteImport.update({
-    id: '/memories',
-    path: '/memories',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppEventsIndexRoute =
-  AuthenticatedAppEventsIndexRouteImport.update({
-    id: '/events/',
-    path: '/events/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppContactsIndexRoute =
-  AuthenticatedAppContactsIndexRouteImport.update({
-    id: '/contacts/',
-    path: '/contacts/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppEventsNewRoute =
-  AuthenticatedAppEventsNewRouteImport.update({
-    id: '/events/new',
-    path: '/events/new',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppEventsEventIdRoute =
-  AuthenticatedAppEventsEventIdRouteImport.update({
-    id: '/events/$eventId',
-    path: '/events/$eventId',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppContactsNewRoute =
-  AuthenticatedAppContactsNewRouteImport.update({
-    id: '/contacts/new',
-    path: '/contacts/new',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppContactsContactIdRoute =
-  AuthenticatedAppContactsContactIdRouteImport.update({
-    id: '/contacts/$contactId',
-    path: '/contacts/$contactId',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppAdminWidgetsRoute =
-  AuthenticatedAppAdminWidgetsRouteImport.update({
-    id: '/admin/widgets',
-    path: '/admin/widgets',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/app': typeof AuthenticatedAppRouteWithChildren
-  '/i/$token': typeof ITokenRoute
-  '/app/memories': typeof AuthenticatedAppMemoriesRoute
-  '/app/profile': typeof AuthenticatedAppProfileRoute
-  '/app/welcome': typeof AuthenticatedAppWelcomeRoute
-  '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
-  '/app/': typeof AuthenticatedAppIndexRoute
-  '/app/admin/widgets': typeof AuthenticatedAppAdminWidgetsRoute
-  '/app/contacts/$contactId': typeof AuthenticatedAppContactsContactIdRoute
-  '/app/contacts/new': typeof AuthenticatedAppContactsNewRoute
-  '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
-  '/app/events/new': typeof AuthenticatedAppEventsNewRoute
-  '/app/contacts/': typeof AuthenticatedAppContactsIndexRoute
-  '/app/events/': typeof AuthenticatedAppEventsIndexRoute
+  '/admin': typeof AuthenticatedAdminRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/i/$token': typeof ITokenRoute
-  '/app/memories': typeof AuthenticatedAppMemoriesRoute
-  '/app/profile': typeof AuthenticatedAppProfileRoute
-  '/app/welcome': typeof AuthenticatedAppWelcomeRoute
-  '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
-  '/app': typeof AuthenticatedAppIndexRoute
-  '/app/admin/widgets': typeof AuthenticatedAppAdminWidgetsRoute
-  '/app/contacts/$contactId': typeof AuthenticatedAppContactsContactIdRoute
-  '/app/contacts/new': typeof AuthenticatedAppContactsNewRoute
-  '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
-  '/app/events/new': typeof AuthenticatedAppEventsNewRoute
-  '/app/contacts': typeof AuthenticatedAppContactsIndexRoute
-  '/app/events': typeof AuthenticatedAppEventsIndexRoute
+  '/admin': typeof AuthenticatedAdminRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/onboarding': typeof OnboardingRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
-  '/i/$token': typeof ITokenRoute
-  '/_authenticated/app/memories': typeof AuthenticatedAppMemoriesRoute
-  '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
-  '/_authenticated/app/welcome': typeof AuthenticatedAppWelcomeRoute
-  '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
-  '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
-  '/_authenticated/app/admin/widgets': typeof AuthenticatedAppAdminWidgetsRoute
-  '/_authenticated/app/contacts/$contactId': typeof AuthenticatedAppContactsContactIdRoute
-  '/_authenticated/app/contacts/new': typeof AuthenticatedAppContactsNewRoute
-  '/_authenticated/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
-  '/_authenticated/app/events/new': typeof AuthenticatedAppEventsNewRoute
-  '/_authenticated/app/contacts/': typeof AuthenticatedAppContactsIndexRoute
-  '/_authenticated/app/events/': typeof AuthenticatedAppEventsIndexRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/auth'
-    | '/onboarding'
-    | '/reset-password'
-    | '/app'
-    | '/i/$token'
-    | '/app/memories'
-    | '/app/profile'
-    | '/app/welcome'
-    | '/invitation/$eventId/$invitationId'
-    | '/app/'
-    | '/app/admin/widgets'
-    | '/app/contacts/$contactId'
-    | '/app/contacts/new'
-    | '/app/events/$eventId'
-    | '/app/events/new'
-    | '/app/contacts/'
-    | '/app/events/'
+  fullPaths: '/' | '/auth' | '/reset-password' | '/admin'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/auth'
-    | '/onboarding'
-    | '/reset-password'
-    | '/i/$token'
-    | '/app/memories'
-    | '/app/profile'
-    | '/app/welcome'
-    | '/invitation/$eventId/$invitationId'
-    | '/app'
-    | '/app/admin/widgets'
-    | '/app/contacts/$contactId'
-    | '/app/contacts/new'
-    | '/app/events/$eventId'
-    | '/app/events/new'
-    | '/app/contacts'
-    | '/app/events'
+  to: '/' | '/auth' | '/reset-password' | '/admin'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
-    | '/onboarding'
     | '/reset-password'
-    | '/_authenticated/app'
-    | '/i/$token'
-    | '/_authenticated/app/memories'
-    | '/_authenticated/app/profile'
-    | '/_authenticated/app/welcome'
-    | '/invitation/$eventId/$invitationId'
-    | '/_authenticated/app/'
-    | '/_authenticated/app/admin/widgets'
-    | '/_authenticated/app/contacts/$contactId'
-    | '/_authenticated/app/contacts/new'
-    | '/_authenticated/app/events/$eventId'
-    | '/_authenticated/app/events/new'
-    | '/_authenticated/app/contacts/'
-    | '/_authenticated/app/events/'
+    | '/_authenticated/admin'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  OnboardingRoute: typeof OnboardingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  ITokenRoute: typeof ITokenRoute
-  InvitationEventIdInvitationIdRoute: typeof InvitationEventIdInvitationIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -274,13 +88,6 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -304,145 +111,22 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/i/$token': {
-      id: '/i/$token'
-      path: '/i/$token'
-      fullPath: '/i/$token'
-      preLoaderRoute: typeof ITokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/app': {
-      id: '/_authenticated/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AuthenticatedAppRouteImport
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/app/': {
-      id: '/_authenticated/app/'
-      path: '/'
-      fullPath: '/app/'
-      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/invitation/$eventId/$invitationId': {
-      id: '/invitation/$eventId/$invitationId'
-      path: '/invitation/$eventId/$invitationId'
-      fullPath: '/invitation/$eventId/$invitationId'
-      preLoaderRoute: typeof InvitationEventIdInvitationIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/app/welcome': {
-      id: '/_authenticated/app/welcome'
-      path: '/welcome'
-      fullPath: '/app/welcome'
-      preLoaderRoute: typeof AuthenticatedAppWelcomeRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/profile': {
-      id: '/_authenticated/app/profile'
-      path: '/profile'
-      fullPath: '/app/profile'
-      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/memories': {
-      id: '/_authenticated/app/memories'
-      path: '/memories'
-      fullPath: '/app/memories'
-      preLoaderRoute: typeof AuthenticatedAppMemoriesRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/events/': {
-      id: '/_authenticated/app/events/'
-      path: '/events'
-      fullPath: '/app/events/'
-      preLoaderRoute: typeof AuthenticatedAppEventsIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/contacts/': {
-      id: '/_authenticated/app/contacts/'
-      path: '/contacts'
-      fullPath: '/app/contacts/'
-      preLoaderRoute: typeof AuthenticatedAppContactsIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/events/new': {
-      id: '/_authenticated/app/events/new'
-      path: '/events/new'
-      fullPath: '/app/events/new'
-      preLoaderRoute: typeof AuthenticatedAppEventsNewRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/events/$eventId': {
-      id: '/_authenticated/app/events/$eventId'
-      path: '/events/$eventId'
-      fullPath: '/app/events/$eventId'
-      preLoaderRoute: typeof AuthenticatedAppEventsEventIdRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/contacts/new': {
-      id: '/_authenticated/app/contacts/new'
-      path: '/contacts/new'
-      fullPath: '/app/contacts/new'
-      preLoaderRoute: typeof AuthenticatedAppContactsNewRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/contacts/$contactId': {
-      id: '/_authenticated/app/contacts/$contactId'
-      path: '/contacts/$contactId'
-      fullPath: '/app/contacts/$contactId'
-      preLoaderRoute: typeof AuthenticatedAppContactsContactIdRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/admin/widgets': {
-      id: '/_authenticated/app/admin/widgets'
-      path: '/admin/widgets'
-      fullPath: '/app/admin/widgets'
-      preLoaderRoute: typeof AuthenticatedAppAdminWidgetsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
     }
   }
 }
 
-interface AuthenticatedAppRouteChildren {
-  AuthenticatedAppMemoriesRoute: typeof AuthenticatedAppMemoriesRoute
-  AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
-  AuthenticatedAppWelcomeRoute: typeof AuthenticatedAppWelcomeRoute
-  AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
-  AuthenticatedAppAdminWidgetsRoute: typeof AuthenticatedAppAdminWidgetsRoute
-  AuthenticatedAppContactsContactIdRoute: typeof AuthenticatedAppContactsContactIdRoute
-  AuthenticatedAppContactsNewRoute: typeof AuthenticatedAppContactsNewRoute
-  AuthenticatedAppEventsEventIdRoute: typeof AuthenticatedAppEventsEventIdRoute
-  AuthenticatedAppEventsNewRoute: typeof AuthenticatedAppEventsNewRoute
-  AuthenticatedAppContactsIndexRoute: typeof AuthenticatedAppContactsIndexRoute
-  AuthenticatedAppEventsIndexRoute: typeof AuthenticatedAppEventsIndexRoute
-}
-
-const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
-  AuthenticatedAppMemoriesRoute: AuthenticatedAppMemoriesRoute,
-  AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
-  AuthenticatedAppWelcomeRoute: AuthenticatedAppWelcomeRoute,
-  AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
-  AuthenticatedAppAdminWidgetsRoute: AuthenticatedAppAdminWidgetsRoute,
-  AuthenticatedAppContactsContactIdRoute:
-    AuthenticatedAppContactsContactIdRoute,
-  AuthenticatedAppContactsNewRoute: AuthenticatedAppContactsNewRoute,
-  AuthenticatedAppEventsEventIdRoute: AuthenticatedAppEventsEventIdRoute,
-  AuthenticatedAppEventsNewRoute: AuthenticatedAppEventsNewRoute,
-  AuthenticatedAppContactsIndexRoute: AuthenticatedAppContactsIndexRoute,
-  AuthenticatedAppEventsIndexRoute: AuthenticatedAppEventsIndexRoute,
-}
-
-const AuthenticatedAppRouteWithChildren =
-  AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
-
 interface AuthenticatedRouteRouteChildren {
-  AuthenticatedAppRoute: typeof AuthenticatedAppRouteWithChildren
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedAppRoute: AuthenticatedAppRouteWithChildren,
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -452,21 +136,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  OnboardingRoute: OnboardingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  ITokenRoute: ITokenRoute,
-  InvitationEventIdInvitationIdRoute: InvitationEventIdInvitationIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
