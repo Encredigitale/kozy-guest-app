@@ -11,8 +11,8 @@ export const Route = createFileRoute("/login")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Connexion" },
-      { name: "description", content: "Connectez-vous à votre compte." },
+      { title: "Connexion — Framework" },
+      { name: "robots", content: "noindex" },
     ],
   }),
   component: LoginPage,
@@ -27,7 +27,7 @@ function LoginPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/account" });
+      if (data.session) navigate({ to: "/app" });
     });
   }, [navigate]);
 
@@ -41,7 +41,7 @@ function LoginPage() {
       return;
     }
     toast.success("Bienvenue !");
-    navigate({ to: "/account" });
+    navigate({ to: "/app" });
   };
 
   const onForgot = async (e: React.FormEvent) => {
@@ -51,10 +51,7 @@ function LoginPage() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setLoading(false);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
+    if (error) return toast.error(error.message);
     toast.success("E-mail envoyé si un compte existe.");
     setForgot(false);
   };
@@ -63,54 +60,32 @@ function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="font-serif text-3xl tracking-tight text-primary">
-            <Link to="/">Bienvenue</Link>
-          </h1>
+          <Link to="/" className="font-serif text-3xl tracking-tight text-primary">Framework</Link>
         </div>
         <Card className="rounded-3xl border-border/60 shadow-none">
           <CardHeader>
             <CardTitle>{forgot ? "Mot de passe oublié" : "Se connecter"}</CardTitle>
             <CardDescription>
-              {forgot
-                ? "Recevez un lien de réinitialisation par e-mail."
-                : "Accédez à votre espace personnel."}
+              {forgot ? "Recevez un lien de réinitialisation." : "Accédez à votre espace."}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={forgot ? onForgot : onSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Adresse e-mail</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+                <Input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
               </div>
               {!forgot && (
                 <div className="space-y-2">
                   <Label htmlFor="password">Mot de passe</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                  <Input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
                 </div>
               )}
               <Button type="submit" className="w-full rounded-full" disabled={loading}>
                 {loading ? "Chargement..." : forgot ? "Envoyer le lien" : "Se connecter"}
               </Button>
               <div className="flex justify-between text-sm pt-2">
-                <button
-                  type="button"
-                  onClick={() => setForgot((v) => !v)}
-                  className="text-muted-foreground hover:text-foreground"
-                >
+                <button type="button" onClick={() => setForgot((v) => !v)} className="text-muted-foreground hover:text-foreground">
                   {forgot ? "Retour" : "Mot de passe oublié"}
                 </button>
                 <Link to="/signup" className="text-muted-foreground hover:text-foreground">
