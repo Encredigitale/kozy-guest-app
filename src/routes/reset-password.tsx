@@ -49,7 +49,7 @@ function ResetPasswordPage() {
       return;
     }
     toast.success("Mot de passe mis à jour.");
-    navigate({ to: "/admin" });
+    navigate({ to: "/app" });
   };
 
   return (
