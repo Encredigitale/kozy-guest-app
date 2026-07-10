@@ -168,7 +168,7 @@ function WidgetDialog({
       description: description.trim() || null,
       version: version.trim() || "1.0.0",
       category: category.trim() || null,
-      manifest: manifest as unknown as Record<string, unknown>,
+      manifest: manifest as unknown as import("@/integrations/supabase/types").Json,
     };
     const { error } = widget
       ? await supabase.from("widgets").update(payload).eq("id", widget.id)
