@@ -28,7 +28,7 @@ function AuthPage() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("mode") === "signup") setMode("signup");
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/app" });
+      if (data.session) navigate({ to: "/admin" });
     });
   }, [navigate]);
 
@@ -83,7 +83,7 @@ function SignInForm({ onForgot, onSwitchSignup }: { onForgot: () => void; onSwit
       return;
     }
     toast.success("Bienvenue !");
-    navigate({ to: "/app" });
+    navigate({ to: "/admin" });
   };
 
   return (
@@ -141,7 +141,7 @@ function SignUpForm({ onSwitchSignin }: { onSwitchSignin: () => void }) {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/app/welcome`,
+        emailRedirectTo: `${window.location.origin}/admin`,
         data: {
           first_name: firstName,
           last_name: lastName,
@@ -158,7 +158,7 @@ function SignUpForm({ onSwitchSignin }: { onSwitchSignin: () => void }) {
       return;
     }
     toast.success("Compte créé !");
-    navigate({ to: "/app/welcome" });
+    navigate({ to: "/admin" });
   };
 
   return (
