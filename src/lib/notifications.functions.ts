@@ -1,0 +1,88 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const sendSchema = z.object({
+  userId: z.string().uuid(),
+  channel: z.enum(["inapp", "email", "push"]).default("inapp"),
+  type: z.string().min(1).max(80),
+  title: z.string().min(1).max(200),
+  body: z.string().max(4000).optional(),
+  emailTo: z.string().email().optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
+
+export const sendNotification = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => sendSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    let status: "pending" | "sent" | "failed" = "pending";
+    let sentAt: string | null = null;
+
+    // Send email via Brevo when requested
+    if (data.channel === "email" && data.emailTo) {
+      const brevoKey = process.env.BREVO_API_KEY;
+      if (!brevoKey) {
+        status = "failed";
+      } else {
+        try {
+          const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+            method: "POST",
+            headers: {
+              "api-key": brevoKey,
+              "content-type": "application/json",
+              accept: "application/json",
+            },
+            body: JSON.stringify({
+              sender: { name: "Framework", email: "noreply@encredigitale.com" },
+              to: [{ email: data.emailTo }],
+              subject: data.title,
+              htmlContent: `<p>${(data.body ?? "").replace(/\n/g, "<br/>")}</p>`,
+            }),
+          });
+          if (res.ok) {
+            status = "sent";
+            sentAt = new Date().toISOString();
+          } else {
+            status = "failed";
+            console.error("Brevo send failed:", await res.text());
+          }
+        } catch (e) {
+          console.error("Brevo error", e);
+          status = "failed";
+        }
+      }
+    } else {
+      status = "sent";
+      sentAt = new Date().toISOString();
+    }
+
+    const { data: row, error } = await supabaseAdmin
+      .from("notifications")
+      .insert({
+        user_id: data.userId,
+        channel: data.channel,
+        type: data.type,
+        title: data.title,
+        body: data.body ?? null,
+        metadata: (data.metadata ?? {}) as never,
+        status,
+        sent_at: sentAt,
+      })
+      .select("id")
+      .single();
+
+    if (error) throw new Error(error.message);
+
+    // Audit
+    await supabaseAdmin.from("audit_log").insert({
+      user_id: context.userId,
+      action: "notification.sent",
+      target: row.id,
+      metadata: { channel: data.channel, type: data.type, recipient: data.userId } as never,
+    });
+
+    return { id: row.id, status };
+  });

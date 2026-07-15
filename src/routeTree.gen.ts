@@ -17,7 +17,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
+import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/app.notifications'
+import { Route as AuthenticatedAppEventsRouteImport } from './routes/_authenticated/app.events'
+import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/app.events.index'
 import { Route as AuthenticatedAppWSplatRouteImport } from './routes/_authenticated/app.w.$'
+import { Route as AuthenticatedAppEventsNewRouteImport } from './routes/_authenticated/app.events.new'
+import { Route as AuthenticatedAppEventsEventIdRouteImport } from './routes/_authenticated/app.events.$eventId'
 import { Route as AuthenticatedAppAdminRegistryRouteImport } from './routes/_authenticated/app.admin.registry'
 
 const SignupRoute = SignupRouteImport.update({
@@ -59,11 +64,40 @@ const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppNotificationsRoute =
+  AuthenticatedAppNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppEventsRoute = AuthenticatedAppEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppEventsIndexRoute =
+  AuthenticatedAppEventsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAppEventsRoute,
+  } as any)
 const AuthenticatedAppWSplatRoute = AuthenticatedAppWSplatRouteImport.update({
   id: '/w/$',
   path: '/w/$',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppEventsNewRoute =
+  AuthenticatedAppEventsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedAppEventsRoute,
+  } as any)
+const AuthenticatedAppEventsEventIdRoute =
+  AuthenticatedAppEventsEventIdRouteImport.update({
+    id: '/$eventId',
+    path: '/$eventId',
+    getParentRoute: () => AuthenticatedAppEventsRoute,
+  } as any)
 const AuthenticatedAppAdminRegistryRoute =
   AuthenticatedAppAdminRegistryRouteImport.update({
     id: '/admin/registry',
@@ -77,20 +111,29 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/app': typeof AuthenticatedAppRouteWithChildren
+  '/app/events': typeof AuthenticatedAppEventsRouteWithChildren
+  '/app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/admin/registry': typeof AuthenticatedAppAdminRegistryRoute
+  '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
+  '/app/events/new': typeof AuthenticatedAppEventsNewRoute
   '/app/w/$': typeof AuthenticatedAppWSplatRoute
+  '/app/events/': typeof AuthenticatedAppEventsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/admin/registry': typeof AuthenticatedAppAdminRegistryRoute
+  '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
+  '/app/events/new': typeof AuthenticatedAppEventsNewRoute
   '/app/w/$': typeof AuthenticatedAppWSplatRoute
+  '/app/events': typeof AuthenticatedAppEventsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -100,10 +143,15 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
+  '/_authenticated/app/events': typeof AuthenticatedAppEventsRouteWithChildren
+  '/_authenticated/app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/admin/registry': typeof AuthenticatedAppAdminRegistryRoute
+  '/_authenticated/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
+  '/_authenticated/app/events/new': typeof AuthenticatedAppEventsNewRoute
   '/_authenticated/app/w/$': typeof AuthenticatedAppWSplatRoute
+  '/_authenticated/app/events/': typeof AuthenticatedAppEventsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -113,20 +161,29 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/app'
+    | '/app/events'
+    | '/app/notifications'
     | '/app/profile'
     | '/app/'
     | '/app/admin/registry'
+    | '/app/events/$eventId'
+    | '/app/events/new'
     | '/app/w/$'
+    | '/app/events/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/app/notifications'
     | '/app/profile'
     | '/app'
     | '/app/admin/registry'
+    | '/app/events/$eventId'
+    | '/app/events/new'
     | '/app/w/$'
+    | '/app/events'
   id:
     | '__root__'
     | '/'
@@ -135,10 +192,15 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/_authenticated/app'
+    | '/_authenticated/app/events'
+    | '/_authenticated/app/notifications'
     | '/_authenticated/app/profile'
     | '/_authenticated/app/'
     | '/_authenticated/app/admin/registry'
+    | '/_authenticated/app/events/$eventId'
+    | '/_authenticated/app/events/new'
     | '/_authenticated/app/w/$'
+    | '/_authenticated/app/events/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -207,12 +269,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/notifications': {
+      id: '/_authenticated/app/notifications'
+      path: '/notifications'
+      fullPath: '/app/notifications'
+      preLoaderRoute: typeof AuthenticatedAppNotificationsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/events': {
+      id: '/_authenticated/app/events'
+      path: '/events'
+      fullPath: '/app/events'
+      preLoaderRoute: typeof AuthenticatedAppEventsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/events/': {
+      id: '/_authenticated/app/events/'
+      path: '/'
+      fullPath: '/app/events/'
+      preLoaderRoute: typeof AuthenticatedAppEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppEventsRoute
+    }
     '/_authenticated/app/w/$': {
       id: '/_authenticated/app/w/$'
       path: '/w/$'
       fullPath: '/app/w/$'
       preLoaderRoute: typeof AuthenticatedAppWSplatRouteImport
       parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/events/new': {
+      id: '/_authenticated/app/events/new'
+      path: '/new'
+      fullPath: '/app/events/new'
+      preLoaderRoute: typeof AuthenticatedAppEventsNewRouteImport
+      parentRoute: typeof AuthenticatedAppEventsRoute
+    }
+    '/_authenticated/app/events/$eventId': {
+      id: '/_authenticated/app/events/$eventId'
+      path: '/$eventId'
+      fullPath: '/app/events/$eventId'
+      preLoaderRoute: typeof AuthenticatedAppEventsEventIdRouteImport
+      parentRoute: typeof AuthenticatedAppEventsRoute
     }
     '/_authenticated/app/admin/registry': {
       id: '/_authenticated/app/admin/registry'
@@ -224,7 +321,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAppEventsRouteChildren {
+  AuthenticatedAppEventsEventIdRoute: typeof AuthenticatedAppEventsEventIdRoute
+  AuthenticatedAppEventsNewRoute: typeof AuthenticatedAppEventsNewRoute
+  AuthenticatedAppEventsIndexRoute: typeof AuthenticatedAppEventsIndexRoute
+}
+
+const AuthenticatedAppEventsRouteChildren: AuthenticatedAppEventsRouteChildren =
+  {
+    AuthenticatedAppEventsEventIdRoute: AuthenticatedAppEventsEventIdRoute,
+    AuthenticatedAppEventsNewRoute: AuthenticatedAppEventsNewRoute,
+    AuthenticatedAppEventsIndexRoute: AuthenticatedAppEventsIndexRoute,
+  }
+
+const AuthenticatedAppEventsRouteWithChildren =
+  AuthenticatedAppEventsRoute._addFileChildren(
+    AuthenticatedAppEventsRouteChildren,
+  )
+
 interface AuthenticatedAppRouteChildren {
+  AuthenticatedAppEventsRoute: typeof AuthenticatedAppEventsRouteWithChildren
+  AuthenticatedAppNotificationsRoute: typeof AuthenticatedAppNotificationsRoute
   AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAdminRegistryRoute: typeof AuthenticatedAppAdminRegistryRoute
@@ -232,6 +349,8 @@ interface AuthenticatedAppRouteChildren {
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
+  AuthenticatedAppEventsRoute: AuthenticatedAppEventsRouteWithChildren,
+  AuthenticatedAppNotificationsRoute: AuthenticatedAppNotificationsRoute,
   AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppAdminRegistryRoute: AuthenticatedAppAdminRegistryRoute,
@@ -262,13 +381,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

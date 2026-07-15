@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useActiveWidgets } from "@/core/registry/useRegistry";
 import { useSession } from "@/core/auth/useSession";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/core/notifications/NotificationBell";
 
 type CoreLink = {
   key: string;
@@ -18,6 +19,8 @@ type CoreLink = {
 
 const CORE_LINKS: CoreLink[] = [
   { key: "home", label: "Accueil", to: "/app", icon: "Home" },
+  { key: "events", label: "Événements", to: "/app/events", icon: "Calendar" },
+  { key: "notifications", label: "Notifications", to: "/app/notifications", icon: "Bell" },
   { key: "profile", label: "Profil", to: "/app/profile", icon: "User" },
   { key: "registry", label: "Registry", to: "/app/admin/registry", icon: "LayoutGrid", adminOnly: true },
 ];
@@ -116,8 +119,13 @@ export function AppShell() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-x-hidden">
-        <Outlet />
+      <main className="flex-1 overflow-x-hidden flex flex-col">
+        <header className="h-14 border-b border-border/60 flex items-center justify-end px-4 gap-2 shrink-0">
+          <NotificationBell />
+        </header>
+        <div className="flex-1 overflow-y-auto">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
