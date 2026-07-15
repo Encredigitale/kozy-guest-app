@@ -118,8 +118,13 @@ export function AppShell() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-x-hidden">
-        <Outlet />
+      <main className="flex-1 overflow-x-hidden flex flex-col">
+        <header className="h-14 border-b border-border/60 flex items-center justify-end px-4 gap-2 shrink-0">
+          <NotificationBell />
+        </header>
+        <div className="flex-1 overflow-y-auto">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
