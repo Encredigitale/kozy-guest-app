@@ -18,6 +18,8 @@ type CoreLink = {
 
 const CORE_LINKS: CoreLink[] = [
   { key: "home", label: "Accueil", to: "/app", icon: "Home" },
+  { key: "events", label: "Événements", to: "/app/events", icon: "Calendar" },
+  { key: "notifications", label: "Notifications", to: "/app/notifications", icon: "Bell" },
   { key: "profile", label: "Profil", to: "/app/profile", icon: "User" },
   { key: "registry", label: "Registry", to: "/app/admin/registry", icon: "LayoutGrid", adminOnly: true },
 ];
