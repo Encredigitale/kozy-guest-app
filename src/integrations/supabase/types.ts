@@ -41,6 +41,131 @@ export type Database = {
         }
         Relationships: []
       }
+      event_participants: {
+        Row: {
+          created_at: string
+          email: string | null
+          event_id: string
+          id: string
+          role: Database["public"]["Enums"]["participant_role"]
+          rsvp_status: Database["public"]["Enums"]["rsvp_status"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          event_id: string
+          id?: string
+          role?: Database["public"]["Enums"]["participant_role"]
+          rsvp_status?: Database["public"]["Enums"]["rsvp_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          event_id?: string
+          id?: string
+          role?: Database["public"]["Enums"]["participant_role"]
+          rsvp_status?: Database["public"]["Enums"]["rsvp_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_participants_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      events: {
+        Row: {
+          created_at: string
+          description: string | null
+          ends_at: string | null
+          id: string
+          location: string | null
+          metadata: Json
+          organizer_id: string
+          starts_at: string | null
+          status: Database["public"]["Enums"]["event_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          location?: string | null
+          metadata?: Json
+          organizer_id: string
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["event_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          location?: string | null
+          metadata?: Json
+          organizer_id?: string
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["event_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string | null
+          channel: Database["public"]["Enums"]["notification_channel"]
+          created_at: string
+          id: string
+          metadata: Json
+          read_at: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["notification_status"]
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          channel?: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          id?: string
+          metadata?: Json
+          read_at?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["notification_status"]
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          channel?: Database["public"]["Enums"]["notification_channel"]
+          created_at?: string
+          id?: string
+          metadata?: Json
+          read_at?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["notification_status"]
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -137,11 +262,24 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_event_organizer: {
+        Args: { _event_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_event_participant: {
+        Args: { _event_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "user"
       contact_group: "family" | "friends" | "colleagues" | "neighbors" | "other"
       contact_source: "personal" | "imported" | "member"
+      event_status: "draft" | "published" | "archived"
+      notification_channel: "inapp" | "email" | "push"
+      notification_status: "pending" | "sent" | "failed"
+      participant_role: "organizer" | "guest"
+      rsvp_status: "pending" | "accepted" | "declined"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -272,6 +410,11 @@ export const Constants = {
       app_role: ["admin", "user"],
       contact_group: ["family", "friends", "colleagues", "neighbors", "other"],
       contact_source: ["personal", "imported", "member"],
+      event_status: ["draft", "published", "archived"],
+      notification_channel: ["inapp", "email", "push"],
+      notification_status: ["pending", "sent", "failed"],
+      participant_role: ["organizer", "guest"],
+      rsvp_status: ["pending", "accepted", "declined"],
     },
   },
 } as const
