@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useActiveWidgets } from "@/core/registry/useRegistry";
 import { useSession } from "@/core/auth/useSession";
 import { Button } from "@/components/ui/button";
+import { NotificationBell } from "@/core/notifications/NotificationBell";
 
 type CoreLink = {
   key: string;
