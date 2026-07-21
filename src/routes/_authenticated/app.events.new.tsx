@@ -111,7 +111,3 @@ function StepRenderer({ componentKey }: { componentKey: string }) {
     </Suspense>
   );
 }
-      </div>
-    </WizardContext.Provider>
-  );
-}
