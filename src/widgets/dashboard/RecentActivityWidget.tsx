@@ -33,7 +33,7 @@ export default function RecentActivityWidget() {
               <li key={a.id} className="flex items-center gap-3 p-2 rounded-md">
                 <Activity className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
                 <div className="min-w-0 flex-1 flex items-center justify-between gap-2">
-                  <p className="text-sm truncate"><span className="font-medium">{a.action}</span> · <span className="text-muted-foreground">{a.target_type ?? "—"}</span></p>
+                  <p className="text-sm truncate"><span className="font-medium">{a.action}</span> · <span className="text-muted-foreground">{a.target ?? "—"}</span></p>
                   <p className="text-xs text-muted-foreground shrink-0">{new Date(a.created_at).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })}</p>
                 </div>
               </li>
