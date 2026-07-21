@@ -3,6 +3,7 @@ import { ChevronLeft } from "lucide-react";
 import { WidgetRenderer } from "@/core/registry/WidgetRenderer";
 import { useSession } from "@/core/auth/useSession";
 import { useEvent, useParticipants } from "@/widgets/event-shared/queries";
+import { EventExtensionsPanel } from "@/core/extensions/EventExtensionsPanel";
 
 export const Route = createFileRoute("/_authenticated/app/events/$eventId")({
   head: () => ({ meta: [{ title: "Événement — Framework" }] }),
@@ -15,24 +16,21 @@ function EventDetailPage() {
   const { data: ev } = useEvent(eventId);
   const { data: participants = [] } = useParticipants(eventId);
 
-  // Contextual roles are resolved here — the route is the only surface
-  // that knows the user's relationship to this event.
   const contextualRoles: string[] = [];
   if (ev && user) {
     if (ev.organizer_id === user.id) contextualRoles.push("organizer");
     if (participants.some((p) => p.user_id === user.id)) contextualRoles.push("guest");
   }
 
+  const isOrganizer = ev && user && ev.organizer_id === user.id;
+
   return (
     <div className="p-8 max-w-3xl space-y-6">
       <Link to="/app/events" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
         <ChevronLeft className="h-4 w-4" /> Retour
       </Link>
-      <WidgetRenderer
-        surface="event.detail"
-        contextualRoles={contextualRoles}
-        context={{ eventId }}
-      />
+      <WidgetRenderer surface="event.detail" contextualRoles={contextualRoles} context={{ eventId }} />
+      {isOrganizer && <EventExtensionsPanel eventId={eventId} />}
     </div>
   );
 }
