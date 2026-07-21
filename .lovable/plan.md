@@ -1,101 +1,128 @@
-Ce chantier regroupe 9 demandes en 2 axes. Je propose de le livrer en **3 lots** livrables indépendamment.
+## Objectif
 
-## Lot A — Widget Photos & Documents (UI/UX)
+Rendre tous les écrans 100% pilotés par le Registry (aucun widget en dur), enrichir le modèle pour associer widgets ↔ événements/profils, ajouter la notion de layout (taille/position/ordre) et un Studio Admin complet (CRUD, activer, configurer, associer, réordonner drag&drop, permissions, prévisualiser, publier).
 
-**A1. Photos : tri manuel + couverture + drag-and-drop + vignettes**
-- Ajouter `sort_order` (integer) et `is_cover` (bool) dans `widget_items` (via migration, valeurs par défaut safe).
-- Utiliser `@dnd-kit/core` + `@dnd-kit/sortable` (déjà à installer) pour le glisser-déposer.
-- Génération de vignettes côté client via Canvas API (max 400×400, JPEG 0.8) uploadées dans un dossier `thumbs/` du bucket `widget-photos`. Stockées dans `data.thumb_path`.
-- Bouton "Définir comme couverture" par photo, badge visuel sur la couverture, tri par `sort_order` puis `created_at`.
+## État actuel (résumé)
 
-**A2. Documents : aperçu intégré PDF + images**
-- Modal d'aperçu (Dialog shadcn) :
-  - PDF → `<iframe>` avec signed URL
-  - Images → `<img>` avec signed URL
-  - Autres → message "Aperçu non disponible, téléchargez le fichier"
-- Bouton "Télécharger" séparé (déjà présent, on le conserve).
+- `event.detail` : déjà via `WidgetRenderer` — à conserver, ajouter le panneau extensions en tant que widget dédié.
+- `app.index.tsx` (dashboard) : liste statique de cartes, **pas** de rendu widget → à refondre en surface `dashboard`.
+- `app.events.new.tsx` : formulaire hardcodé → à refondre en surface `event.new` (steps = widgets).
+- Modèle `widgets.manifest` (jsonb) : surface/order/permissions/eventTypes plats — pas de `size`, pas de `status` publish, pas d'association typée events/profils.
 
-**A3. Progression + erreurs pour uploads/downloads**
-- Composant `<UploadProgress />` réutilisable (barre par fichier, état pending/uploading/error/done).
-- Utilisation de `XMLHttpRequest` pour capter `progress` sur upload (Supabase JS ne l'expose pas nativement) → route via signed upload URL.
-- Messages d'erreur explicites : taille, type MIME, réseau, quota.
-- Toasts sonner détaillés + retry par fichier échoué.
+## Modèle de données (migrations)
 
-## Lot B — Config d'extensions & scope événement
+### 1. Enrichir `public.widgets`
+- Ajouter `status text` (`'draft' | 'published'`, défaut `'draft'`).
+- Ajouter `size text` (`'sm' | 'md' | 'lg' | 'full'`, défaut `'full'`).
+- Le manifeste JSON reste la source pour surface/order/eventTypes/permissions, mais le studio écrit désormais via des champs structurés.
 
-**B1. Table `extension_settings`**
-```sql
-extension_settings (
-  id uuid PK,
-  extension_key text NOT NULL,
-  event_id uuid NULL,      -- NULL = global, sinon override par événement
-  user_id uuid NOT NULL,   -- propriétaire (organisateur)
-  settings jsonb NOT NULL DEFAULT '{}',
-  UNIQUE (extension_key, event_id, user_id)
-)
+### 2. Placements par événement — `public.event_widgets`
 ```
-- RLS : owner only via `auth.uid()`.
-- Hook `useExtensionSettings(extensionKey, eventId?)` avec merge global → event.
-
-**B2. Manifest enrichi**
-Ajout aux `ExtensionDefinition` :
-```ts
-settingsSchema?: Array<{ key, label, type: 'text'|'number'|'boolean'|'select', options?, default? }>;
-settingsComponent?: LazyExoticComponent;  // écran custom si besoin
-scope?: 'global' | 'event' | 'both';       // par défaut 'global'
+event_id uuid FK, widget_id text FK, enabled bool, position int, size text nullable
+PRIMARY KEY (event_id, widget_id)
 ```
+Si présent → surcharge le placement par défaut du widget pour cet événement. Sinon → le widget hérite de son manifeste (eventTypes/order/size).
 
-**B3. Écrans de configuration**
-- `/app/admin/extensions/$key` : réglages globaux (form auto-généré depuis `settingsSchema` OU `settingsComponent` custom).
-- Dans la page événement : nouvel onglet/section "Extensions" → activer/désactiver par événement + régler les paramètres locaux.
-- Table `event_extensions (event_id, extension_key, enabled)` pour l'activation par événement.
-
-**B4. Résolution en runtime**
-- `useActiveExtensions(eventId?)` filtre : globalement activé ET (pas de scope event OU activé pour cet événement).
-- Les widgets d'extension reçoivent leurs settings mergés via `context`.
-
-## Lot C — Ordre, installation manifest, versioning
-
-**C1. Ordre des menus sidebar**
-- Colonne `sort_order` (int) sur `extensions`.
-- Colonne `menu_order` (jsonb, `{ path: order }`) pour ordonner les entrées d'une même extension.
-- Interface admin drag-and-drop pour réordonner les extensions et leurs menus.
-- `AppShell` trie par `sort_order` puis `menu.order`.
-
-**C2. Versioning + compat**
-Ajout à la table `extensions` :
-```sql
-version text NOT NULL DEFAULT '0.0.0',
-min_core_version text NOT NULL DEFAULT '0.0.0',
-min_db_version int NOT NULL DEFAULT 1,
-manifest jsonb  -- manifeste JSON complet importé
+### 3. Associations par profil — `public.widget_role_bindings`
 ```
-- Constantes `CORE_VERSION` (semver) et `DB_VERSION` (int) exposées depuis `src/core/version.ts`.
-- Helper `isCompatible(extension)` utilisé :
-  - au toggle activation (bloque + toast explicatif)
-  - au démarrage (extensions incompatibles marquées "⚠️ Incompatible" et non chargées)
+widget_id text FK, role text  -- ex 'organizer','guest','admin', ou app_role custom
+PRIMARY KEY (widget_id, role)
+```
+Écrit par le studio; lecture fusionnée avec `manifest.permissions` en OR.
 
-**C3. Installation via manifest**
-- Écran `/app/admin/extensions/install` avec 2 modes :
-  - **Coller JSON** (textarea)
-  - **URL** (fetch client → GET JSON)
-- Validation Zod du manifest (schéma strict : `key`, `name`, `version`, `min_core_version`, `min_db_version`, `widgets[]`, `screens[]`, `menu[]`, `settingsSchema?`, `scope?`).
-- Le manifest décrit **quels widgets/écrans** l'extension apporte mais **le code doit être présent** dans `src/extensions/<key>/` et déclaré dans `registry.ts` — sinon badge "Code manquant" (déjà géré).
-- Note importante : dans une SPA/PWA sans store dynamique, on ne peut pas exécuter du code téléchargé à chaud sans risque sécurité majeur. L'installation par manifest **enregistre les métadonnées et active l'entrée** ; le code des widgets doit toujours être fourni via un build. Ceci sera clairement expliqué dans l'UI.
+### 4. Layout dashboard — `public.dashboard_layout`
+```
+user_id uuid nullable (null = défaut global édité par superadmin),
+widget_id text FK, position int, size text, visible bool
+PRIMARY KEY (user_id nullable, widget_id)
+```
+Le superadmin édite la ligne globale (`user_id IS NULL`); un utilisateur peut la surcharger plus tard (hors scope MVP).
 
-## Détails techniques
+RLS : lecture publique/authentifiée selon rôle, écriture réservée à `has_role('admin')`. GRANTs conformes.
 
-- **Nouvelles dépendances** : `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`, `semver`.
-- **Migrations** : 3 migrations distinctes (Lot A schema, Lot B tables, Lot C versioning + colonnes).
-- **RLS** : toutes les nouvelles tables ont RLS activé, scopé à `auth.uid()`.
-- **Types Zod** partagés dans `src/core/extensions/manifest.schema.ts`.
-- **Rétrocompat** : les 4 extensions existantes reçoivent `version=1.0.0`, `min_core_version=0.0.0` pour rester activables.
+## Moteur (Core)
 
-## Question d'orientation
+### `src/core/registry/useRegistry.ts`
+- `useSurfaceWidgets(surface, ctx)` étendu : accepte `eventId?`. Quand fourni, fusionne `event_widgets` (override placement/size/enabled) pour la surface `event.detail`.
+- Retourne `{ widget, size, order, config }[]` afin que le renderer connaisse la taille.
+- Ajoute filtre `status = 'published'` sauf pour l'admin en mode preview.
 
-**Ordre de livraison souhaité ?**
-1. Tout en une passe (long, ~gros diff)
-2. Lot A d'abord, puis B, puis C (recommandé — chaque lot vérifiable)
-3. Prioriser B + C (extensions) car c'est plus structurel, puis A
+### `src/core/registry/WidgetRenderer.tsx`
+- Rend une **grille CSS** responsive (`grid grid-cols-12 gap-6`).
+- `size` mappé : `sm=col-span-4`, `md=col-span-6`, `lg=col-span-8`, `full=col-span-12` (mobile = `col-span-12`).
+- Skeleton par tuile pendant Suspense.
 
-Confirme l'ordre (ou dis "tout en une passe") et je démarre.
+### Surfaces normalisées
+- `dashboard` — cartes vue d'ensemble (nouveau).
+- `event.new` — steps du wizard de création.
+- `event.detail` — inchangé.
+- `admin.studio` — surface pour widgets internes admin (optionnel).
+
+## Écrans refactorés
+
+### `app.index.tsx` (Dashboard)
+- Devient un simple `<WidgetRenderer surface="dashboard" />`.
+- Widgets de dashboard livrés (nouveaux, minimaux) : `dashboard.upcoming-events`, `dashboard.recent-activity`, `dashboard.stats`, `dashboard.quick-actions`. Layout initial seedé dans `dashboard_layout` (user_id NULL).
+
+### `app.events.new.tsx`
+- Devient un enchaînement de widgets sur la surface `event.new`, un par étape :
+  - `event.new.type` (choix type)
+  - `event.new.info` (titre/date/lieu)
+  - `event.new.widgets` (choix des widgets initialement activés pour l'événement — coche la liste des widgets par défaut selon type)
+- Un composant `WizardShell` fournit contexte `step`, `next`, `back` via `context`.
+
+### `app.events.$eventId.tsx`
+- Rien à changer côté rendu ; `EventExtensionsPanel` déplacé dans un widget `event.extensions` (organizer only) inséré via registry.
+
+## Studio Admin
+
+Nouvelle route parent `/app/admin/studio` avec onglets :
+
+1. **Widgets** (`/app/admin/studio/widgets`)
+   - Liste triable (drag&drop dnd-kit sur `order` par surface).
+   - Filtre surface + statut.
+   - Actions : activer/désactiver, publier/dépublier (`status`), dupliquer, supprimer (bloqué si `required`).
+   - Formulaire d'édition **structuré** (au lieu du JSON brut) :
+     - identité (id lock si existant, name, description, version, category, icon)
+     - surface (select), order (int), size (select), status (select)
+     - permissions (checkboxes admin/organizer/guest + input rôles custom)
+     - eventTypes (multi-input tags)
+     - dependencies (multi-select parmi widgets existants)
+     - config (JSON textarea repliable — accès power-user)
+     - required, visible (switches)
+   - Bouton **Prévisualiser** : dialog qui rend `<WidgetRenderer surface={w.manifest.surface} contextualRoles={[preview role]} />` avec un event fictif; utilise le composant existant.
+   - Bouton **Publier** : bascule `status` draft/published.
+
+2. **Événements** (`/app/admin/studio/events`)
+   - Sélecteur d'événement → tableau des widgets `event.detail`.
+   - Toggle enabled, réordonner (dnd), changer size.
+   - Écrit dans `event_widgets`; reset = supprime la ligne (hérite du manifeste).
+
+3. **Profils** (`/app/admin/studio/roles`)
+   - Matrice widgets × rôles ; coche = insert dans `widget_role_bindings`.
+
+4. **Dashboard** (`/app/admin/studio/dashboard`)
+   - dnd-kit sur widgets de surface `dashboard` : ajouter/retirer, ordonner, choisir size (sm/md/lg/full), visibilité. Écrit dans `dashboard_layout` (user_id NULL).
+
+L'ancienne route `/app/admin/registry` redirige vers `/app/admin/studio/widgets`.
+
+## Technique
+
+- Migration SQL unique (tables + GRANTs + RLS + triggers `updated_at` + seed layout dashboard par défaut).
+- Hooks : `useEventWidgets(eventId)`, `useWidgetRoleBindings(widgetId)`, `useDashboardLayout()`.
+- Réutiliser `@dnd-kit` déjà installé.
+- TanStack Query pour tous les hooks; invalidation ciblée à chaque mutation.
+- `types.ts` : ajouter `WidgetSize`, `WidgetStatus`; élargir `WidgetManifest` (rétrocompatible, tous champs additionnels optionnels).
+- `WidgetRenderer` : shape retour du hook = `Placement[]` avec `size`.
+
+## Sécurité
+
+- Toutes les nouvelles tables : RLS + GRANTs (select authentifié ; write admin uniquement via `has_role`).
+- `event_widgets` : select autorisé pour organizer/participant de l'événement, write pour organizer + admin.
+- Preview admin : contourne `status='published'` seulement si `has_role('admin')`.
+
+## Livraisons hors scope (à documenter)
+
+- Layout dashboard par utilisateur (déjà provisionné en table, non exposé dans le studio MVP).
+- Association widgets ↔ profils via rôles custom au-delà de admin/organizer/guest : supporté en base mais UI limitée aux 3 rôles standards + input libre.
+- Édition de code source d'un widget depuis l'UI (les composants restent livrés dans `src/widgets/*`).
