@@ -249,8 +249,12 @@ function WidgetDialog({
               className="font-mono text-xs h-48"
             />
             <p className="text-xs text-muted-foreground">
-              Clés : <code>component</code>, <code>path</code>, <code>menu</code> {"{ label, icon, order }"}, <code>permissions</code> [], <code>config</code> {"{ ... }"}.
+              Clés : <code>component</code>, <code>surface</code>, <code>order</code>,{" "}
+              <code>required</code>, <code>visible</code>, <code>eventTypes</code>[],{" "}
+              <code>permissions</code>[], <code>dependencies</code>[], <code>path</code>,{" "}
+              <code>menu</code> {"{ label, icon, order }"}, <code>config</code> {"{ ... }"}.
             </p>
+
           </div>
         </div>
         <DialogFooter>
