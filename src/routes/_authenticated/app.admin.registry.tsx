@@ -254,6 +254,12 @@ function WidgetDialog({
               <code>permissions</code>[], <code>dependencies</code>[], <code>path</code>,{" "}
               <code>menu</code> {"{ label, icon, order }"}, <code>config</code> {"{ ... }"}.
             </p>
+            <p className="text-xs text-muted-foreground">
+              Jetons <code>permissions</code> (OR — au moins un requis) :{" "}
+              <code>admin</code>, <code>organizer</code>, <code>guest</code>, ou un rôle
+              applicatif personnalisé. Vide = visible par tous. <code>admin</code> voit tout.
+            </p>
+
 
           </div>
         </div>
