@@ -1,12 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { WidgetRenderer } from "@/core/registry/WidgetRenderer";
+import { WizardContext, type WizardValue } from "@/widgets/event-new/context";
+import { useSurfaceWidgets } from "@/core/registry/useRegistry";
 
 export const Route = createFileRoute("/_authenticated/app/events/new")({
   head: () => ({ meta: [{ title: "Nouvel événement — Framework" }] }),
@@ -16,14 +14,20 @@ export const Route = createFileRoute("/_authenticated/app/events/new")({
 function NewEventPage() {
   const { user } = Route.useRouteContext();
   const navigate = useNavigate();
+
+  const [step, setStep] = useState(0);
+  const [type, setType] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
   const [startsAt, setStartsAt] = useState("");
+  const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const toggleWidget = (id: string) =>
+    setSelectedWidgets((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+
+  const submit = async () => {
     if (!title.trim()) return toast.error("Titre requis.");
     setSaving(true);
     const { data, error } = await supabase
@@ -37,29 +41,69 @@ function NewEventPage() {
       })
       .select("id")
       .single();
+    if (error || !data) {
+      setSaving(false);
+      return toast.error(error?.message ?? "Erreur.");
+    }
+    // Persist per-event widget overrides: activate only selected widgets.
+    if (selectedWidgets.length > 0) {
+      const rows = selectedWidgets.map((widget_id, i) => ({
+        event_id: data.id,
+        widget_id,
+        enabled: true,
+        position: i,
+      }));
+      await supabase.from("event_widgets" as never).insert(rows as never);
+    }
     setSaving(false);
-    if (error || !data) return toast.error(error?.message ?? "Erreur.");
     toast.success("Événement créé.");
     navigate({ to: "/app/events/$eventId", params: { eventId: data.id } });
   };
 
+  const value: WizardValue = useMemo(
+    () => ({
+      type, setType,
+      title, setTitle,
+      description, setDescription,
+      startsAt, setStartsAt,
+      location, setLocation,
+      selectedWidgets, setSelectedWidgets, toggleWidget,
+      step, next: () => setStep((s) => Math.min(s + 1, 2)), back: () => setStep((s) => Math.max(s - 1, 0)),
+      submit, saving,
+    }),
+    [type, title, description, startsAt, location, selectedWidgets, step, saving],
+  );
+
+  const { data: placements } = useSurfaceWidgets("event.new");
+  const current = placements[step];
+
   return (
-    <div className="p-8 max-w-2xl">
-      <h1 className="font-serif text-3xl tracking-tight text-primary">Nouvel événement</h1>
-      <Card className="mt-6 rounded-2xl border-border/60">
-        <CardHeader><CardTitle className="text-base">Informations</CardTitle></CardHeader>
-        <CardContent>
-          <form onSubmit={submit} className="space-y-4">
-            <div className="space-y-2"><Label>Titre</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} required /></div>
-            <div className="space-y-2"><Label>Description</Label><Textarea value={description} onChange={(e) => setDescription(e.target.value)} /></div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2"><Label>Date de début</Label><Input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} /></div>
-              <div className="space-y-2"><Label>Lieu</Label><Input value={location} onChange={(e) => setLocation(e.target.value)} /></div>
-            </div>
-            <Button type="submit" disabled={saving} className="rounded-full">{saving ? "Création…" : "Créer"}</Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    <WizardContext.Provider value={value}>
+      <div className="p-8 max-w-3xl">
+        <h1 className="font-serif text-3xl tracking-tight text-primary">Nouvel événement</h1>
+        <div className="mt-2 flex items-center gap-1">
+          {placements.map((_, i) => (
+            <div
+              key={i}
+              className={`h-1 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-muted"}`}
+            />
+          ))}
+        </div>
+        <div className="mt-6">
+          {current ? (
+            <WidgetRenderer
+              surface="event.new"
+              layout="stack"
+              // Render only the current step widget by filtering.
+              // We use a placement filter via config below.
+              context={{ __step: step }}
+              fallback={<p className="text-sm text-muted-foreground">Aucune étape configurée.</p>}
+            />
+          ) : (
+            <p className="text-sm text-muted-foreground">Aucune étape configurée. Utilisez le Studio pour publier les widgets de l'onboarding.</p>
+          )}
+        </div>
+      </div>
+    </WizardContext.Provider>
   );
 }
