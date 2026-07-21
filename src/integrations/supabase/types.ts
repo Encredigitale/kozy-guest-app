@@ -166,6 +166,45 @@ export type Database = {
         }
         Relationships: []
       }
+      extensions: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          enabled: boolean
+          id: string
+          key: string
+          manifest: Json
+          name: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          key: string
+          manifest?: Json
+          name: string
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          enabled?: boolean
+          id?: string
+          key?: string
+          manifest?: Json
+          name?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
