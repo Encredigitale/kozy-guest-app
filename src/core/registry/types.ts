@@ -61,5 +61,9 @@ export type WidgetRow = {
 export type SurfaceContext = {
   eventType?: string;
   isAdmin?: boolean;
+  /** App-level custom roles. */
   roles?: string[];
+  /** Contextual roles for this surface, e.g. ["organizer"] or ["guest"]. */
+  contextualRoles?: string[];
 };
+
