@@ -54,13 +54,19 @@ export function AppShell() {
 
   const { data: extensions } = useActiveExtensions();
   const extensionLinks = useMemo(() => {
-    const links: { to: string; label: string; icon?: string }[] = [];
-    for (const ext of extensions) {
+    const links: { to: string; label: string; icon?: string; order: number }[] = [];
+    for (let i = 0; i < extensions.length; i++) {
+      const ext = extensions[i];
       for (const m of ext.menu ?? []) {
-        links.push({ to: `/app/x/${ext.key}/${m.path}`, label: m.label, icon: m.icon });
+        links.push({
+          to: `/app/x/${ext.key}/${m.path}`,
+          label: m.label,
+          icon: m.icon,
+          order: i * 1000 + (m.order ?? 0),
+        });
       }
     }
-    return links;
+    return links.sort((a, b) => a.order - b.order);
   }, [extensions]);
 
   const signOut = async () => {
