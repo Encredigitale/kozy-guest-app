@@ -27,6 +27,7 @@ import { Route as AuthenticatedAppXSplatRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAppWSplatRouteImport } from './routes/_authenticated/app.w.$'
 import { Route as AuthenticatedAppEventsNewRouteImport } from './routes/_authenticated/app.events.new'
 import { Route as AuthenticatedAppEventsEventIdRouteImport } from './routes/_authenticated/app.events.$eventId'
+import { Route as AuthenticatedAppAdminStudioRouteImport } from './routes/_authenticated/app.admin.studio'
 import { Route as AuthenticatedAppAdminRegistryRouteImport } from './routes/_authenticated/app.admin.registry'
 import { Route as AuthenticatedAppAdminExtensionsRouteImport } from './routes/_authenticated/app.admin.extensions'
 import { Route as AuthenticatedAppAdminExtensionsInstallRouteImport } from './routes/_authenticated/app.admin.extensions.install'
@@ -125,6 +126,12 @@ const AuthenticatedAppEventsEventIdRoute =
     path: '/$eventId',
     getParentRoute: () => AuthenticatedAppEventsRoute,
   } as any)
+const AuthenticatedAppAdminStudioRoute =
+  AuthenticatedAppAdminStudioRouteImport.update({
+    id: '/admin/studio',
+    path: '/admin/studio',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppAdminRegistryRoute =
   AuthenticatedAppAdminRegistryRouteImport.update({
     id: '/admin/registry',
@@ -164,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/admin/extensions': typeof AuthenticatedAppAdminExtensionsRouteWithChildren
   '/app/admin/registry': typeof AuthenticatedAppAdminRegistryRoute
+  '/app/admin/studio': typeof AuthenticatedAppAdminStudioRoute
   '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
   '/app/w/$': typeof AuthenticatedAppWSplatRoute
@@ -185,6 +193,7 @@ export interface FileRoutesByTo {
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/admin/extensions': typeof AuthenticatedAppAdminExtensionsRouteWithChildren
   '/app/admin/registry': typeof AuthenticatedAppAdminRegistryRoute
+  '/app/admin/studio': typeof AuthenticatedAppAdminStudioRoute
   '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
   '/app/w/$': typeof AuthenticatedAppWSplatRoute
@@ -210,6 +219,7 @@ export interface FileRoutesById {
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/admin/extensions': typeof AuthenticatedAppAdminExtensionsRouteWithChildren
   '/_authenticated/app/admin/registry': typeof AuthenticatedAppAdminRegistryRoute
+  '/_authenticated/app/admin/studio': typeof AuthenticatedAppAdminStudioRoute
   '/_authenticated/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
   '/_authenticated/app/events/new': typeof AuthenticatedAppEventsNewRoute
   '/_authenticated/app/w/$': typeof AuthenticatedAppWSplatRoute
@@ -235,6 +245,7 @@ export interface FileRouteTypes {
     | '/app/'
     | '/app/admin/extensions'
     | '/app/admin/registry'
+    | '/app/admin/studio'
     | '/app/events/$eventId'
     | '/app/events/new'
     | '/app/w/$'
@@ -256,6 +267,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/app/admin/extensions'
     | '/app/admin/registry'
+    | '/app/admin/studio'
     | '/app/events/$eventId'
     | '/app/events/new'
     | '/app/w/$'
@@ -280,6 +292,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/'
     | '/_authenticated/app/admin/extensions'
     | '/_authenticated/app/admin/registry'
+    | '/_authenticated/app/admin/studio'
     | '/_authenticated/app/events/$eventId'
     | '/_authenticated/app/events/new'
     | '/_authenticated/app/w/$'
@@ -427,6 +440,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppEventsEventIdRouteImport
       parentRoute: typeof AuthenticatedAppEventsRoute
     }
+    '/_authenticated/app/admin/studio': {
+      id: '/_authenticated/app/admin/studio'
+      path: '/admin/studio'
+      fullPath: '/app/admin/studio'
+      preLoaderRoute: typeof AuthenticatedAppAdminStudioRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/admin/registry': {
       id: '/_authenticated/app/admin/registry'
       path: '/admin/registry'
@@ -503,6 +523,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAdminExtensionsRoute: typeof AuthenticatedAppAdminExtensionsRouteWithChildren
   AuthenticatedAppAdminRegistryRoute: typeof AuthenticatedAppAdminRegistryRoute
+  AuthenticatedAppAdminStudioRoute: typeof AuthenticatedAppAdminStudioRoute
   AuthenticatedAppWSplatRoute: typeof AuthenticatedAppWSplatRoute
   AuthenticatedAppXSplatRoute: typeof AuthenticatedAppXSplatRoute
 }
@@ -517,6 +538,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppAdminExtensionsRoute:
     AuthenticatedAppAdminExtensionsRouteWithChildren,
   AuthenticatedAppAdminRegistryRoute: AuthenticatedAppAdminRegistryRoute,
+  AuthenticatedAppAdminStudioRoute: AuthenticatedAppAdminStudioRoute,
   AuthenticatedAppWSplatRoute: AuthenticatedAppWSplatRoute,
   AuthenticatedAppXSplatRoute: AuthenticatedAppXSplatRoute,
 }
