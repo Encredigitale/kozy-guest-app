@@ -12,7 +12,7 @@ export default function RecentActivityWidget() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("audit_log")
-        .select("id,action,target_type,created_at")
+        .select("id,action,target,created_at")
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false })
         .limit(8);
