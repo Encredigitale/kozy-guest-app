@@ -27,8 +27,8 @@ function NewEventPage() {
   const toggleWidget = (id: string) =>
     setSelectedWidgets((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
-  const submit = async () => {
-    if (!title.trim()) return toast.error("Titre requis.");
+  const submit = async (): Promise<void> => {
+    if (!title.trim()) { toast.error("Titre requis."); return; }
     setSaving(true);
     const { data, error } = await supabase
       .from("events")
