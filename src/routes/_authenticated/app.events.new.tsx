@@ -43,7 +43,8 @@ function NewEventPage() {
       .single();
     if (error || !data) {
       setSaving(false);
-      return toast.error(error?.message ?? "Erreur.");
+      toast.error(error?.message ?? "Erreur.");
+      return;
     }
     // Persist per-event widget overrides: activate only selected widgets.
     if (selectedWidgets.length > 0) {
