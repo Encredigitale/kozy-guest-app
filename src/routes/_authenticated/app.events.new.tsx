@@ -1,10 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { WidgetRenderer } from "@/core/registry/WidgetRenderer";
 import { WizardContext, type WizardValue } from "@/widgets/event-new/context";
 import { useSurfaceWidgets } from "@/core/registry/useRegistry";
+import { resolveWidgetComponent } from "@/core/registry/components";
 
 export const Route = createFileRoute("/_authenticated/app/events/new")({
   head: () => ({ meta: [{ title: "Nouvel événement — Framework" }] }),
