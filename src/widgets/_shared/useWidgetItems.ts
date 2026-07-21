@@ -58,7 +58,7 @@ export function useWidgetItems(widgetKey: string, scope: Scope) {
           widget_key: widgetKey,
           scope_type: scope.scope_type,
           scope_id: scope.scope_id,
-          payload: input.payload ?? {},
+          payload: (input.payload ?? {}) as never,
           done: input.done ?? false,
           position: input.position ?? (query.data?.length ?? 0),
         })
@@ -71,8 +71,8 @@ export function useWidgetItems(widgetKey: string, scope: Scope) {
   });
 
   const update = useMutation({
-    mutationFn: async (input: { id: string; patch: Partial<Pick<WidgetItem, "payload" | "done" | "position">> }) => {
-      const { error } = await supabase.from("widget_items").update(input.patch).eq("id", input.id);
+    mutationFn: async (input: { id: string; patch: { payload?: Record<string, unknown>; done?: boolean; position?: number } }) => {
+      const { error } = await supabase.from("widget_items").update(input.patch as never).eq("id", input.id);
       if (error) throw error;
     },
     onSuccess: invalidate,
@@ -92,7 +92,7 @@ export function useWidgetItems(widgetKey: string, scope: Scope) {
       if (!user) throw new Error("Non authentifié");
       const existing = query.data?.[0];
       if (existing) {
-        const { error } = await supabase.from("widget_items").update({ payload }).eq("id", existing.id);
+        const { error } = await supabase.from("widget_items").update({ payload: payload as never }).eq("id", existing.id);
         if (error) throw error;
       } else {
         const { error } = await supabase.from("widget_items").insert({
@@ -100,7 +100,7 @@ export function useWidgetItems(widgetKey: string, scope: Scope) {
           widget_key: widgetKey,
           scope_type: scope.scope_type,
           scope_id: scope.scope_id,
-          payload,
+          payload: payload as never,
         });
         if (error) throw error;
       }
