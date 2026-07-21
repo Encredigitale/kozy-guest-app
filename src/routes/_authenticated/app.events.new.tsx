@@ -92,18 +92,25 @@ function NewEventPage() {
         </div>
         <div className="mt-6">
           {current ? (
-            <WidgetRenderer
-              surface="event.new"
-              layout="stack"
-              // Render only the current step widget by filtering.
-              // We use a placement filter via config below.
-              context={{ __step: step }}
-              fallback={<p className="text-sm text-muted-foreground">Aucune étape configurée.</p>}
-            />
+            <StepRenderer componentKey={current.widget.manifest.component} />
           ) : (
             <p className="text-sm text-muted-foreground">Aucune étape configurée. Utilisez le Studio pour publier les widgets de l'onboarding.</p>
           )}
         </div>
+      </div>
+    </WizardContext.Provider>
+  );
+}
+
+function StepRenderer({ componentKey }: { componentKey: string }) {
+  const Cmp = resolveWidgetComponent(componentKey);
+  if (!Cmp) return <p className="text-sm text-destructive">Composant introuvable : {componentKey}</p>;
+  return (
+    <Suspense fallback={<p className="text-sm text-muted-foreground">Chargement…</p>}>
+      <Cmp />
+    </Suspense>
+  );
+}
       </div>
     </WizardContext.Provider>
   );
