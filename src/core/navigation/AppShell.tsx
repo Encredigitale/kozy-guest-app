@@ -52,6 +52,17 @@ export function AppShell() {
       .sort((a, b) => (a.manifest.menu?.order ?? 0) - (b.manifest.menu?.order ?? 0));
   }, [widgets, isAdmin]);
 
+  const { data: extensions } = useActiveExtensions();
+  const extensionLinks = useMemo(() => {
+    const links: { to: string; label: string; icon?: string }[] = [];
+    for (const ext of extensions) {
+      for (const m of ext.menu ?? []) {
+        links.push({ to: `/app/x/${ext.key}/${m.path}`, label: m.label, icon: m.icon });
+      }
+    }
+    return links;
+  }, [extensions]);
+
   const signOut = async () => {
     await supabase.auth.signOut();
     toast.success("Déconnecté.");
