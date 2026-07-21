@@ -5,6 +5,7 @@ import { LogOut, User as UserIcon, LayoutGrid, Settings, Home } from "lucide-rea
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useActiveWidgets } from "@/core/registry/useRegistry";
+import { useActiveExtensions } from "@/core/extensions";
 import { useSession } from "@/core/auth/useSession";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/core/notifications/NotificationBell";
