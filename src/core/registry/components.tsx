@@ -14,7 +14,12 @@ type WidgetComponent = LazyExoticComponent<ComponentType<WidgetProps>>;
 
 const registry: Record<string, WidgetComponent> = {
   "hello-world": lazy(() => import("@/widgets/hello/HelloWidget")),
+  "event.info": lazy(() => import("@/widgets/event-info/EventInfoWidget")),
+  "event.guests": lazy(() => import("@/widgets/event-guests/EventGuestsWidget")),
+  "event.responses": lazy(() => import("@/widgets/event-responses/EventResponsesWidget")),
+  "event.contributions": lazy(() => import("@/widgets/event-contributions/EventContributionsWidget")),
 };
+
 
 export function resolveWidgetComponent(key: string): WidgetComponent | null {
   return registry[key] ?? null;
