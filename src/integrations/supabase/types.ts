@@ -83,6 +83,41 @@ export type Database = {
         }
         Relationships: []
       }
+      event_extensions: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          event_id: string
+          extension_key: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          event_id: string
+          extension_key: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          event_id?: string
+          extension_key?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_extensions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_participants: {
         Row: {
           created_at: string
@@ -166,6 +201,44 @@ export type Database = {
         }
         Relationships: []
       }
+      extension_settings: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          extension_key: string
+          id: string
+          settings: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          extension_key: string
+          id?: string
+          settings?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          extension_key?: string
+          id?: string
+          settings?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "extension_settings_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       extensions: {
         Row: {
           category: string | null
@@ -173,9 +246,15 @@ export type Database = {
           description: string | null
           enabled: boolean
           id: string
+          installed_from: string | null
           key: string
           manifest: Json
+          menu_order: Json
+          min_core_version: string
+          min_db_version: number
           name: string
+          scope: string
+          sort_order: number
           updated_at: string
           version: string
         }
@@ -185,9 +264,15 @@ export type Database = {
           description?: string | null
           enabled?: boolean
           id?: string
+          installed_from?: string | null
           key: string
           manifest?: Json
+          menu_order?: Json
+          min_core_version?: string
+          min_db_version?: number
           name: string
+          scope?: string
+          sort_order?: number
           updated_at?: string
           version?: string
         }
@@ -197,9 +282,15 @@ export type Database = {
           description?: string | null
           enabled?: boolean
           id?: string
+          installed_from?: string | null
           key?: string
           manifest?: Json
+          menu_order?: Json
+          min_core_version?: string
+          min_db_version?: number
           name?: string
+          scope?: string
+          sort_order?: number
           updated_at?: string
           version?: string
         }
