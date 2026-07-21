@@ -69,7 +69,6 @@ function InstallExtensionPage() {
           name: m.name,
           description: m.description ?? null,
           category: m.category ?? null,
-          icon: m.icon ?? null,
           version: m.version,
           min_core_version: m.min_core_version ?? "0.0.0",
           min_db_version: m.min_db_version ?? 1,
