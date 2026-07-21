@@ -17,7 +17,7 @@ export async function uploadWithProgress(params: {
 
   const { data: signed, error: signedError } = await supabase.storage
     .from(bucket)
-    .createSignedUploadURL(path);
+    .createSignedUploadUrl(path);
   if (signedError || !signed) {
     throw new Error(signedError?.message ?? "Impossible d'initialiser l'upload.");
   }
