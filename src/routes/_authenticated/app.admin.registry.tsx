@@ -127,9 +127,130 @@ function RegistryPage() {
           ))
         )}
       </div>
+
+      <PreviewPanel widgets={widgets ?? []} />
     </div>
   );
 }
+
+function PreviewPanel({ widgets }: { widgets: WidgetRow[] }) {
+  const surfaces = useMemo(() => {
+    const s = new Set<string>();
+    widgets.forEach((w) => { if (w.manifest?.surface) s.add(w.manifest.surface); });
+    return Array.from(s).sort();
+  }, [widgets]);
+  const [surface, setSurface] = useState<string>("");
+  const [eventType, setEventType] = useState<string>("");
+
+  const activeSurface = surface || surfaces[0] || "";
+
+  const simulate = (role: "organizer" | "guest" | "admin") => {
+    const isAdmin = role === "admin";
+    const contextualRoles = role === "admin" ? [] : [role];
+    const held = new Set<string>([...(isAdmin ? ["admin"] : []), ...contextualRoles]);
+    const enabledIds = new Set(widgets.filter((w) => w.enabled).map((w) => w.id));
+    return widgets
+      .filter((w) => w.enabled)
+      .filter((w) => w.manifest?.surface === activeSurface)
+      .filter((w) => w.manifest?.visible !== false)
+      .filter((w) => {
+        const types = w.manifest?.eventTypes ?? [];
+        if (types.length === 0) return true;
+        return eventType ? types.includes(eventType) : false;
+      })
+      .filter((w) => {
+        const perms = w.manifest?.permissions ?? [];
+        if (perms.length === 0) return true;
+        if (isAdmin) return true;
+        return perms.some((p) => held.has(p));
+      })
+      .filter((w) => (w.manifest?.dependencies ?? []).every((d) => enabledIds.has(d)))
+      .sort((a, b) => (a.manifest?.order ?? 0) - (b.manifest?.order ?? 0));
+  };
+
+  const roles: Array<{ key: "organizer" | "guest" | "admin"; label: string; hint: string }> = [
+    { key: "organizer", label: "Organisateur", hint: "Rôle contextuel : organizer" },
+    { key: "guest", label: "Invité", hint: "Rôle contextuel : guest" },
+    { key: "admin", label: "Admin", hint: "Super-rôle applicatif" },
+  ];
+
+  return (
+    <div className="mt-12">
+      <div className="flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="font-serif text-2xl tracking-tight text-primary">Prévisualisation</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Simule l'affichage d'une surface selon le rôle contextuel de l'utilisateur.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <div className="space-y-1">
+            <Label className="text-xs">Surface</Label>
+            <select
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+              value={activeSurface}
+              onChange={(e) => setSurface(e.target.value)}
+            >
+              {surfaces.length === 0 && <option value="">—</option>}
+              {surfaces.map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Type d'événement (optionnel)</Label>
+            <Input
+              value={eventType}
+              onChange={(e) => setEventType(e.target.value)}
+              placeholder="ex. dinner"
+              className="h-9 w-48"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+        {roles.map(({ key, label, hint }) => {
+          const list = simulate(key);
+          return (
+            <Card key={key} className="rounded-2xl border-border/60">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">{label}</CardTitle>
+                <CardDescription className="text-xs">{hint}</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0 space-y-2">
+                {list.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic">Aucun widget visible.</p>
+                ) : (
+                  list.map((w) => (
+                    <div
+                      key={w.id}
+                      className="p-3 rounded-lg border border-border/60 bg-muted/30"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-sm font-medium truncate">{w.name}</p>
+                        <span className="text-[10px] font-mono text-muted-foreground shrink-0">
+                          #{w.manifest?.order ?? 0}
+                        </span>
+                      </div>
+                      <p className="text-[11px] font-mono text-muted-foreground truncate">
+                        {w.manifest?.component}
+                      </p>
+                      {(w.manifest?.permissions ?? []).length > 0 && (
+                        <p className="text-[11px] text-muted-foreground mt-1">
+                          perms : {(w.manifest?.permissions ?? []).join(", ")}
+                        </p>
+                      )}
+                    </div>
+                  ))
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 
 function Meta({ label, value }: { label: string; value: string }) {
   return (
