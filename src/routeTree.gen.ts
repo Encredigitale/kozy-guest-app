@@ -23,6 +23,7 @@ import { Route as AuthenticatedAppEventsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAppAuditRouteImport } from './routes/_authenticated/app.audit'
 import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/app.events.index'
 import { Route as ApiPublicV1MeRouteImport } from './routes/api/public/v1/me'
+import { Route as AuthenticatedAppXSplatRouteImport } from './routes/_authenticated/app.x.$'
 import { Route as AuthenticatedAppWSplatRouteImport } from './routes/_authenticated/app.w.$'
 import { Route as AuthenticatedAppEventsNewRouteImport } from './routes/_authenticated/app.events.new'
 import { Route as AuthenticatedAppEventsEventIdRouteImport } from './routes/_authenticated/app.events.$eventId'
@@ -99,6 +100,11 @@ const ApiPublicV1MeRoute = ApiPublicV1MeRouteImport.update({
   path: '/api/public/v1/me',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAppXSplatRoute = AuthenticatedAppXSplatRouteImport.update({
+  id: '/x/$',
+  path: '/x/$',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
 const AuthenticatedAppWSplatRoute = AuthenticatedAppWSplatRouteImport.update({
   id: '/w/$',
   path: '/w/$',
@@ -139,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
   '/app/w/$': typeof AuthenticatedAppWSplatRoute
+  '/app/x/$': typeof AuthenticatedAppXSplatRoute
   '/api/public/v1/me': typeof ApiPublicV1MeRoute
   '/app/events/': typeof AuthenticatedAppEventsIndexRoute
 }
@@ -156,6 +163,7 @@ export interface FileRoutesByTo {
   '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
   '/app/w/$': typeof AuthenticatedAppWSplatRoute
+  '/app/x/$': typeof AuthenticatedAppXSplatRoute
   '/api/public/v1/me': typeof ApiPublicV1MeRoute
   '/app/events': typeof AuthenticatedAppEventsIndexRoute
 }
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   '/_authenticated/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
   '/_authenticated/app/events/new': typeof AuthenticatedAppEventsNewRoute
   '/_authenticated/app/w/$': typeof AuthenticatedAppWSplatRoute
+  '/_authenticated/app/x/$': typeof AuthenticatedAppXSplatRoute
   '/api/public/v1/me': typeof ApiPublicV1MeRoute
   '/_authenticated/app/events/': typeof AuthenticatedAppEventsIndexRoute
 }
@@ -198,6 +207,7 @@ export interface FileRouteTypes {
     | '/app/events/$eventId'
     | '/app/events/new'
     | '/app/w/$'
+    | '/app/x/$'
     | '/api/public/v1/me'
     | '/app/events/'
   fileRoutesByTo: FileRoutesByTo
@@ -215,6 +225,7 @@ export interface FileRouteTypes {
     | '/app/events/$eventId'
     | '/app/events/new'
     | '/app/w/$'
+    | '/app/x/$'
     | '/api/public/v1/me'
     | '/app/events'
   id:
@@ -235,6 +246,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/events/$eventId'
     | '/_authenticated/app/events/new'
     | '/_authenticated/app/w/$'
+    | '/_authenticated/app/x/$'
     | '/api/public/v1/me'
     | '/_authenticated/app/events/'
   fileRoutesById: FileRoutesById
@@ -348,6 +360,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicV1MeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/app/x/$': {
+      id: '/_authenticated/app/x/$'
+      path: '/x/$'
+      fullPath: '/app/x/$'
+      preLoaderRoute: typeof AuthenticatedAppXSplatRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/app/w/$': {
       id: '/_authenticated/app/w/$'
       path: '/w/$'
@@ -406,6 +425,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAdminRegistryRoute: typeof AuthenticatedAppAdminRegistryRoute
   AuthenticatedAppWSplatRoute: typeof AuthenticatedAppWSplatRoute
+  AuthenticatedAppXSplatRoute: typeof AuthenticatedAppXSplatRoute
 }
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
@@ -417,6 +437,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppAdminRegistryRoute: AuthenticatedAppAdminRegistryRoute,
   AuthenticatedAppWSplatRoute: AuthenticatedAppWSplatRoute,
+  AuthenticatedAppXSplatRoute: AuthenticatedAppXSplatRoute,
 }
 
 const AuthenticatedAppRouteWithChildren =
