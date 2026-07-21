@@ -14,7 +14,7 @@ export default function EventBudgetWidget({ config }: WidgetProps) {
   const scope = scopeFromEventId(config?.eventId as string | undefined);
   const { items, isLoading, create, update, remove, upsertSingle } = useWidgetItems("event.budget", scope);
 
-  const [draft, setDraft] = useState<Record<string, unknown>>({ label: "", amount:  });
+  const [draft, setDraft] = useState<Record<string, unknown>>({ label: "", amount: "" });
 
   const add = () => {
     if (!draft.label) return toast.error("Champ requis manquant.");
@@ -22,7 +22,7 @@ export default function EventBudgetWidget({ config }: WidgetProps) {
     if (Number.isNaN(amount)) return toast.error("Montant invalide.");
     create.mutate(
       { payload: { ...draft, amount } },
-      { onSuccess: () => setDraft({ label: "", amount:  }) },
+      { onSuccess: () => setDraft({ label: "", amount: "" }) },
     );
   };
 
