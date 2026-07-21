@@ -3,24 +3,45 @@ import { Loader2 } from "lucide-react";
 import { useSurfaceWidgets } from "./useRegistry";
 import { resolveWidgetComponent } from "./components";
 import { useSession } from "@/core/auth/useSession";
-import type { SurfaceContext } from "./types";
+import type { SurfaceContext, WidgetSize } from "./types";
 
 type Props = {
   surface: string;
   eventType?: string;
   /** Contextual roles for this surface (e.g. ["organizer"], ["guest"]). */
   contextualRoles?: string[];
+  /** Event ID to enable per-event overrides on surface "event.detail". */
+  eventId?: string;
   /** Extra config merged into every widget's manifest.config. */
   context?: Record<string, unknown>;
   /** Optional fallback when no widget matches the surface. */
   fallback?: React.ReactNode;
+  /** Grid vs stacked rendering. Grid is default. */
+  layout?: "grid" | "stack";
+  /** Include drafts (admin preview only). */
+  includeDrafts?: boolean;
 };
 
-export function WidgetRenderer({ surface, eventType, contextualRoles, context, fallback }: Props) {
-  const { isAdmin } = useSession();
-  const ctx: SurfaceContext = { eventType, isAdmin, contextualRoles };
-  const { data: widgets, isLoading } = useSurfaceWidgets(surface, ctx);
+const SIZE_TO_COL: Record<WidgetSize, string> = {
+  sm: "md:col-span-4 col-span-12",
+  md: "md:col-span-6 col-span-12",
+  lg: "md:col-span-8 col-span-12",
+  full: "col-span-12",
+};
 
+export function WidgetRenderer({
+  surface,
+  eventType,
+  contextualRoles,
+  eventId,
+  context,
+  fallback,
+  layout = "grid",
+  includeDrafts,
+}: Props) {
+  const { isAdmin } = useSession();
+  const ctx: SurfaceContext = { eventType, isAdmin, contextualRoles, eventId, includeDrafts };
+  const { data: placements, isLoading } = useSurfaceWidgets(surface, ctx);
 
   if (isLoading) {
     return (
@@ -30,34 +51,51 @@ export function WidgetRenderer({ surface, eventType, contextualRoles, context, f
     );
   }
 
-  if (widgets.length === 0) {
+  if (placements.length === 0) {
     return <>{fallback ?? null}</>;
   }
 
+  if (layout === "stack") {
+    return (
+      <div className="space-y-6">
+        {placements.map((p) => (
+          <RenderOne key={p.widget.id} placement={p} extra={context} />
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      {widgets.map((w) => {
-        const Component = resolveWidgetComponent(w.manifest.component);
-        if (!Component) {
-          return (
-            <div
-              key={w.id}
-              className="p-4 rounded-lg border border-destructive/40 text-xs text-destructive"
-            >
-              Composant <span className="font-mono">{w.manifest.component}</span> introuvable.
-            </div>
-          );
-        }
-        const merged = { ...(w.manifest.config ?? {}), ...(context ?? {}) };
-        return (
-          <Suspense
-            key={w.id}
-            fallback={<div className="p-4 text-sm text-muted-foreground">Chargement…</div>}
-          >
-            <Component config={merged} />
-          </Suspense>
-        );
-      })}
+    <div className="grid grid-cols-12 gap-6">
+      {placements.map((p) => (
+        <div key={p.widget.id} className={SIZE_TO_COL[p.size]}>
+          <RenderOne placement={p} extra={context} />
+        </div>
+      ))}
     </div>
+  );
+}
+
+function RenderOne({
+  placement,
+  extra,
+}: {
+  placement: import("./types").ResolvedPlacement;
+  extra?: Record<string, unknown>;
+}) {
+  const { widget: w, config } = placement;
+  const Component = resolveWidgetComponent(w.manifest.component);
+  if (!Component) {
+    return (
+      <div className="p-4 rounded-lg border border-destructive/40 text-xs text-destructive">
+        Composant <span className="font-mono">{w.manifest.component}</span> introuvable.
+      </div>
+    );
+  }
+  const merged = { ...config, ...(extra ?? {}) };
+  return (
+    <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Chargement…</div>}>
+      <Component config={merged} />
+    </Suspense>
   );
 }

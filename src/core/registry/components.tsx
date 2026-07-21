@@ -31,6 +31,14 @@ const registry: Record<string, WidgetComponent> = {
   "event.history": lazy(() => import("@/widgets/event-history/EventHistoryWidget")),
   "event.notes": lazy(() => import("@/widgets/event-notes/EventNotesWidget")),
   "contacts.book": lazy(() => import("@/widgets/contacts-book/ContactsBookWidget")),
+  "event.extensions": lazy(() => import("@/widgets/event-extensions")),
+  "dashboard.stats": lazy(() => import("@/widgets/dashboard/StatsWidget")),
+  "dashboard.upcoming": lazy(() => import("@/widgets/dashboard/UpcomingEventsWidget")),
+  "dashboard.quick-actions": lazy(() => import("@/widgets/dashboard/QuickActionsWidget")),
+  "dashboard.activity": lazy(() => import("@/widgets/dashboard/RecentActivityWidget")),
+  "event.new.type": lazy(() => import("@/widgets/event-new/TypeStepWidget")),
+  "event.new.info": lazy(() => import("@/widgets/event-new/InfoStepWidget")),
+  "event.new.widgets": lazy(() => import("@/widgets/event-new/WidgetsStepWidget")),
 };
 
 

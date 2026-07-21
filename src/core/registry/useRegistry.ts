@@ -1,7 +1,15 @@
 import { useMemo } from "react";
 import { useQuery, queryOptions } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { SurfaceContext, WidgetRow } from "./types";
+import type {
+  DashboardLayoutRow,
+  EventWidgetRow,
+  ResolvedPlacement,
+  SurfaceContext,
+  WidgetRoleBinding,
+  WidgetRow,
+  WidgetSize,
+} from "./types";
 
 export const widgetsQueryOptions = queryOptions({
   queryKey: ["core", "widgets"],
@@ -26,46 +34,154 @@ export function useActiveWidgets() {
   return { ...q, data: (q.data ?? []).filter((w) => w.enabled) };
 }
 
+/** Event-level widget overrides (placement, size, enabled). */
+export function useEventWidgets(eventId?: string) {
+  return useQuery({
+    queryKey: ["core", "event_widgets", eventId],
+    enabled: !!eventId,
+    queryFn: async (): Promise<EventWidgetRow[]> => {
+      const { data, error } = await supabase
+        .from("event_widgets" as never)
+        .select("*")
+        .eq("event_id", eventId!);
+      if (error) throw error;
+      return (data ?? []) as unknown as EventWidgetRow[];
+    },
+    staleTime: 15_000,
+  });
+}
+
+/** Global dashboard layout (user_id IS NULL). */
+export function useDashboardLayout(userId: string | null = null) {
+  return useQuery({
+    queryKey: ["core", "dashboard_layout", userId ?? "global"],
+    queryFn: async (): Promise<DashboardLayoutRow[]> => {
+      let q = supabase.from("dashboard_layout" as never).select("*");
+      q = userId ? q.eq("user_id", userId) : q.is("user_id", null);
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data ?? []) as unknown as DashboardLayoutRow[];
+    },
+    staleTime: 15_000,
+  });
+}
+
+/** Role bindings across all widgets (small table, cached long). */
+export function useWidgetRoleBindings() {
+  return useQuery({
+    queryKey: ["core", "widget_role_bindings"],
+    queryFn: async (): Promise<WidgetRoleBinding[]> => {
+      const { data, error } = await supabase.from("widget_role_bindings" as never).select("*");
+      if (error) throw error;
+      return (data ?? []) as unknown as WidgetRoleBinding[];
+    },
+    staleTime: 60_000,
+  });
+}
+
 /**
- * Registry query: returns widgets mounted on a given surface, filtered by
- * event type, permissions and dependencies, sorted by manifest.order.
- *
- * Permission tokens accepted in manifest.permissions[] (OR semantics —
- * user must hold AT LEAST ONE to see the widget):
- *   - "admin"                → app-level admin (user_roles)
- *   - "organizer" | "guest"  → contextual role for the current surface
- *   - any other string       → custom app-level role from ctx.roles
- * Empty permissions = visible to everyone.
+ * Registry query: returns widgets mounted on a given surface with resolved
+ * size / order / config, applying:
+ *   - status = 'published' (bypassed when ctx.includeDrafts)
+ *   - event_widgets overrides (for surface 'event.detail' when eventId is set)
+ *   - dashboard_layout overrides (for surface 'dashboard')
+ *   - eventType filter, permissions, dependencies
  */
 export function useSurfaceWidgets(surface: string, ctx: SurfaceContext = {}) {
   const q = useActiveWidgets();
+  const { data: eventOverrides = [] } = useEventWidgets(
+    surface === "event.detail" ? ctx.eventId : undefined,
+  );
+  const { data: dashboardLayout = [] } = useDashboardLayout(surface === "dashboard" ? null : undefined as never);
+  const { data: bindings = [] } = useWidgetRoleBindings();
+
   const enabledIds = useMemo(() => new Set(q.data.map((w) => w.id)), [q.data]);
 
-  const widgets = useMemo(() => {
+  const eventOverrideMap = useMemo(() => {
+    const m = new Map<string, EventWidgetRow>();
+    for (const row of eventOverrides) m.set(row.widget_id, row);
+    return m;
+  }, [eventOverrides]);
+
+  const dashboardMap = useMemo(() => {
+    const m = new Map<string, DashboardLayoutRow>();
+    for (const row of dashboardLayout) m.set(row.widget_id, row);
+    return m;
+  }, [dashboardLayout]);
+
+  const roleBindingsByWidget = useMemo(() => {
+    const m = new Map<string, Set<string>>();
+    for (const b of bindings) {
+      if (!m.has(b.widget_id)) m.set(b.widget_id, new Set());
+      m.get(b.widget_id)!.add(b.role);
+    }
+    return m;
+  }, [bindings]);
+
+  const placements: ResolvedPlacement[] = useMemo(() => {
     const held = new Set<string>([
       ...(ctx.isAdmin ? ["admin"] : []),
       ...(ctx.roles ?? []),
       ...(ctx.contextualRoles ?? []),
     ]);
+
     return q.data
       .filter((w) => w.manifest?.surface === surface)
       .filter((w) => w.manifest?.visible !== false)
-      .filter((w) => {
+      .filter((w) => (ctx.includeDrafts || ctx.isAdmin ? true : (w.status ?? "published") === "published"))
+      .map<ResolvedPlacement | null>((w) => {
+        // Event override: hides the widget when disabled explicitly
+        if (surface === "event.detail" && ctx.eventId) {
+          const ov = eventOverrideMap.get(w.id);
+          if (ov && ov.enabled === false) return null;
+          const size = (ov?.size ?? w.size ?? "full") as WidgetSize;
+          const order = ov ? ov.position : (w.manifest?.order ?? 0);
+          return {
+            widget: w,
+            size,
+            order,
+            config: { ...(w.manifest?.config ?? {}) },
+          };
+        }
+        // Dashboard: only widgets present in the layout & visible
+        if (surface === "dashboard") {
+          const ov = dashboardMap.get(w.id);
+          if (dashboardMap.size > 0) {
+            if (!ov || ov.visible === false) return null;
+            return {
+              widget: w,
+              size: ov.size,
+              order: ov.position,
+              config: { ...(w.manifest?.config ?? {}) },
+            };
+          }
+        }
+        return {
+          widget: w,
+          size: (w.size ?? "full") as WidgetSize,
+          order: w.manifest?.order ?? 0,
+          config: { ...(w.manifest?.config ?? {}) },
+        };
+      })
+      .filter((p): p is ResolvedPlacement => p !== null)
+      .filter(({ widget: w }) => {
         const types = w.manifest?.eventTypes ?? [];
         if (types.length === 0) return true;
         return ctx.eventType ? types.includes(ctx.eventType) : false;
       })
-      .filter((w) => {
-        const perms = w.manifest?.permissions ?? [];
-        if (perms.length === 0) return true;
-        // Admin is a super-role: always grants access.
+      .filter(({ widget: w }) => {
+        const perms = new Set<string>(w.manifest?.permissions ?? []);
+        for (const r of roleBindingsByWidget.get(w.id) ?? []) perms.add(r);
+        if (perms.size === 0) return true;
         if (ctx.isAdmin) return true;
-        return perms.some((p) => held.has(p));
+        for (const p of perms) if (held.has(p)) return true;
+        return false;
       })
-      .filter((w) => (w.manifest?.dependencies ?? []).every((d) => enabledIds.has(d)))
-      .sort((a, b) => (a.manifest?.order ?? 0) - (b.manifest?.order ?? 0));
-  }, [q.data, surface, ctx.eventType, ctx.isAdmin, ctx.roles, ctx.contextualRoles, enabledIds]);
+      .filter(({ widget: w }) =>
+        (w.manifest?.dependencies ?? []).every((d) => enabledIds.has(d)),
+      )
+      .sort((a, b) => a.order - b.order);
+  }, [q.data, surface, ctx.eventType, ctx.eventId, ctx.isAdmin, ctx.roles, ctx.contextualRoles, ctx.includeDrafts, enabledIds, eventOverrideMap, dashboardMap, roleBindingsByWidget]);
 
-  return { ...q, data: widgets };
+  return { ...q, data: placements };
 }
-

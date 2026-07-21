@@ -9,40 +9,21 @@ export type WidgetMenuEntry = {
   order?: number;
 };
 
+export type WidgetSize = "sm" | "md" | "lg" | "full";
+export type WidgetStatus = "draft" | "published";
+
 export type WidgetManifest = {
-  // Key used to resolve the React component in the code-side registry.
   component: string;
-
-  // ---- Placement ----
-  // Surface identifier where the widget is mounted (e.g. "event.detail",
-  // "dashboard", "contact.detail"). A surface is a screen slot rendered
-  // by <WidgetRenderer surface="..." />.
   surface?: string;
-  // Order inside the surface (ascending). Defaults to 0.
   order?: number;
-
-  // ---- Routing (optional, for routed widgets under /app/w/<path>) ----
   path?: string;
   menu?: WidgetMenuEntry;
-
-  // ---- Visibility & lifecycle ----
-  // If true, cannot be disabled from the admin UI.
   required?: boolean;
-  // If false, still active but hidden from screens (kept for future).
   visible?: boolean;
-
-  // ---- Targeting ----
-  // Only render for these event types (empty/absent = any type).
   eventTypes?: string[];
-  // Role names required to see the widget. Empty = any authenticated user.
   permissions?: string[];
-  // IDs of widgets this one depends on (must be enabled).
   dependencies?: string[];
-
-  // ---- Metadata ----
   icon?: string;
-
-  // ---- Widget configuration ----
   config?: Record<string, unknown>;
 };
 
@@ -54,6 +35,8 @@ export type WidgetRow = {
   category: string | null;
   manifest: WidgetManifest;
   enabled: boolean;
+  status?: WidgetStatus;
+  size?: WidgetSize;
   created_at: string;
   updated_at: string;
 };
@@ -65,5 +48,37 @@ export type SurfaceContext = {
   roles?: string[];
   /** Contextual roles for this surface, e.g. ["organizer"] or ["guest"]. */
   contextualRoles?: string[];
+  /** When provided, event_widgets overrides apply for surface `event.detail`. */
+  eventId?: string;
+  /** Ignore `status = 'published'` gating (admin preview). */
+  includeDrafts?: boolean;
 };
 
+export type EventWidgetRow = {
+  event_id: string;
+  widget_id: string;
+  enabled: boolean;
+  position: number;
+  size: WidgetSize | null;
+};
+
+export type WidgetRoleBinding = {
+  widget_id: string;
+  role: string;
+};
+
+export type DashboardLayoutRow = {
+  id: string;
+  user_id: string | null;
+  widget_id: string;
+  position: number;
+  size: WidgetSize;
+  visible: boolean;
+};
+
+export type ResolvedPlacement = {
+  widget: WidgetRow;
+  size: WidgetSize;
+  order: number;
+  config: Record<string, unknown>;
+};
