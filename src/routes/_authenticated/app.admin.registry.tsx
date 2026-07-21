@@ -36,13 +36,15 @@ function RegistryPage() {
     refresh();
   };
 
-  const remove = async (id: string) => {
+  const remove = async (w: WidgetRow) => {
+    if (w.manifest?.required) return toast.error("Widget obligatoire — suppression interdite.");
     if (!confirm("Supprimer ce widget du registry ?")) return;
-    const { error } = await supabase.from("widgets").delete().eq("id", id);
+    const { error } = await supabase.from("widgets").delete().eq("id", w.id);
     if (error) return toast.error(error.message);
     toast.success("Widget supprimé.");
     refresh();
   };
+
 
   if (sessionLoading) return <div className="p-8 text-sm text-muted-foreground">Chargement…</div>;
   if (!isAdmin) {
@@ -89,11 +91,20 @@ function RegistryPage() {
                     <CardDescription>{w.description ?? "—"}</CardDescription>
                   </div>
                   <div className="flex items-center gap-3">
-                    <Switch checked={w.enabled} onCheckedChange={(v) => toggle(w, v)} />
+                    <Switch
+                      checked={w.enabled}
+                      disabled={!!w.manifest?.required}
+                      onCheckedChange={(v) => toggle(w, v)}
+                    />
                     <WidgetDialog widget={w} onSaved={refresh} registeredKeys={registeredKeys}>
                       <Button variant="outline" size="sm" className="rounded-full">Éditer</Button>
                     </WidgetDialog>
-                    <Button variant="ghost" size="icon" onClick={() => remove(w.id)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled={!!w.manifest?.required}
+                      onClick={() => remove(w)}
+                    >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
@@ -102,9 +113,14 @@ function RegistryPage() {
               <CardContent className="pt-0">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                   <Meta label="ID" value={w.id} />
-                  <Meta label="Catégorie" value={w.category ?? "—"} />
                   <Meta label="Composant" value={w.manifest?.component ?? "—"} />
+                  <Meta label="Surface" value={w.manifest?.surface ?? "—"} />
+                  <Meta label="Ordre" value={String(w.manifest?.order ?? 0)} />
+                  <Meta label="Catégorie" value={w.category ?? "—"} />
                   <Meta label="Path" value={w.manifest?.path ?? "—"} />
+                  <Meta label="Types" value={(w.manifest?.eventTypes ?? []).join(", ") || "tous"} />
+                  <Meta label="Obligatoire" value={w.manifest?.required ? "oui" : "non"} />
+
                 </div>
               </CardContent>
             </Card>
@@ -143,7 +159,19 @@ function WidgetDialog({
   const [category, setCategory] = useState(widget?.category ?? "");
   const [manifestJson, setManifestJson] = useState(
     JSON.stringify(
-      widget?.manifest ?? { component: registeredKeys[0] ?? "hello-world", path: "hello", menu: { label: "Hello", icon: "Sparkles" } },
+      widget?.manifest ?? {
+        component: registeredKeys[0] ?? "hello-world",
+        surface: "",
+        order: 0,
+        required: false,
+        visible: true,
+        eventTypes: [],
+        permissions: [],
+        dependencies: [],
+        path: "hello",
+        menu: { label: "Hello", icon: "Sparkles" },
+      },
+
       null,
       2,
     ),
@@ -221,8 +249,12 @@ function WidgetDialog({
               className="font-mono text-xs h-48"
             />
             <p className="text-xs text-muted-foreground">
-              Clés : <code>component</code>, <code>path</code>, <code>menu</code> {"{ label, icon, order }"}, <code>permissions</code> [], <code>config</code> {"{ ... }"}.
+              Clés : <code>component</code>, <code>surface</code>, <code>order</code>,{" "}
+              <code>required</code>, <code>visible</code>, <code>eventTypes</code>[],{" "}
+              <code>permissions</code>[], <code>dependencies</code>[], <code>path</code>,{" "}
+              <code>menu</code> {"{ label, icon, order }"}, <code>config</code> {"{ ... }"}.
             </p>
+
           </div>
         </div>
         <DialogFooter>

@@ -1,23 +1,48 @@
 // Widget manifest shape stored in the `widgets` table.
-// The Core reads this to build routes, menus and permission gates.
+// The Registry is the brain: screens never import widgets directly, they
+// query the Registry which returns filtered, ordered widget lists.
 
 export type WidgetMenuEntry = {
   label: string;
   icon?: string; // lucide-react icon name
-  section?: string; // menu grouping (e.g. "Général", "Admin")
+  section?: string; // menu grouping
   order?: number;
 };
 
 export type WidgetManifest = {
   // Key used to resolve the React component in the code-side registry.
   component: string;
-  // URL segment mounted under /app/w/<path>. Required for routed widgets.
+
+  // ---- Placement ----
+  // Surface identifier where the widget is mounted (e.g. "event.detail",
+  // "dashboard", "contact.detail"). A surface is a screen slot rendered
+  // by <WidgetRenderer surface="..." />.
+  surface?: string;
+  // Order inside the surface (ascending). Defaults to 0.
+  order?: number;
+
+  // ---- Routing (optional, for routed widgets under /app/w/<path>) ----
   path?: string;
-  // Menu entry. Omit to hide from navigation.
   menu?: WidgetMenuEntry;
-  // Role names required to see/access the widget. Empty = any authenticated user.
+
+  // ---- Visibility & lifecycle ----
+  // If true, cannot be disabled from the admin UI.
+  required?: boolean;
+  // If false, still active but hidden from screens (kept for future).
+  visible?: boolean;
+
+  // ---- Targeting ----
+  // Only render for these event types (empty/absent = any type).
+  eventTypes?: string[];
+  // Role names required to see the widget. Empty = any authenticated user.
   permissions?: string[];
-  // Free-form widget configuration passed as props.
+  // IDs of widgets this one depends on (must be enabled).
+  dependencies?: string[];
+
+  // ---- Metadata ----
+  icon?: string;
+
+  // ---- Widget configuration ----
   config?: Record<string, unknown>;
 };
 
@@ -31,4 +56,10 @@ export type WidgetRow = {
   enabled: boolean;
   created_at: string;
   updated_at: string;
+};
+
+export type SurfaceContext = {
+  eventType?: string;
+  isAdmin?: boolean;
+  roles?: string[];
 };
