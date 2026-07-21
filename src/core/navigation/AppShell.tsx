@@ -108,6 +108,35 @@ export function AppShell() {
               })}
             </div>
           )}
+
+          {extensionLinks.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground px-2">Extensions</p>
+              {extensionLinks.map((l) => {
+                const active = pathname === l.to;
+                return (
+                  <Link
+                    key={l.to}
+                    to={l.to}
+                    className={`flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-accent ${
+                      active ? "bg-accent text-foreground" : "text-muted-foreground"
+                    }`}
+                  >
+                    <DynIcon name={l.icon} className="h-4 w-4" />
+                    {l.label}
+                  </Link>
+                );
+              })}
+              {isAdmin && (
+                <Link
+                  to="/app/admin/extensions"
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-accent text-muted-foreground text-xs"
+                >
+                  <Settings className="h-3.5 w-3.5" /> Gérer les extensions
+                </Link>
+              )}
+            </div>
+          )}
         </nav>
 
         <div className="border-t border-border/60 pt-4 space-y-2">
