@@ -1,52 +1,24 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { WidgetProps } from "@/core/registry/components";
+import { useWidgetItems, scopeFromEventId } from "@/widgets/_shared/useWidgetItems";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 import { MapPin, Plus, Trash2 } from "lucide-react";
 
-// Widget: Localisation
-// Auto-contenu : stockage local (localStorage) par événement/utilisateur.
-// Aucune dépendance à un autre widget. Peut être remplacé par un backend dédié.
-
-type Item = { id: string; label: string; done?: boolean };
-
 export default function EventLocationWidget({ config }: WidgetProps) {
-  const scope = (config?.eventId as string | undefined) ?? "global";
-  const storageKey = `widget.location.${scope}`;
+  const scope = scopeFromEventId(config?.eventId as string | undefined);
+  const { items, isLoading, create, update, remove, upsertSingle } = useWidgetItems("event.location", scope);
 
-  const [items, setItems] = useState<Item[]>([]);
-  const [text, setText] = useState("");
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) setItems(JSON.parse(raw));
-    } catch { /* ignore */ }
-    setLoaded(true);
-  }, [storageKey]);
-
-  useEffect(() => {
-    if (loaded) localStorage.setItem(storageKey, JSON.stringify(items));
-  }, [items, loaded, storageKey]);
-
-  const stats = useMemo(() => ({
-    total: items.length,
-    done: items.filter((i) => i.done).length,
-  }), [items]);
-
-  const add = () => {
-    const label = text.trim();
-    if (!label) return;
-    setItems((prev) => [...prev, { id: crypto.randomUUID(), label }]);
-    setText("");
-  };
-  const toggle = (id: string) =>
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, done: !i.done } : i)));
-  const remove = (id: string) => setItems((prev) => prev.filter((i) => i.id !== id));
+  const item = items[0];
+  const [single, setSingle] = useState<Record<string, unknown>>(item?.payload ?? {});
+  useEffect(() => { if (item) setSingle(item.payload ?? {}); }, [item]);
+  const setField = (k: string, v: unknown) => setSingle((s) => ({ ...s, [k]: v }));
+  const save = () => upsertSingle.mutate(single, { onSuccess: () => toast.success("Enregistré.") });
 
   return (
     <Card className="rounded-2xl border-border/60">
@@ -57,22 +29,34 @@ export default function EventLocationWidget({ config }: WidgetProps) {
           </div>
           <div className="flex-1">
             <CardTitle className="text-base">Localisation</CardTitle>
-            <CardDescription>Adresse, plan d'accès et informations pratiques.</CardDescription>
+            <CardDescription>Adresse et accès.</CardDescription>
           </div>
-          
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
         
-        <Textarea
-          value={items[0]?.label ?? ""}
-          onChange={(e) =>
-            setItems([{ id: items[0]?.id ?? crypto.randomUUID(), label: e.target.value }])
-          }
-          placeholder="Écrire ici…"
-          className="min-h-32"
-        />
-        
+        <div className="space-y-1">
+          <Label className="text-xs">Adresse</Label>
+          <Input
+            value={(single.address as string) ?? ""}
+            onChange={(e) => setField("address", e.target.value)}
+            placeholder="12 rue…"
+          />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs">Accès / parking</Label>
+          <Textarea
+            value={(single.notes as string) ?? ""}
+            onChange={(e) => setField("notes", e.target.value)}
+            placeholder="Digicode, parking…"
+            className="min-h-24"
+          />
+        </div>
+        <div className="flex justify-end">
+          <Button onClick={save} disabled={upsertSingle.isPending} className="rounded-full">
+            {upsertSingle.isPending ? "…" : "Enregistrer"}
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );

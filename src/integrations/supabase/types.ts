@@ -256,6 +256,45 @@ export type Database = {
         }
         Relationships: []
       }
+      widget_items: {
+        Row: {
+          created_at: string
+          done: boolean
+          id: string
+          owner_id: string
+          payload: Json
+          position: number
+          scope_id: string | null
+          scope_type: string
+          updated_at: string
+          widget_key: string
+        }
+        Insert: {
+          created_at?: string
+          done?: boolean
+          id?: string
+          owner_id: string
+          payload?: Json
+          position?: number
+          scope_id?: string | null
+          scope_type?: string
+          updated_at?: string
+          widget_key: string
+        }
+        Update: {
+          created_at?: string
+          done?: boolean
+          id?: string
+          owner_id?: string
+          payload?: Json
+          position?: number
+          scope_id?: string | null
+          scope_type?: string
+          updated_at?: string
+          widget_key?: string
+        }
+        Relationships: []
+      }
       widgets: {
         Row: {
           category: string | null

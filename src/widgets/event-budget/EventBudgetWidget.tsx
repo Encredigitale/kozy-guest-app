@@ -1,52 +1,30 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { WidgetProps } from "@/core/registry/components";
+import { useWidgetItems, scopeFromEventId } from "@/widgets/_shared/useWidgetItems";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 import { Wallet, Plus, Trash2 } from "lucide-react";
 
-// Widget: Budget
-// Auto-contenu : stockage local (localStorage) par événement/utilisateur.
-// Aucune dépendance à un autre widget. Peut être remplacé par un backend dédié.
-
-type Item = { id: string; label: string; done?: boolean };
-
 export default function EventBudgetWidget({ config }: WidgetProps) {
-  const scope = (config?.eventId as string | undefined) ?? "global";
-  const storageKey = `widget.budget.${scope}`;
+  const scope = scopeFromEventId(config?.eventId as string | undefined);
+  const { items, isLoading, create, update, remove, upsertSingle } = useWidgetItems("event.budget", scope);
 
-  const [items, setItems] = useState<Item[]>([]);
-  const [text, setText] = useState("");
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(storageKey);
-      if (raw) setItems(JSON.parse(raw));
-    } catch { /* ignore */ }
-    setLoaded(true);
-  }, [storageKey]);
-
-  useEffect(() => {
-    if (loaded) localStorage.setItem(storageKey, JSON.stringify(items));
-  }, [items, loaded, storageKey]);
-
-  const stats = useMemo(() => ({
-    total: items.length,
-    done: items.filter((i) => i.done).length,
-  }), [items]);
+  const [draft, setDraft] = useState<Record<string, unknown>>({ label: "", amount: "" });
 
   const add = () => {
-    const label = text.trim();
-    if (!label) return;
-    setItems((prev) => [...prev, { id: crypto.randomUUID(), label }]);
-    setText("");
+    if (!draft.label) return toast.error("Champ requis manquant.");
+    const amount = Number(draft.amount);
+    if (Number.isNaN(amount)) return toast.error("Montant invalide.");
+    create.mutate(
+      { payload: { ...draft, amount } },
+      { onSuccess: () => setDraft({ label: "", amount: "" }) },
+    );
   };
-  const toggle = (id: string) =>
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, done: !i.done } : i)));
-  const remove = (id: string) => setItems((prev) => prev.filter((i) => i.id !== id));
 
   return (
     <Card className="rounded-2xl border-border/60">
@@ -57,38 +35,28 @@ export default function EventBudgetWidget({ config }: WidgetProps) {
           </div>
           <div className="flex-1">
             <CardTitle className="text-base">Budget</CardTitle>
-            <CardDescription>Suivi des dépenses et estimation.</CardDescription>
+            <CardDescription>Suivi des dépenses.</CardDescription>
           </div>
-          
+          <span className="text-xs text-muted-foreground">{items.length}</span>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        
-        <div className="flex gap-2">
-          <Input
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && add()}
-            placeholder="Ajouter un élément…"
-          />
-          <Button onClick={add} size="icon" variant="secondary" className="rounded-full">
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
-        {items.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic py-4 text-center">
-            Aucun élément pour l'instant.
-          </p>
+        {isLoading ? (
+          <p className="text-xs text-muted-foreground">Chargement…</p>
+        ) : items.length === 0 ? (
+          <p className="text-xs text-muted-foreground italic py-2">Aucun élément.</p>
         ) : (
           <ul className="space-y-1">
             {items.map((i) => (
-              <li key={i.id} className="flex items-center gap-2 group py-1.5">
-                
-                <span className={`flex-1 text-sm ${i.done ? "line-through text-muted-foreground" : ""}`}>
-                  {i.label}
-                </span>
+              <li key={i.id} className="flex items-center gap-2 group py-1.5 border-b border-border/40 last:border-0">
+                <>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{String(i.payload.label ?? "")}</p>
+                </div>
+                <span className="text-sm font-mono">{Number(i.payload.amount ?? 0).toFixed(2)} €</span>
+              </>
                 <button
-                  onClick={() => remove(i.id)}
+                  onClick={() => remove.mutate(i.id)}
                   className="opacity-0 group-hover:opacity-100 transition"
                   aria-label="Supprimer"
                 >
@@ -98,7 +66,29 @@ export default function EventBudgetWidget({ config }: WidgetProps) {
             ))}
           </ul>
         )}
-        
+        <div className="flex justify-between text-sm border-t pt-3 mt-2">
+          <span className="text-muted-foreground">Total</span>
+          <span className="font-medium">{items.reduce((s, i) => s + (Number(i.payload.amount) || 0), 0).toFixed(2)} €</span>
+        </div>
+        <div className="grid gap-2 pt-2 border-t border-border/40">
+          <div className="grid grid-cols-2 gap-2">
+          <Input
+            
+            value={(draft.label as string) ?? ""}
+            onChange={(e) => setDraft({ ...draft, label: e.target.value })}
+            placeholder="Traiteur"
+          />
+          <Input
+            type="number"
+            value={(draft.amount as number | string) ?? ""}
+            onChange={(e) => setDraft({ ...draft, amount: e.target.value })}
+            placeholder="0"
+          />
+          </div>
+          <Button onClick={add} disabled={create.isPending} size="sm" className="rounded-full self-end">
+            <Plus className="h-3.5 w-3.5" /> Ajouter
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
