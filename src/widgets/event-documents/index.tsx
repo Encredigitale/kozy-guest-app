@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { WidgetProps } from "@/core/registry/components";
 import { useWidgetItems, scopeFromEventId } from "@/widgets/_shared/useWidgetItems";
 import { UploadProgressList, type UploadItemState } from "@/widgets/_shared/UploadProgress";
@@ -40,10 +40,9 @@ function PreviewDialog({ payload, onClose }: { payload: Payload | null; onClose:
     setState("ready");
   }, [payload]);
 
-  // Load on open
-  useState(() => {
+  useEffect(() => {
     if (payload) load();
-  });
+  }, [payload, load]);
 
   const isImage = payload?.type?.startsWith("image/");
   const isPdf = payload?.type === "application/pdf" || payload?.name?.toLowerCase().endsWith(".pdf");
