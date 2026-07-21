@@ -83,6 +83,47 @@ export type Database = {
         }
         Relationships: []
       }
+      dashboard_layout: {
+        Row: {
+          created_at: string
+          id: string
+          position: number
+          size: string
+          updated_at: string
+          user_id: string | null
+          visible: boolean
+          widget_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          position?: number
+          size?: string
+          updated_at?: string
+          user_id?: string | null
+          visible?: boolean
+          widget_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          position?: number
+          size?: string
+          updated_at?: string
+          user_id?: string | null
+          visible?: boolean
+          widget_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dashboard_layout_widget_id_fkey"
+            columns: ["widget_id"]
+            isOneToOne: false
+            referencedRelation: "widgets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_extensions: {
         Row: {
           created_at: string
@@ -155,6 +196,51 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_widgets: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          event_id: string
+          position: number
+          size: string | null
+          updated_at: string
+          widget_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          event_id: string
+          position?: number
+          size?: string | null
+          updated_at?: string
+          widget_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          event_id?: string
+          position?: number
+          size?: string | null
+          updated_at?: string
+          widget_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_widgets_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_widgets_widget_id_fkey"
+            columns: ["widget_id"]
+            isOneToOne: false
+            referencedRelation: "widgets"
             referencedColumns: ["id"]
           },
         ]
@@ -425,6 +511,32 @@ export type Database = {
         }
         Relationships: []
       }
+      widget_role_bindings: {
+        Row: {
+          created_at: string
+          role: string
+          widget_id: string
+        }
+        Insert: {
+          created_at?: string
+          role: string
+          widget_id: string
+        }
+        Update: {
+          created_at?: string
+          role?: string
+          widget_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "widget_role_bindings_widget_id_fkey"
+            columns: ["widget_id"]
+            isOneToOne: false
+            referencedRelation: "widgets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       widgets: {
         Row: {
           category: string | null
@@ -434,6 +546,8 @@ export type Database = {
           id: string
           manifest: Json
           name: string
+          size: string
+          status: string
           updated_at: string
           version: string
         }
@@ -445,6 +559,8 @@ export type Database = {
           id: string
           manifest?: Json
           name: string
+          size?: string
+          status?: string
           updated_at?: string
           version?: string
         }
@@ -456,6 +572,8 @@ export type Database = {
           id?: string
           manifest?: Json
           name?: string
+          size?: string
+          status?: string
           updated_at?: string
           version?: string
         }
