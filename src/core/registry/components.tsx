@@ -35,6 +35,17 @@ const registry: Record<string, WidgetComponent> = {
 
 
 
+import { EXTENSIONS } from "@/core/extensions/registry";
+
+// Extension widgets are merged into the same lookup table so that the shell
+// and <WidgetRenderer /> resolve them transparently. Extensions never mutate
+// the Core registry — they only contribute additional entries at build time.
+for (const ext of EXTENSIONS) {
+  for (const w of ext.widgets ?? []) {
+    if (!registry[w.key]) registry[w.key] = w.component;
+  }
+}
+
 export function resolveWidgetComponent(key: string): WidgetComponent | null {
   return registry[key] ?? null;
 }
