@@ -8,16 +8,19 @@ import type { SurfaceContext } from "./types";
 type Props = {
   surface: string;
   eventType?: string;
+  /** Contextual roles for this surface (e.g. ["organizer"], ["guest"]). */
+  contextualRoles?: string[];
   /** Extra config merged into every widget's manifest.config. */
   context?: Record<string, unknown>;
   /** Optional fallback when no widget matches the surface. */
   fallback?: React.ReactNode;
 };
 
-export function WidgetRenderer({ surface, eventType, context, fallback }: Props) {
+export function WidgetRenderer({ surface, eventType, contextualRoles, context, fallback }: Props) {
   const { isAdmin } = useSession();
-  const ctx: SurfaceContext = { eventType, isAdmin };
+  const ctx: SurfaceContext = { eventType, isAdmin, contextualRoles };
   const { data: widgets, isLoading } = useSurfaceWidgets(surface, ctx);
+
 
   if (isLoading) {
     return (
