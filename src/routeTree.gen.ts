@@ -29,6 +29,8 @@ import { Route as AuthenticatedAppEventsNewRouteImport } from './routes/_authent
 import { Route as AuthenticatedAppEventsEventIdRouteImport } from './routes/_authenticated/app.events.$eventId'
 import { Route as AuthenticatedAppAdminRegistryRouteImport } from './routes/_authenticated/app.admin.registry'
 import { Route as AuthenticatedAppAdminExtensionsRouteImport } from './routes/_authenticated/app.admin.extensions'
+import { Route as AuthenticatedAppAdminExtensionsInstallRouteImport } from './routes/_authenticated/app.admin.extensions.install'
+import { Route as AuthenticatedAppAdminExtensionsKeyRouteImport } from './routes/_authenticated/app.admin.extensions.$key'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -135,6 +137,18 @@ const AuthenticatedAppAdminExtensionsRoute =
     path: '/admin/extensions',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppAdminExtensionsInstallRoute =
+  AuthenticatedAppAdminExtensionsInstallRouteImport.update({
+    id: '/install',
+    path: '/install',
+    getParentRoute: () => AuthenticatedAppAdminExtensionsRoute,
+  } as any)
+const AuthenticatedAppAdminExtensionsKeyRoute =
+  AuthenticatedAppAdminExtensionsKeyRouteImport.update({
+    id: '/$key',
+    path: '/$key',
+    getParentRoute: () => AuthenticatedAppAdminExtensionsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -148,7 +162,7 @@ export interface FileRoutesByFullPath {
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/tokens': typeof AuthenticatedAppTokensRoute
   '/app/': typeof AuthenticatedAppIndexRoute
-  '/app/admin/extensions': typeof AuthenticatedAppAdminExtensionsRoute
+  '/app/admin/extensions': typeof AuthenticatedAppAdminExtensionsRouteWithChildren
   '/app/admin/registry': typeof AuthenticatedAppAdminRegistryRoute
   '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
@@ -156,6 +170,8 @@ export interface FileRoutesByFullPath {
   '/app/x/$': typeof AuthenticatedAppXSplatRoute
   '/api/public/v1/me': typeof ApiPublicV1MeRoute
   '/app/events/': typeof AuthenticatedAppEventsIndexRoute
+  '/app/admin/extensions/$key': typeof AuthenticatedAppAdminExtensionsKeyRoute
+  '/app/admin/extensions/install': typeof AuthenticatedAppAdminExtensionsInstallRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -167,7 +183,7 @@ export interface FileRoutesByTo {
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/tokens': typeof AuthenticatedAppTokensRoute
   '/app': typeof AuthenticatedAppIndexRoute
-  '/app/admin/extensions': typeof AuthenticatedAppAdminExtensionsRoute
+  '/app/admin/extensions': typeof AuthenticatedAppAdminExtensionsRouteWithChildren
   '/app/admin/registry': typeof AuthenticatedAppAdminRegistryRoute
   '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
@@ -175,6 +191,8 @@ export interface FileRoutesByTo {
   '/app/x/$': typeof AuthenticatedAppXSplatRoute
   '/api/public/v1/me': typeof ApiPublicV1MeRoute
   '/app/events': typeof AuthenticatedAppEventsIndexRoute
+  '/app/admin/extensions/$key': typeof AuthenticatedAppAdminExtensionsKeyRoute
+  '/app/admin/extensions/install': typeof AuthenticatedAppAdminExtensionsInstallRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -190,7 +208,7 @@ export interface FileRoutesById {
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
   '/_authenticated/app/tokens': typeof AuthenticatedAppTokensRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
-  '/_authenticated/app/admin/extensions': typeof AuthenticatedAppAdminExtensionsRoute
+  '/_authenticated/app/admin/extensions': typeof AuthenticatedAppAdminExtensionsRouteWithChildren
   '/_authenticated/app/admin/registry': typeof AuthenticatedAppAdminRegistryRoute
   '/_authenticated/app/events/$eventId': typeof AuthenticatedAppEventsEventIdRoute
   '/_authenticated/app/events/new': typeof AuthenticatedAppEventsNewRoute
@@ -198,6 +216,8 @@ export interface FileRoutesById {
   '/_authenticated/app/x/$': typeof AuthenticatedAppXSplatRoute
   '/api/public/v1/me': typeof ApiPublicV1MeRoute
   '/_authenticated/app/events/': typeof AuthenticatedAppEventsIndexRoute
+  '/_authenticated/app/admin/extensions/$key': typeof AuthenticatedAppAdminExtensionsKeyRoute
+  '/_authenticated/app/admin/extensions/install': typeof AuthenticatedAppAdminExtensionsInstallRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -221,6 +241,8 @@ export interface FileRouteTypes {
     | '/app/x/$'
     | '/api/public/v1/me'
     | '/app/events/'
+    | '/app/admin/extensions/$key'
+    | '/app/admin/extensions/install'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -240,6 +262,8 @@ export interface FileRouteTypes {
     | '/app/x/$'
     | '/api/public/v1/me'
     | '/app/events'
+    | '/app/admin/extensions/$key'
+    | '/app/admin/extensions/install'
   id:
     | '__root__'
     | '/'
@@ -262,6 +286,8 @@ export interface FileRouteTypes {
     | '/_authenticated/app/x/$'
     | '/api/public/v1/me'
     | '/_authenticated/app/events/'
+    | '/_authenticated/app/admin/extensions/$key'
+    | '/_authenticated/app/admin/extensions/install'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -415,6 +441,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAdminExtensionsRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/app/admin/extensions/install': {
+      id: '/_authenticated/app/admin/extensions/install'
+      path: '/install'
+      fullPath: '/app/admin/extensions/install'
+      preLoaderRoute: typeof AuthenticatedAppAdminExtensionsInstallRouteImport
+      parentRoute: typeof AuthenticatedAppAdminExtensionsRoute
+    }
+    '/_authenticated/app/admin/extensions/$key': {
+      id: '/_authenticated/app/admin/extensions/$key'
+      path: '/$key'
+      fullPath: '/app/admin/extensions/$key'
+      preLoaderRoute: typeof AuthenticatedAppAdminExtensionsKeyRouteImport
+      parentRoute: typeof AuthenticatedAppAdminExtensionsRoute
+    }
   }
 }
 
@@ -436,6 +476,24 @@ const AuthenticatedAppEventsRouteWithChildren =
     AuthenticatedAppEventsRouteChildren,
   )
 
+interface AuthenticatedAppAdminExtensionsRouteChildren {
+  AuthenticatedAppAdminExtensionsKeyRoute: typeof AuthenticatedAppAdminExtensionsKeyRoute
+  AuthenticatedAppAdminExtensionsInstallRoute: typeof AuthenticatedAppAdminExtensionsInstallRoute
+}
+
+const AuthenticatedAppAdminExtensionsRouteChildren: AuthenticatedAppAdminExtensionsRouteChildren =
+  {
+    AuthenticatedAppAdminExtensionsKeyRoute:
+      AuthenticatedAppAdminExtensionsKeyRoute,
+    AuthenticatedAppAdminExtensionsInstallRoute:
+      AuthenticatedAppAdminExtensionsInstallRoute,
+  }
+
+const AuthenticatedAppAdminExtensionsRouteWithChildren =
+  AuthenticatedAppAdminExtensionsRoute._addFileChildren(
+    AuthenticatedAppAdminExtensionsRouteChildren,
+  )
+
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppAuditRoute: typeof AuthenticatedAppAuditRoute
   AuthenticatedAppEventsRoute: typeof AuthenticatedAppEventsRouteWithChildren
@@ -443,7 +501,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
   AuthenticatedAppTokensRoute: typeof AuthenticatedAppTokensRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
-  AuthenticatedAppAdminExtensionsRoute: typeof AuthenticatedAppAdminExtensionsRoute
+  AuthenticatedAppAdminExtensionsRoute: typeof AuthenticatedAppAdminExtensionsRouteWithChildren
   AuthenticatedAppAdminRegistryRoute: typeof AuthenticatedAppAdminRegistryRoute
   AuthenticatedAppWSplatRoute: typeof AuthenticatedAppWSplatRoute
   AuthenticatedAppXSplatRoute: typeof AuthenticatedAppXSplatRoute
@@ -456,7 +514,8 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
   AuthenticatedAppTokensRoute: AuthenticatedAppTokensRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
-  AuthenticatedAppAdminExtensionsRoute: AuthenticatedAppAdminExtensionsRoute,
+  AuthenticatedAppAdminExtensionsRoute:
+    AuthenticatedAppAdminExtensionsRouteWithChildren,
   AuthenticatedAppAdminRegistryRoute: AuthenticatedAppAdminRegistryRoute,
   AuthenticatedAppWSplatRoute: AuthenticatedAppWSplatRoute,
   AuthenticatedAppXSplatRoute: AuthenticatedAppXSplatRoute,
