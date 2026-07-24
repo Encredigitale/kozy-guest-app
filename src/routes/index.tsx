@@ -1,67 +1,149 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Layers, ShieldCheck, Puzzle } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Calendar, Users, Wine, Heart, Bell } from "lucide-react";
+import heroImg from "@/assets/hero-gathering.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Framework — Plateforme SaaS modulaire" },
-      { name: "description", content: "Un Core stable, des widgets déclaratifs, des interfaces générées automatiquement." },
-      { property: "og:title", content: "Framework — Plateforme SaaS modulaire" },
-      { property: "og:description", content: "Un Core stable, des widgets déclaratifs, des interfaces générées automatiquement." },
+      { title: "Kosy — Organisez vos moments et gardez-en le souvenir" },
+      {
+        name: "description",
+        content:
+          "Kosy vous aide à organiser vos repas, anniversaires et moments entre proches, puis à en garder le souvenir.",
+      },
+      { property: "og:title", content: "Kosy" },
+      {
+        property: "og:description",
+        content: "Organisez vos moments et gardez-en le souvenir.",
+      },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Landing,
 });
 
+const benefits = [
+  {
+    icon: Calendar,
+    title: "Créez en quelques secondes",
+    text: "Un événement, une date, un lieu — c'est tout.",
+  },
+  {
+    icon: Users,
+    title: "Invitez vos proches",
+    text: "Famille, amis, collègues. Sans compte requis.",
+  },
+  {
+    icon: Wine,
+    title: "Répartissez les contributions",
+    text: "Qui apporte le dessert ? Le vin ? Les fleurs ?",
+  },
+  {
+    icon: Heart,
+    title: "Gardez la mémoire",
+    text: "Menus, invités, photos et souvenirs.",
+  },
+  {
+    icon: Bell,
+    title: "Ne rien oublier",
+    text: "Rappels et checklists au bon moment.",
+  },
+];
+
 function Landing() {
   return (
-    <div className="min-h-screen bg-background">
-      <header className="max-w-5xl mx-auto px-6 py-6 flex items-center justify-between">
-        <span className="font-serif text-xl tracking-tight text-primary">Framework</span>
-        <div className="flex gap-2">
-          <Button asChild variant="ghost" size="sm">
-            <Link to="/login">Se connecter</Link>
-          </Button>
-          <Button asChild size="sm" className="rounded-full">
-            <Link to="/signup">Créer un compte</Link>
-          </Button>
-        </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="max-w-6xl mx-auto flex items-center justify-between px-6 py-5">
+        <div className="font-serif text-2xl tracking-tight text-primary">Kosy</div>
+        <Button asChild variant="ghost" size="sm">
+          <Link to="/login">Se connecter</Link>
+        </Button>
       </header>
 
-      <section className="max-w-3xl mx-auto px-6 py-20 text-center">
-        <h1 className="font-serif text-5xl tracking-tight text-primary">
-          Une plateforme, mille modules.
-        </h1>
-        <p className="mt-5 text-lg text-muted-foreground">
-          Le cœur reste stable. Les fonctionnalités s'ajoutent, se retirent, se composent —
-          sans jamais toucher au moteur.
-        </p>
-        <div className="mt-8 flex justify-center gap-3">
-          <Button asChild size="lg" className="rounded-full px-8">
+      <main>
+        <section className="max-w-6xl mx-auto px-6 pt-8 pb-20">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="animate-fade-in">
+              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-foreground">
+                Les plus beaux souvenirs commencent autour d'une&nbsp;table.
+              </h1>
+              <p className="mt-6 text-lg text-muted-foreground max-w-xl leading-relaxed">
+                Organisez facilement vos repas, anniversaires et moments entre proches.
+                Invitez vos proches, répartissez les contributions et retrouvez l'historique
+                de tous vos événements.
+              </p>
+              <div className="mt-8 flex flex-col sm:flex-row gap-3">
+                <Button asChild size="lg" className="rounded-full px-8">
+                  <Link to="/signup">Créer un compte</Link>
+                </Button>
+                <Button asChild size="lg" variant="outline" className="rounded-full px-8">
+                  <Link to="/login">Se connecter</Link>
+                </Button>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="absolute -inset-8 bg-accent/40 rounded-[3rem] blur-3xl -z-10" />
+              <img
+                src={heroImg}
+                alt="Famille et amis partageant un repas convivial autour d'une table."
+                width={1600}
+                height={1200}
+                className="w-full h-auto rounded-[2rem] shadow-sm"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="max-w-6xl mx-auto px-6 pb-24">
+          <div className="text-center mb-12">
+            <h2 className="font-serif text-3xl sm:text-4xl tracking-tight">
+              Tout ce qu'il faut, rien de plus.
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              Pensé pour se concentrer sur l'essentiel : les gens.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {benefits.map((b, i) => (
+              <Card
+                key={b.title}
+                className="p-6 rounded-3xl border-border/60 shadow-none hover:shadow-sm transition-shadow animate-fade-in"
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                <div className="h-11 w-11 rounded-2xl bg-accent grid place-items-center mb-4">
+                  <b.icon className="h-5 w-5 text-primary" />
+                </div>
+                <h3 className="font-serif text-lg mb-1">{b.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{b.text}</p>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <section className="max-w-3xl mx-auto px-6 pb-24 text-center">
+          <h2 className="font-serif text-3xl sm:text-4xl tracking-tight mb-4">
+            Prêt à créer votre prochain moment ?
+          </h2>
+          <p className="text-muted-foreground mb-8">
+            Rejoignez Kosy et rassemblez ceux qui comptent.
+          </p>
+          <Button asChild size="lg" className="rounded-full px-10">
             <Link to="/signup">Commencer</Link>
           </Button>
-          <Button asChild size="lg" variant="outline" className="rounded-full px-8">
-            <Link to="/login">J'ai un compte</Link>
-          </Button>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      <section className="max-w-5xl mx-auto px-6 pb-24 grid md:grid-cols-3 gap-6">
-        {[
-          { icon: Layers, title: "Core stable", body: "Utilisateur, sécurité, navigation, notifications. Le socle ne change pas." },
-          { icon: Puzzle, title: "Widgets déclaratifs", body: "Chaque module se décrit par un manifest. L'UI se génère toute seule." },
-          { icon: ShieldCheck, title: "Sécurité par défaut", body: "Rôles, permissions, journalisation d'audit intégrés au Core." },
-        ].map(({ icon: Icon, title, body }) => (
-          <div key={title} className="p-6 rounded-2xl border border-border/60">
-            <Icon className="h-6 w-6 text-primary" />
-            <h3 className="mt-3 font-medium">{title}</h3>
-            <p className="mt-1 text-sm text-muted-foreground">{body}</p>
-          </div>
-        ))}
-      </section>
+      <footer className="border-t border-border/60">
+        <div className="max-w-6xl mx-auto px-6 py-8 text-sm text-muted-foreground flex flex-wrap gap-4 justify-between">
+          <div>© {new Date().getFullYear()} Kosy</div>
+          <div className="font-serif text-primary">Kosy</div>
+        </div>
+      </footer>
     </div>
   );
 }
