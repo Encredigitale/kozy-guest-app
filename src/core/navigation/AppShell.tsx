@@ -1,7 +1,7 @@
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useMemo } from "react";
 import * as Icons from "lucide-react";
-import { LogOut, User as UserIcon, LayoutGrid, Settings, Home } from "lucide-react";
+import { LogOut, User as UserIcon, LayoutGrid, Settings, Home, Calendar, BookUser, User as ProfileIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useActiveWidgets } from "@/core/registry/useRegistry";
@@ -74,6 +74,49 @@ export function AppShell() {
     toast.success("Déconnecté.");
     navigate({ to: "/" });
   };
+
+  // Non-admin users: no sidebar, top header nav only.
+  if (!isAdmin) {
+    const USER_NAV = [
+      { to: "/app/events", label: "Événements", Icon: Calendar },
+      { to: "/app/contacts", label: "Contacts", Icon: BookUser },
+      { to: "/app/profile", label: "Profil", Icon: ProfileIcon },
+    ];
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <header className="h-14 border-b border-border/60 flex items-center justify-between px-4 gap-4 shrink-0">
+          <Link to="/app" className="font-serif text-xl tracking-tight text-primary">
+            Framework
+          </Link>
+          <nav className="flex items-center gap-1 text-sm">
+            {USER_NAV.map(({ to, label, Icon }) => {
+              const active = pathname === to || pathname.startsWith(to);
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-accent ${
+                    active ? "bg-accent text-foreground" : "text-muted-foreground"
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="hidden sm:inline">{label}</span>
+                </Link>
+              );
+            })}
+            <NotificationBell />
+            <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground">
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline ml-2">Déconnexion</span>
+            </Button>
+          </nav>
+        </header>
+        <main className="flex-1 overflow-y-auto">
+          <Outlet />
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex">
