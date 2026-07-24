@@ -21,9 +21,8 @@ type CoreLink = {
 const CORE_LINKS: CoreLink[] = [
   { key: "home", label: "Accueil", to: "/app", icon: "Home" },
   { key: "events", label: "Événements", to: "/app/events", icon: "Calendar" },
-  { key: "notifications", label: "Notifications", to: "/app/notifications", icon: "Bell" },
-  { key: "tokens", label: "Jetons API", to: "/app/tokens", icon: "KeyRound" },
-  { key: "audit", label: "Journal d'audit", to: "/app/audit", icon: "ScrollText" },
+  { key: "create", label: "Créer", to: "/app/events/new", icon: "PlusCircle" },
+  { key: "contacts", label: "Contacts", to: "/app/contacts", icon: "BookUser" },
   { key: "profile", label: "Profil", to: "/app/profile", icon: "User" },
   { key: "studio", label: "Studio", to: "/app/admin/studio", icon: "Wand2", adminOnly: true },
   { key: "registry", label: "Registry", to: "/app/admin/registry", icon: "LayoutGrid", adminOnly: true },
