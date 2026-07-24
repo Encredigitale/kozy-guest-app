@@ -129,6 +129,42 @@ function Landing() {
           </div>
         </section>
 
+        <section className="max-w-6xl mx-auto px-6 pb-24">
+          <div className="text-center mb-12">
+            <h2 className="font-serif text-3xl sm:text-4xl tracking-tight">
+              De l'idée au souvenir.
+            </h2>
+            <p className="mt-3 text-muted-foreground">
+              Un parcours simple, du premier invité au dernier souvenir.
+            </p>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { img: organizeImg, title: "Organisez", text: "Créez un événement en moins d'une minute." },
+              { img: shareImg, title: "Partagez", text: "Invitez vos proches, répartissez les rôles." },
+              { img: rememberImg, title: "Souvenez-vous", text: "Photos, menus et invités, tout est gardé." },
+              { img: readyImg, title: "Recommencez", text: "Chaque événement inspire le prochain." },
+            ].map((s, i) => (
+              <div
+                key={s.title}
+                className="animate-fade-in"
+                style={{ animationDelay: `${i * 80}ms` }}
+              >
+                <img
+                  src={s.img}
+                  alt={s.title}
+                  width={800}
+                  height={800}
+                  className="w-full h-auto rounded-[2rem] shadow-sm"
+                />
+                <h3 className="mt-4 font-serif text-lg">{s.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed mt-1">{s.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+
         <section className="max-w-3xl mx-auto px-6 pb-24 text-center">
           <h2 className="font-serif text-3xl sm:text-4xl tracking-tight mb-4">
             Prêt à créer votre prochain moment ?
