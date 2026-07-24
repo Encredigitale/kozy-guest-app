@@ -20,6 +20,7 @@ import { Route as AuthenticatedAppTokensRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
 import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/app.notifications'
 import { Route as AuthenticatedAppEventsRouteImport } from './routes/_authenticated/app.events'
+import { Route as AuthenticatedAppContactsRouteImport } from './routes/_authenticated/app.contacts'
 import { Route as AuthenticatedAppAuditRouteImport } from './routes/_authenticated/app.audit'
 import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/app.events.index'
 import { Route as ApiPublicV1MeRouteImport } from './routes/api/public/v1/me'
@@ -88,6 +89,12 @@ const AuthenticatedAppEventsRoute = AuthenticatedAppEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppContactsRoute =
+  AuthenticatedAppContactsRouteImport.update({
+    id: '/contacts',
+    path: '/contacts',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppAuditRoute = AuthenticatedAppAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
@@ -164,6 +171,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/app/audit': typeof AuthenticatedAppAuditRoute
+  '/app/contacts': typeof AuthenticatedAppContactsRoute
   '/app/events': typeof AuthenticatedAppEventsRouteWithChildren
   '/app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
@@ -187,6 +195,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/app/audit': typeof AuthenticatedAppAuditRoute
+  '/app/contacts': typeof AuthenticatedAppContactsRoute
   '/app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
   '/app/tokens': typeof AuthenticatedAppTokensRoute
@@ -212,6 +221,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/app/audit': typeof AuthenticatedAppAuditRoute
+  '/_authenticated/app/contacts': typeof AuthenticatedAppContactsRoute
   '/_authenticated/app/events': typeof AuthenticatedAppEventsRouteWithChildren
   '/_authenticated/app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
@@ -238,6 +248,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/app'
     | '/app/audit'
+    | '/app/contacts'
     | '/app/events'
     | '/app/notifications'
     | '/app/profile'
@@ -261,6 +272,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/app/audit'
+    | '/app/contacts'
     | '/app/notifications'
     | '/app/profile'
     | '/app/tokens'
@@ -285,6 +297,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_authenticated/app'
     | '/_authenticated/app/audit'
+    | '/_authenticated/app/contacts'
     | '/_authenticated/app/events'
     | '/_authenticated/app/notifications'
     | '/_authenticated/app/profile'
@@ -389,6 +402,13 @@ declare module '@tanstack/react-router' {
       path: '/events'
       fullPath: '/app/events'
       preLoaderRoute: typeof AuthenticatedAppEventsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/contacts': {
+      id: '/_authenticated/app/contacts'
+      path: '/contacts'
+      fullPath: '/app/contacts'
+      preLoaderRoute: typeof AuthenticatedAppContactsRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/app/audit': {
@@ -516,6 +536,7 @@ const AuthenticatedAppAdminExtensionsRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppAuditRoute: typeof AuthenticatedAppAuditRoute
+  AuthenticatedAppContactsRoute: typeof AuthenticatedAppContactsRoute
   AuthenticatedAppEventsRoute: typeof AuthenticatedAppEventsRouteWithChildren
   AuthenticatedAppNotificationsRoute: typeof AuthenticatedAppNotificationsRoute
   AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
@@ -530,6 +551,7 @@ interface AuthenticatedAppRouteChildren {
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppAuditRoute: AuthenticatedAppAuditRoute,
+  AuthenticatedAppContactsRoute: AuthenticatedAppContactsRoute,
   AuthenticatedAppEventsRoute: AuthenticatedAppEventsRouteWithChildren,
   AuthenticatedAppNotificationsRoute: AuthenticatedAppNotificationsRoute,
   AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
