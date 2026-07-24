@@ -3,6 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, Users, Wine, Heart, Bell } from "lucide-react";
 import heroImg from "@/assets/hero-gathering.jpg";
+import organizeImg from "@/assets/onboard-organize.jpg";
+import shareImg from "@/assets/onboard-share.jpg";
+import rememberImg from "@/assets/onboard-remember.jpg";
+import readyImg from "@/assets/onboard-ready.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
