@@ -6,13 +6,14 @@ import { useExtensionSettings } from "@/core/extensions/useExtensionSettings";
 
 export default function PersonalInfoWidget() {
   const { settings, isLoading } = useExtensionSettings("personal-info");
+  const s = settings as Record<string, unknown>;
 
   const rows: { icon: React.ReactNode; label: string; value?: string }[] = [
-    { icon: <Cake className="h-3.5 w-3.5" />, label: "Anniversaire", value: settings.birthday as string },
-    { icon: <Phone className="h-3.5 w-3.5" />, label: "Téléphone", value: settings.phone as string },
-    { icon: <MapPin className="h-3.5 w-3.5" />, label: "Ville", value: settings.city as string },
-    { icon: <Utensils className="h-3.5 w-3.5" />, label: "Régime", value: settings.diet as string },
-    { icon: <AlertTriangle className="h-3.5 w-3.5" />, label: "Allergies", value: settings.allergies as string },
+    { icon: <Cake className="h-3.5 w-3.5" />, label: "Anniversaire", value: s.birthday as string | undefined },
+    { icon: <Phone className="h-3.5 w-3.5" />, label: "Téléphone", value: s.phone as string | undefined },
+    { icon: <MapPin className="h-3.5 w-3.5" />, label: "Ville", value: s.city as string | undefined },
+    { icon: <Utensils className="h-3.5 w-3.5" />, label: "Régime", value: s.diet as string | undefined },
+    { icon: <AlertTriangle className="h-3.5 w-3.5" />, label: "Allergies", value: s.allergies as string | undefined },
   ];
 
   const filled = rows.filter((r) => r.value && String(r.value).trim().length > 0);
