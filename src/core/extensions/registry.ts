@@ -102,6 +102,48 @@ export const EXTENSIONS: ExtensionDefinition[] = [
     ],
     menu: [{ label: "Statistiques", path: "stats", icon: "BarChart3", order: 20 }],
   },
+  {
+    key: "personal-info",
+    name: "Informations personnelles",
+    description: "Fiche personnelle de l'utilisateur (contact, régime, allergies, notes).",
+    category: "profile",
+    icon: "UserCircle2",
+    version: "1.0.0",
+    scope: "global",
+    settingsSchema: [
+      { key: "birthday", label: "Date de naissance", type: "text" },
+      { key: "phone", label: "Téléphone", type: "text" },
+      { key: "address", label: "Adresse", type: "text" },
+      { key: "city", label: "Ville", type: "text" },
+      {
+        key: "diet",
+        label: "Régime alimentaire",
+        type: "select",
+        default: "any",
+        options: [
+          { value: "any", label: "Aucun" },
+          { value: "vegetarian", label: "Végétarien" },
+          { value: "vegan", label: "Végan" },
+          { value: "gluten-free", label: "Sans gluten" },
+          { value: "halal", label: "Halal" },
+          { value: "kosher", label: "Casher" },
+        ],
+      },
+      { key: "allergies", label: "Allergies", type: "text" },
+      { key: "notes", label: "Notes", type: "textarea" },
+    ],
+    widgets: [
+      { key: "ext.personal-info", component: lazy(() => import("@/extensions/personal-info/PersonalInfoWidget")) },
+    ],
+    screens: [
+      {
+        path: "edit",
+        label: "Modifier mes informations",
+        component: lazy(() => import("@/extensions/personal-info/PersonalInfoScreen")),
+      },
+    ],
+    menu: [{ label: "Mes informations", path: "edit", icon: "UserCircle2", order: 5 }],
+  },
 ];
 
 export function findExtensionByKey(key: string): ExtensionDefinition | undefined {
