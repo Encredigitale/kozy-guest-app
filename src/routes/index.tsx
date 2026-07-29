@@ -2,11 +2,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, Users, Wine, Heart, Bell } from "lucide-react";
-import heroImg from "@/assets/hero-gathering.jpg";
+import heroAsset from "@/assets/hero-gathering.jpg.asset.json";
 import organizeImg from "@/assets/onboard-organize.jpg";
 import shareImg from "@/assets/onboard-share.jpg";
 import rememberImg from "@/assets/onboard-remember.jpg";
 import readyImg from "@/assets/onboard-ready.jpg";
+
+const heroImg = heroAsset.url;
 
 export const Route = createFileRoute("/")({
   head: () => ({
