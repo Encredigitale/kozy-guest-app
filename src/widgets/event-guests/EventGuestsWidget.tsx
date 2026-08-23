@@ -21,21 +21,22 @@ function initialsFromEmail(email: string | null): string {
   return local.slice(0, 2).toUpperCase();
 }
 
-function avatarColor(email: string | null): string {
+const AVATAR_CLASSES = [
+  "bg-avatar-1 text-avatar-1-fg",
+  "bg-avatar-2 text-avatar-2-fg",
+  "bg-avatar-3 text-avatar-3-fg",
+  "bg-avatar-4 text-avatar-4-fg",
+  "bg-avatar-5 text-avatar-5-fg",
+  "bg-avatar-6 text-avatar-6-fg",
+  "bg-avatar-7 text-avatar-7-fg",
+  "bg-avatar-8 text-avatar-8-fg",
+];
+
+function avatarClasses(email: string | null): string {
   if (!email) return "bg-muted text-muted-foreground";
-  const colors = [
-    "bg-rose-100 text-rose-700",
-    "bg-amber-100 text-amber-700",
-    "bg-emerald-100 text-emerald-700",
-    "bg-sky-100 text-sky-700",
-    "bg-violet-100 text-violet-700",
-    "bg-orange-100 text-orange-700",
-    "bg-teal-100 text-teal-700",
-    "bg-indigo-100 text-indigo-700",
-  ];
   let hash = 0;
   for (let i = 0; i < email.length; i++) hash = email.charCodeAt(i) + ((hash << 5) - hash);
-  return colors[Math.abs(hash) % colors.length];
+  return AVATAR_CLASSES[Math.abs(hash) % AVATAR_CLASSES.length];
 }
 
 function rsvpBadge(status: "pending" | "accepted" | "declined") {
