@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { renderNotificationEmail } from "@/lib/email-templates";
 
 const sendSchema = z.object({
   userId: z.string().uuid(),
@@ -9,6 +10,8 @@ const sendSchema = z.object({
   title: z.string().min(1).max(200),
   body: z.string().max(4000).optional(),
   emailTo: z.string().email().optional(),
+  ctaLabel: z.string().max(60).optional(),
+  ctaUrl: z.string().url().max(2000).optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
@@ -41,7 +44,13 @@ export const sendNotification = createServerFn({ method: "POST" })
               sender: { name: "Kosy", email: "contact@nonvitcha.fr" },
               to: [{ email: data.emailTo }],
               subject: data.title,
-              htmlContent: `<p>${(data.body ?? "").replace(/\n/g, "<br/>")}</p>`,
+              htmlContent: renderNotificationEmail({
+                title: data.title,
+                body: data.body,
+                ctaLabel: data.ctaLabel,
+                ctaUrl: data.ctaUrl,
+              }),
+              textContent: data.body ?? data.title,
             }),
           });
           if (res.ok) {
