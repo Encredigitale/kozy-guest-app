@@ -16,9 +16,8 @@ export type WizardValue = {
   selectedWidgets: string[];
   toggleWidget: (id: string) => void;
   setSelectedWidgets: (ids: string[]) => void;
-  menuChoices: Record<string, string[]>;
-  addMenuChoice: (componentKey: string, label: string) => void;
-  removeMenuChoice: (componentKey: string, index: number) => void;
+  menuComponents: string[];
+  toggleMenuComponent: (componentKey: string) => void;
   step: number;
   stepIndex: number;
   stepCount: number;
