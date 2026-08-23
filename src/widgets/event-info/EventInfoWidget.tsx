@@ -15,7 +15,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { useActiveEventTypes } from "@/core/eventTypes/useEventTypes";
+import {
+  Trash2, Utensils, Briefcase, PartyPopper, Gift, Coffee, Heart, Cake, Music, Baby,
+  Users, CalendarDays, Sparkles, type LucideIcon,
+} from "lucide-react";
+
+const ICONS: Record<string, LucideIcon> = {
+  Utensils, Briefcase, PartyPopper, Gift, Coffee, Heart, Cake, Music, Baby, Users, CalendarDays, Sparkles,
+};
 
 export default function EventInfoWidget({ config }: WidgetProps) {
   const eventId = config?.eventId as string;
