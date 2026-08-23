@@ -17,6 +17,7 @@ function NewEventPage() {
 
   const [step, setStep] = useState(0);
   const [type, setType] = useState("");
+  const [customType, setCustomType] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
