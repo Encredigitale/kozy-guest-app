@@ -15,7 +15,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { useActiveEventTypes } from "@/core/eventTypes/useEventTypes";
+import {
+  Trash2, Utensils, Briefcase, PartyPopper, Gift, Coffee, Heart, Cake, Music, Baby,
+  Users, CalendarDays, Sparkles, type LucideIcon,
+} from "lucide-react";
+
+const ICONS: Record<string, LucideIcon> = {
+  Utensils, Briefcase, PartyPopper, Gift, Coffee, Heart, Cake, Music, Baby, Users, CalendarDays, Sparkles,
+};
 
 export default function EventInfoWidget({ config }: WidgetProps) {
   const eventId = config?.eventId as string;
@@ -27,8 +35,16 @@ export default function EventInfoWidget({ config }: WidgetProps) {
   const { data: participants = [] } = useParticipants(eventId);
   const [draft, setDraft] = useState<EventRow | null>(null);
   const [saving, setSaving] = useState(false);
+  const { data: eventTypes = [] } = useActiveEventTypes();
 
   useEffect(() => { if (ev) setDraft(ev); }, [ev]);
+
+  const typeKey = (ev?.metadata?.event_type as string) || null;
+  const typeCustomLabel = (ev?.metadata?.event_type_label as string) || null;
+  const typeDef = typeKey ? eventTypes.find((t) => t.key === typeKey) : null;
+  const typeLabel = typeKey === "other" ? (typeCustomLabel || "Autre") : (typeDef?.label ?? typeKey);
+  const TypeIcon = typeKey === "other" ? Sparkles : (ICONS[typeDef?.icon ?? ""] ?? Sparkles);
+
 
   if (isLoading) return <div className="text-sm text-muted-foreground">Chargement…</div>;
   if (!ev || !draft) return <div className="text-sm text-destructive">Événement introuvable.</div>;
@@ -72,8 +88,18 @@ export default function EventInfoWidget({ config }: WidgetProps) {
   return (
     <Card className="rounded-2xl border-border/60">
       <CardHeader className="flex flex-row items-start justify-between gap-4">
-        <div>
-          <CardTitle className="text-base">Informations</CardTitle>
+        <div className="min-w-0">
+          <div className="flex items-center gap-3">
+            {typeKey && (
+              <div className="h-10 w-10 rounded-xl bg-primary/10 grid place-items-center shrink-0">
+                <TypeIcon className="h-5 w-5 text-primary" />
+              </div>
+            )}
+            <div className="min-w-0">
+              <CardTitle className="text-lg font-serif tracking-tight truncate">{ev.title}</CardTitle>
+              {typeKey && <p className="text-xs text-muted-foreground mt-0.5">{typeLabel}</p>}
+            </div>
+          </div>
           <Badge className="mt-2" variant={ev.status === "published" ? "default" : "secondary"}>{ev.status}</Badge>
         </div>
         {isOrganizer && (

@@ -12,6 +12,7 @@ export default function WidgetsStepWidget() {
   const available = useMemo(() => {
     return widgets
       .filter((w) => w.manifest?.surface === "event.detail")
+      .filter((w) => w.manifest?.component !== "event.type")
       .filter((w) => {
         const types = w.manifest?.eventTypes ?? [];
         return types.length === 0 || types.includes(type);
