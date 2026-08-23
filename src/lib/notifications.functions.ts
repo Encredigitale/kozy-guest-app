@@ -10,6 +10,8 @@ const sendSchema = z.object({
   title: z.string().min(1).max(200),
   body: z.string().max(4000).optional(),
   emailTo: z.string().email().optional(),
+  ctaLabel: z.string().max(60).optional(),
+  ctaUrl: z.string().url().max(2000).optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
