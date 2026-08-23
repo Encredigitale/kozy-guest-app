@@ -23,16 +23,11 @@ function NewEventPage() {
   const [location, setLocation] = useState("");
   const [startsAt, setStartsAt] = useState("");
   const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
-  const [menuChoices, setMenuChoices] = useState<Record<string, string[]>>({});
+  const [menuComponents, setMenuComponents] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
 
-  const addMenuChoice = (componentKey: string, label: string) =>
-    setMenuChoices((prev) => ({ ...prev, [componentKey]: [...(prev[componentKey] ?? []), label] }));
-  const removeMenuChoice = (componentKey: string, index: number) =>
-    setMenuChoices((prev) => ({
-      ...prev,
-      [componentKey]: (prev[componentKey] ?? []).filter((_, i) => i !== index),
-    }));
+  const toggleMenuComponent = (key: string) =>
+    setMenuComponents((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
 
   const toggleWidget = (id: string) =>
     setSelectedWidgets((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -51,6 +46,7 @@ function NewEventPage() {
         metadata: {
           event_type: type || null,
           event_type_label: type === "other" ? customType.trim() || "Autre" : null,
+          menu_components: menuComponents,
         },
       })
       .select("id")
@@ -69,20 +65,6 @@ function NewEventPage() {
         position: i,
       }));
       await supabase.from("event_widgets" as never).insert(rows as never);
-    }
-    // Persist menu choices captured during the wizard.
-    const menuRows = Object.entries(menuChoices).flatMap(([componentKey, labels]) =>
-      labels.map((label, i) => ({
-        owner_id: user.id,
-        widget_key: "event.menu",
-        scope_type: "event",
-        scope_id: data.id,
-        payload: { component_key: componentKey, label },
-        position: i,
-      })),
-    );
-    if (menuRows.length > 0) {
-      await supabase.from("widget_items").insert(menuRows as never);
     }
     setSaving(false);
     toast.success("Événement créé.");
@@ -109,7 +91,7 @@ function NewEventPage() {
       startsAt, setStartsAt,
       location, setLocation,
       selectedWidgets, setSelectedWidgets, toggleWidget,
-      menuChoices, addMenuChoice, removeMenuChoice,
+      menuComponents, toggleMenuComponent,
       step,
       stepIndex: step,
       stepCount,
@@ -118,7 +100,7 @@ function NewEventPage() {
       back: () => setStep((s) => Math.max(s - 1, 0)),
       submit, saving,
     }),
-    [type, customType, title, description, startsAt, location, selectedWidgets, menuChoices, step, stepCount, saving],
+    [type, customType, title, description, startsAt, location, selectedWidgets, menuComponents, step, stepCount, saving],
   );
 
   const current = steps[Math.min(step, Math.max(stepCount - 1, 0))];
