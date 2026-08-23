@@ -3,6 +3,8 @@ import { createContext, useContext } from "react";
 export type WizardValue = {
   type: string;
   setType: (v: string) => void;
+  customType: string;
+  setCustomType: (v: string) => void;
   title: string;
   setTitle: (v: string) => void;
   description: string;

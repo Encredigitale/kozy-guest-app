@@ -26,6 +26,7 @@ const CORE_LINKS: CoreLink[] = [
   { key: "profile", label: "Profil", to: "/app/profile", icon: "User" },
   { key: "studio", label: "Studio", to: "/app/admin/studio", icon: "Wand2", adminOnly: true },
   { key: "registry", label: "Registry", to: "/app/admin/registry", icon: "LayoutGrid", adminOnly: true },
+  { key: "event-types", label: "Types d'événement", to: "/app/admin/event-types", icon: "Tags", adminOnly: true },
 ];
 
 function DynIcon({ name, className }: { name?: string; className?: string }) {

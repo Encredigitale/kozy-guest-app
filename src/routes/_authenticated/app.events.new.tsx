@@ -17,6 +17,7 @@ function NewEventPage() {
 
   const [step, setStep] = useState(0);
   const [type, setType] = useState("");
+  const [customType, setCustomType] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
@@ -38,6 +39,10 @@ function NewEventPage() {
         description: description.trim() || null,
         location: location.trim() || null,
         starts_at: startsAt ? new Date(startsAt).toISOString() : null,
+        metadata: {
+          event_type: type || null,
+          event_type_label: type === "other" ? customType.trim() || "Autre" : null,
+        },
       })
       .select("id")
       .single();
@@ -64,6 +69,7 @@ function NewEventPage() {
   const value: WizardValue = useMemo(
     () => ({
       type, setType,
+      customType, setCustomType,
       title, setTitle,
       description, setDescription,
       startsAt, setStartsAt,
@@ -72,7 +78,7 @@ function NewEventPage() {
       step, next: () => setStep((s) => Math.min(s + 1, 2)), back: () => setStep((s) => Math.max(s - 1, 0)),
       submit, saving,
     }),
-    [type, title, description, startsAt, location, selectedWidgets, step, saving],
+    [type, customType, title, description, startsAt, location, selectedWidgets, step, saving],
   );
 
   const { data: placements } = useSurfaceWidgets("event.new");
