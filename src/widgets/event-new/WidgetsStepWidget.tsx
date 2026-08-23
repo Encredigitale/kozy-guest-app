@@ -6,7 +6,7 @@ import { useActiveWidgets } from "@/core/registry/useRegistry";
 import { useMemo } from "react";
 
 export default function WidgetsStepWidget() {
-  const { type, selectedWidgets, toggleWidget, back, submit, saving } = useWizard();
+  const { type, selectedWidgets, toggleWidget, back, next, submit, saving, isLastStep, stepIndex, stepCount } = useWizard();
   const { data: widgets } = useActiveWidgets();
 
   const available = useMemo(() => {
@@ -24,7 +24,7 @@ export default function WidgetsStepWidget() {
     <Card className="rounded-2xl border-border/60">
       <CardContent className="p-6 space-y-6">
         <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Étape 3 / 3</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Étape {stepIndex + 1} / {stepCount}</p>
           <h2 className="text-xl font-serif tracking-tight text-primary mt-1">Widgets activés</h2>
           <p className="text-sm text-muted-foreground mt-1">Cochez ceux qui apparaîtront sur la page de votre événement.</p>
         </div>
@@ -44,7 +44,11 @@ export default function WidgetsStepWidget() {
         </div>
         <div className="flex justify-between">
           <Button variant="ghost" onClick={back} className="rounded-full">Retour</Button>
-          <Button disabled={saving} onClick={submit} className="rounded-full">{saving ? "Création…" : "Créer l'événement"}</Button>
+          {isLastStep ? (
+            <Button disabled={saving} onClick={submit} className="rounded-full">{saving ? "Création…" : "Créer l'événement"}</Button>
+          ) : (
+            <Button onClick={next} className="rounded-full">Continuer</Button>
+          )}
         </div>
       </CardContent>
     </Card>
