@@ -35,8 +35,16 @@ export default function EventInfoWidget({ config }: WidgetProps) {
   const { data: participants = [] } = useParticipants(eventId);
   const [draft, setDraft] = useState<EventRow | null>(null);
   const [saving, setSaving] = useState(false);
+  const { data: eventTypes = [] } = useActiveEventTypes();
 
   useEffect(() => { if (ev) setDraft(ev); }, [ev]);
+
+  const typeKey = (ev?.metadata?.event_type as string) || null;
+  const typeCustomLabel = (ev?.metadata?.event_type_label as string) || null;
+  const typeDef = typeKey ? eventTypes.find((t) => t.key === typeKey) : null;
+  const typeLabel = typeKey === "other" ? (typeCustomLabel || "Autre") : (typeDef?.label ?? typeKey);
+  const TypeIcon = typeKey === "other" ? Sparkles : (ICONS[typeDef?.icon ?? ""] ?? Sparkles);
+
 
   if (isLoading) return <div className="text-sm text-muted-foreground">Chargement…</div>;
   if (!ev || !draft) return <div className="text-sm text-destructive">Événement introuvable.</div>;
