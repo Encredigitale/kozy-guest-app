@@ -32,7 +32,16 @@ export default function EventMenuWidget({ config }: WidgetProps) {
     ((event?.metadata as Record<string, unknown> | undefined)?.["event_type"] as string | undefined) ??
     null;
 
-  const { data: components } = useMenuComponentsForType(eventType);
+  const { data: allComponents } = useMenuComponentsForType(eventType);
+  const selectedKeys = ((event?.metadata as Record<string, unknown> | undefined)?.["menu_components"] ??
+    null) as string[] | null;
+  const components = useMemo(
+    () =>
+      selectedKeys && selectedKeys.length > 0
+        ? allComponents.filter((c) => selectedKeys.includes(c.key))
+        : allComponents,
+    [allComponents, selectedKeys],
+  );
   const { items, create, remove } = useWidgetItems(WIDGET_KEY, scopeFromEventId(eventId));
 
   const [drafts, setDrafts] = useState<Record<string, string>>({});
