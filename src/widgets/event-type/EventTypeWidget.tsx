@@ -62,12 +62,12 @@ export default function EventTypeWidget({ config }: WidgetProps) {
 
   const save = async () => {
     if (!ev || !draftType) return;
-    const metadata: EventRow["metadata"] = {
+    const metadata = {
       ...ev.metadata,
       event_type: draftType,
       event_type_label: draftType === OTHER_TYPE ? draftCustom.trim() || "Autre" : null,
-    };
-    const { error } = await supabase.from("events").update({ metadata }).eq("id", ev.id);
+    } as unknown as EventRow["metadata"];
+    const { error } = await supabase.from("events").update({ metadata: metadata as any }).eq("id", ev.id);
     if (error) return toast.error(error.message);
     toast.success("Type d'événement mis à jour.");
     qc.invalidateQueries({ queryKey: ["event", eventId] });
