@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { renderNotificationEmail } from "@/lib/email-templates";
 
 const sendSchema = z.object({
   userId: z.string().uuid(),
