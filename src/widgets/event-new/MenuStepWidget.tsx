@@ -1,9 +1,7 @@
-import { useState } from "react";
 import * as Icons from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { UtensilsCrossed, Plus, Trash2 } from "lucide-react";
+import { UtensilsCrossed, Check } from "lucide-react";
 import { useWizard } from "./context";
 import { useMenuComponentsForType } from "@/core/menu/useMenuComponents";
 
@@ -14,16 +12,8 @@ function LucideIcon({ name, className }: { name: string; className?: string }) {
 }
 
 export default function MenuStepWidget() {
-  const { type, menuChoices, addMenuChoice, removeMenuChoice, back, submit, saving, stepIndex, stepCount } = useWizard();
+  const { type, menuComponents, toggleMenuComponent, back, submit, saving, stepIndex, stepCount } = useWizard();
   const { data: components } = useMenuComponentsForType(type);
-  const [drafts, setDrafts] = useState<Record<string, string>>({});
-
-  const add = (key: string) => {
-    const label = (drafts[key] ?? "").trim();
-    if (!label) return;
-    addMenuChoice(key, label);
-    setDrafts((d) => ({ ...d, [key]: "" }));
-  };
 
   return (
     <Card className="rounded-2xl border-border/60">
@@ -34,57 +24,38 @@ export default function MenuStepWidget() {
           </p>
           <h2 className="text-xl font-serif tracking-tight text-primary mt-1">Menu &amp; Thème</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Composez le repas : ajoutez un ou plusieurs choix par composante.
+            Sélectionnez les composantes du repas. Vous saisirez les choix sur la page de l'événement.
           </p>
         </div>
 
-        <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
+        <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
           {components.length === 0 ? (
             <p className="text-xs text-muted-foreground italic py-4 text-center">
               Aucune composante de repas configurée pour ce type d'événement.
             </p>
           ) : (
             components.map((c) => {
-              const list = menuChoices[c.key] ?? [];
+              const active = menuComponents.includes(c.key);
               return (
-                <div key={c.id} className="rounded-xl border border-border/60 p-3 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <LucideIcon name={c.icon} className="h-4 w-4 text-primary" />
-                    <p className="text-sm font-medium flex-1">{c.label}</p>
-                    <span className="text-xs text-muted-foreground">{list.length}</span>
-                  </div>
-
-                  {list.length > 0 && (
-                    <ul className="space-y-1">
-                      {list.map((label, i) => (
-                        <li key={`${label}-${i}`} className="flex items-center gap-2 group py-1">
-                          <span className="flex-1 text-sm">{label}</span>
-                          <button
-                            type="button"
-                            onClick={() => removeMenuChoice(c.key, i)}
-                            className="opacity-60 hover:opacity-100 transition"
-                            aria-label="Supprimer"
-                          >
-                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  <div className="flex gap-2">
-                    <Input
-                      className="h-9"
-                      value={drafts[c.key] ?? ""}
-                      onChange={(e) => setDrafts((d) => ({ ...d, [c.key]: e.target.value }))}
-                      onKeyDown={(e) => e.key === "Enter" && add(c.key)}
-                      placeholder={`Ajouter un choix de ${c.label.toLowerCase()}…`}
-                    />
-                    <Button type="button" onClick={() => add(c.key)} size="icon" variant="secondary" className="rounded-full">
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => toggleMenuComponent(c.key)}
+                  aria-pressed={active}
+                  className={`w-full flex items-center gap-3 rounded-xl border p-3 text-left transition ${
+                    active ? "border-primary bg-primary/5" : "border-border/60 hover:bg-muted/40"
+                  }`}
+                >
+                  <LucideIcon name={c.icon} className="h-4 w-4 text-primary" />
+                  <span className="flex-1 text-sm font-medium">{c.label}</span>
+                  <span
+                    className={`h-5 w-5 rounded-full grid place-items-center border ${
+                      active ? "bg-primary border-primary" : "border-border"
+                    }`}
+                  >
+                    {active && <Check className="h-3 w-3 text-primary-foreground" />}
+                  </span>
+                </button>
               );
             })
           )}
