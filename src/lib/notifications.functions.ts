@@ -44,7 +44,13 @@ export const sendNotification = createServerFn({ method: "POST" })
               sender: { name: "Kosy", email: "contact@nonvitcha.fr" },
               to: [{ email: data.emailTo }],
               subject: data.title,
-              htmlContent: `<p>${(data.body ?? "").replace(/\n/g, "<br/>")}</p>`,
+              htmlContent: renderNotificationEmail({
+                title: data.title,
+                body: data.body,
+                ctaLabel: data.ctaLabel,
+                ctaUrl: data.ctaUrl,
+              }),
+              textContent: data.body ?? data.title,
             }),
           });
           if (res.ok) {
