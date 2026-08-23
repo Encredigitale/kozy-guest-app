@@ -132,7 +132,7 @@ export default function EventGuestsWidget({ config }: WidgetProps) {
                   className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-background p-3 shadow-sm transition-colors hover:border-primary/20 hover:shadow-sm"
                 >
                   <Avatar className="h-11 w-11 shrink-0">
-                    <AvatarFallback className={avatarColor(p.email)}>
+                    <AvatarFallback className={avatarClasses(p.email)}>
                       {initialsFromEmail(p.email)}
                     </AvatarFallback>
                   </Avatar>
