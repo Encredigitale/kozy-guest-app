@@ -10,6 +10,7 @@ export type EventRow = {
   starts_at: string | null;
   ends_at: string | null;
   location: string | null;
+  metadata: Record<string, unknown>;
 };
 
 export type Participant = {
