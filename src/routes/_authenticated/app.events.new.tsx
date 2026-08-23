@@ -69,6 +69,7 @@ function NewEventPage() {
   const value: WizardValue = useMemo(
     () => ({
       type, setType,
+      customType, setCustomType,
       title, setTitle,
       description, setDescription,
       startsAt, setStartsAt,
