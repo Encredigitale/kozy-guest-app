@@ -42,11 +42,11 @@ function avatarClasses(email: string | null): string {
 function rsvpBadge(status: "pending" | "accepted" | "declined") {
   switch (status) {
     case "accepted":
-      return { label: "Accepté", variant: "secondary" as const };
+      return { label: "Accepté", className: "bg-secondary text-secondary-foreground border-transparent" };
     case "declined":
-      return { label: "Décliné", variant: "destructive" as const };
+      return { label: "Décliné", className: "bg-destructive/10 text-destructive border-destructive/20" };
     default:
-      return { label: "En attente", variant: "outline" as const };
+      return { label: "En attente", className: "bg-background text-muted-foreground border-border" };
   }
 }
 
