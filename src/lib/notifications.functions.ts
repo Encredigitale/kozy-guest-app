@@ -23,20 +23,22 @@ export const sendNotification = createServerFn({ method: "POST" })
 
     // Send email via Brevo when requested
     if (data.channel === "email" && data.emailTo) {
+      const lovableKey = process.env.LOVABLE_API_KEY;
       const brevoKey = process.env.BREVO_API_KEY;
-      if (!brevoKey) {
+      if (!lovableKey || !brevoKey) {
         status = "failed";
       } else {
         try {
-          const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+          const res = await fetch("https://connector-gateway.lovable.dev/brevo/smtp/email", {
             method: "POST",
             headers: {
-              "api-key": brevoKey,
               "content-type": "application/json",
               accept: "application/json",
+              "Authorization": `Bearer ${lovableKey}`,
+              "X-Connection-Api-Key": brevoKey,
             },
             body: JSON.stringify({
-              sender: { name: "Framework", email: "noreply@encredigitale.com" },
+              sender: { name: "Kosy", email: "contact@nonvitcha.fr" },
               to: [{ email: data.emailTo }],
               subject: data.title,
               htmlContent: `<p>${(data.body ?? "").replace(/\n/g, "<br/>")}</p>`,
