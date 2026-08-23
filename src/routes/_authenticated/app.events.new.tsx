@@ -78,7 +78,7 @@ function NewEventPage() {
       step, next: () => setStep((s) => Math.min(s + 1, 2)), back: () => setStep((s) => Math.max(s - 1, 0)),
       submit, saving,
     }),
-    [type, title, description, startsAt, location, selectedWidgets, step, saving],
+    [type, customType, title, description, startsAt, location, selectedWidgets, step, saving],
   );
 
   const { data: placements } = useSurfaceWidgets("event.new");
