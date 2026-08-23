@@ -418,6 +418,42 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_components: {
+        Row: {
+          active: boolean
+          created_at: string
+          event_types: string[]
+          icon: string
+          id: string
+          key: string
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          event_types?: string[]
+          icon?: string
+          id?: string
+          key: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          event_types?: string[]
+          icon?: string
+          id?: string
+          key?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
