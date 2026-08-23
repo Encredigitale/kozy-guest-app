@@ -141,7 +141,7 @@ export default function EventGuestsWidget({ config }: WidgetProps) {
                     <p className="text-sm font-medium truncate leading-tight">
                       {p.email ?? "Invité"}
                     </p>
-                    <div className="flex items-center gap-1.5 mt-1.5">
+                    <div className="flex items-center gap-1.5 mt-2">
                       <Badge
                         variant={p.role === "organizer" ? "default" : "outline"}
                         className="rounded-full text-[10px] px-2 py-0.5 font-medium"
@@ -149,8 +149,7 @@ export default function EventGuestsWidget({ config }: WidgetProps) {
                         {p.role === "organizer" ? "Organisateur" : "Invité"}
                       </Badge>
                       <Badge
-                        variant={rsvp.variant}
-                        className="rounded-full text-[10px] px-2 py-0.5 font-medium"
+                        className={`rounded-full text-[10px] px-2 py-0.5 font-medium ${rsvp.className}`}
                       >
                         {rsvp.label}
                       </Badge>
