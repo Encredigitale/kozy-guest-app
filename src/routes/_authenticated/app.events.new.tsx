@@ -39,6 +39,10 @@ function NewEventPage() {
         description: description.trim() || null,
         location: location.trim() || null,
         starts_at: startsAt ? new Date(startsAt).toISOString() : null,
+        metadata: {
+          event_type: type || null,
+          event_type_label: type === "other" ? customType.trim() || "Autre" : null,
+        },
       })
       .select("id")
       .single();
