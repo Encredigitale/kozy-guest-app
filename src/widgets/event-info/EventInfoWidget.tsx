@@ -88,8 +88,18 @@ export default function EventInfoWidget({ config }: WidgetProps) {
   return (
     <Card className="rounded-2xl border-border/60">
       <CardHeader className="flex flex-row items-start justify-between gap-4">
-        <div>
-          <CardTitle className="text-base">Informations</CardTitle>
+        <div className="min-w-0">
+          <div className="flex items-center gap-3">
+            {typeKey && (
+              <div className="h-10 w-10 rounded-xl bg-primary/10 grid place-items-center shrink-0">
+                <TypeIcon className="h-5 w-5 text-primary" />
+              </div>
+            )}
+            <div className="min-w-0">
+              <CardTitle className="text-lg font-serif tracking-tight truncate">{ev.title}</CardTitle>
+              {typeKey && <p className="text-xs text-muted-foreground mt-0.5">{typeLabel}</p>}
+            </div>
+          </div>
           <Badge className="mt-2" variant={ev.status === "published" ? "default" : "secondary"}>{ev.status}</Badge>
         </div>
         {isOrganizer && (
