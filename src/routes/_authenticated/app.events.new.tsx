@@ -23,7 +23,16 @@ function NewEventPage() {
   const [location, setLocation] = useState("");
   const [startsAt, setStartsAt] = useState("");
   const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
+  const [menuChoices, setMenuChoices] = useState<Record<string, string[]>>({});
   const [saving, setSaving] = useState(false);
+
+  const addMenuChoice = (componentKey: string, label: string) =>
+    setMenuChoices((prev) => ({ ...prev, [componentKey]: [...(prev[componentKey] ?? []), label] }));
+  const removeMenuChoice = (componentKey: string, index: number) =>
+    setMenuChoices((prev) => ({
+      ...prev,
+      [componentKey]: (prev[componentKey] ?? []).filter((_, i) => i !== index),
+    }));
 
   const toggleWidget = (id: string) =>
     setSelectedWidgets((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -61,10 +70,35 @@ function NewEventPage() {
       }));
       await supabase.from("event_widgets" as never).insert(rows as never);
     }
+    // Persist menu choices captured during the wizard.
+    const menuRows = Object.entries(menuChoices).flatMap(([componentKey, labels]) =>
+      labels.map((label, i) => ({
+        owner_id: user.id,
+        widget_key: "event.menu",
+        scope_type: "event",
+        scope_id: data.id,
+        payload: { component_key: componentKey, label },
+        position: i,
+      })),
+    );
+    if (menuRows.length > 0) {
+      await supabase.from("widget_items").insert(menuRows as never);
+    }
     setSaving(false);
     toast.success("Événement créé.");
     navigate({ to: "/app/events/$eventId", params: { eventId: data.id } });
   };
+
+  const { data: placements } = useSurfaceWidgets("event.new");
+  const steps = useMemo(
+    () =>
+      placements.filter(
+        (p) =>
+          p.widget.manifest.component !== "event.new.menu" || selectedWidgets.includes("event.menu"),
+      ),
+    [placements, selectedWidgets],
+  );
+  const stepCount = steps.length;
 
   const value: WizardValue = useMemo(
     () => ({
@@ -75,21 +109,26 @@ function NewEventPage() {
       startsAt, setStartsAt,
       location, setLocation,
       selectedWidgets, setSelectedWidgets, toggleWidget,
-      step, next: () => setStep((s) => Math.min(s + 1, 2)), back: () => setStep((s) => Math.max(s - 1, 0)),
+      menuChoices, addMenuChoice, removeMenuChoice,
+      step,
+      stepIndex: step,
+      stepCount,
+      isLastStep: step >= stepCount - 1,
+      next: () => setStep((s) => Math.min(s + 1, Math.max(stepCount - 1, 0))),
+      back: () => setStep((s) => Math.max(s - 1, 0)),
       submit, saving,
     }),
-    [type, customType, title, description, startsAt, location, selectedWidgets, step, saving],
+    [type, customType, title, description, startsAt, location, selectedWidgets, menuChoices, step, stepCount, saving],
   );
 
-  const { data: placements } = useSurfaceWidgets("event.new");
-  const current = placements[step];
+  const current = steps[Math.min(step, Math.max(stepCount - 1, 0))];
 
   return (
     <WizardContext.Provider value={value}>
       <div className="p-8 max-w-3xl">
         <h1 className="font-serif text-3xl tracking-tight text-primary">Nouvel événement</h1>
         <div className="mt-2 flex items-center gap-1">
-          {placements.map((_, i) => (
+          {steps.map((_, i) => (
             <div
               key={i}
               className={`h-1 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-muted"}`}
