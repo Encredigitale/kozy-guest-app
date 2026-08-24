@@ -7,7 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, MailCheck } from "lucide-react";
+import { sendVerificationEmail } from "@/lib/email-verification.functions";
+
 
 const schema = z.object({
   email: z.string().trim().email("Adresse e-mail invalide").max(255),
