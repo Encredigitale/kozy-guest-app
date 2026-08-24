@@ -204,33 +204,39 @@ export type Database = {
         Row: {
           active: boolean
           created_at: string
+          default_widgets: string[]
           description: string | null
           icon: string
           id: string
           key: string
           label: string
+          menu_components: string[]
           sort_order: number
           updated_at: string
         }
         Insert: {
           active?: boolean
           created_at?: string
+          default_widgets?: string[]
           description?: string | null
           icon?: string
           id?: string
           key: string
           label: string
+          menu_components?: string[]
           sort_order?: number
           updated_at?: string
         }
         Update: {
           active?: boolean
           created_at?: string
+          default_widgets?: string[]
           description?: string | null
           icon?: string
           id?: string
           key?: string
           label?: string
+          menu_components?: string[]
           sort_order?: number
           updated_at?: string
         }

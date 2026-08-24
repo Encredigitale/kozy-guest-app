@@ -91,7 +91,7 @@ function NewEventPage() {
       startsAt, setStartsAt,
       location, setLocation,
       selectedWidgets, setSelectedWidgets, toggleWidget,
-      menuComponents, toggleMenuComponent,
+      menuComponents, toggleMenuComponent, setMenuComponents,
       step,
       stepIndex: step,
       stepCount,

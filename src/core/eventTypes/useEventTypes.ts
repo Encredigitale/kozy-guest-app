@@ -9,6 +9,8 @@ export type EventTypeRow = {
   description: string | null;
   sort_order: number;
   active: boolean;
+  default_widgets: string[];
+  menu_components: string[];
 };
 
 export const eventTypesQueryKey = ["event-types"] as const;
@@ -16,7 +18,7 @@ export const eventTypesQueryKey = ["event-types"] as const;
 async function fetchEventTypes(): Promise<EventTypeRow[]> {
   const { data, error } = await supabase
     .from("event_types" as never)
-    .select("id, key, label, icon, description, sort_order, active")
+    .select("id, key, label, icon, description, sort_order, active, default_widgets, menu_components")
     .order("sort_order", { ascending: true });
   if (error) throw error;
   return (data ?? []) as unknown as EventTypeRow[];
