@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
+import { sendVerificationEmail } from "@/lib/email-verification.functions";
+
 
 export const Route = createFileRoute("/login")({
   ssr: false,
