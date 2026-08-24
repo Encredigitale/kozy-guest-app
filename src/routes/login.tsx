@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 import { sendVerificationEmail } from "@/lib/email-verification.functions";
+import { sendPasswordResetEmail } from "@/lib/password-reset.functions";
+
 
 
 export const Route = createFileRoute("/login")({
