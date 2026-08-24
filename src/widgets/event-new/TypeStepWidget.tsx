@@ -16,8 +16,15 @@ const ICONS: Record<string, LucideIcon> = {
 export const OTHER_TYPE = "other";
 
 export default function TypeStepWidget() {
-  const { type, setType, customType, setCustomType, next } = useWizard();
+  const { type, setType, customType, setCustomType, next, setSelectedWidgets, setMenuComponents } = useWizard();
   const { data: types, isLoading } = useActiveEventTypes();
+
+  const pickType = (key: string) => {
+    setType(key);
+    const found = types.find((t) => t.key === key);
+    setSelectedWidgets(found?.default_widgets ?? []);
+    setMenuComponents(found?.menu_components ?? []);
+  };
 
   const isOther = type === OTHER_TYPE;
   const canContinue = Boolean(type) && (!isOther || customType.trim().length > 0);
@@ -43,7 +50,7 @@ export default function TypeStepWidget() {
                 <button
                   key={t.id}
                   type="button"
-                  onClick={() => setType(t.key)}
+                  onClick={() => pickType(t.key)}
                   className={`p-4 rounded-xl border-2 text-left transition-all ${type === t.key ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
                 >
                   <Icon className="h-5 w-5 text-primary mb-2" />
@@ -54,7 +61,7 @@ export default function TypeStepWidget() {
             })}
             <button
               type="button"
-              onClick={() => setType(OTHER_TYPE)}
+              onClick={() => pickType(OTHER_TYPE)}
               className={`p-4 rounded-xl border-2 text-left transition-all ${isOther ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
             >
               <Sparkles className="h-5 w-5 text-primary mb-2" />
