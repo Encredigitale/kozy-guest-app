@@ -107,7 +107,7 @@ function NewEventPage() {
 
   return (
     <WizardContext.Provider value={value}>
-      <div className="p-8 max-w-3xl">
+      <div className="p-8 max-w-3xl lg:max-w-5xl xl:max-w-7xl mx-auto">
         <h1 className="font-serif text-3xl tracking-tight text-primary">Nouvel événement</h1>
         <div className="mt-2 flex items-center gap-1">
           {steps.map((_, i) => (

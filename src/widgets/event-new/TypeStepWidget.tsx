@@ -43,7 +43,7 @@ export default function TypeStepWidget() {
         {isLoading ? (
           <p className="text-sm text-muted-foreground">Chargement des types…</p>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
             {types.map((t) => {
               const Icon = ICONS[t.icon] ?? Sparkles;
               return (
