@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
+import { sendVerificationEmail } from "@/lib/email-verification.functions";
+
 
 export const Route = createFileRoute("/login")({
   ssr: false,
@@ -36,15 +38,35 @@ function LoginPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
+    const { data: signIn, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
+      setLoading(false);
       toast.error("Adresse e-mail ou mot de passe incorrect.");
       return;
     }
+    const userId = signIn.user?.id;
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("email_verified_at")
+      .eq("user_id", userId!)
+      .maybeSingle();
+    if (!profile?.email_verified_at) {
+      await supabase.auth.signOut();
+      setLoading(false);
+      toast.error("Votre adresse e-mail n'est pas encore validée. Consultez votre boîte de réception.");
+      try {
+        await sendVerificationEmail({ data: { email } });
+        toast.success("Un nouveau lien de validation vient de vous être envoyé.");
+      } catch {
+        toast.error("Impossible de renvoyer l'e-mail de validation.");
+      }
+      return;
+    }
+    setLoading(false);
     toast.success("Bienvenue !");
     navigate({ to: "/app" });
   };
+
 
   const onForgot = async (e: React.FormEvent) => {
     e.preventDefault();
