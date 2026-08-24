@@ -33,6 +33,7 @@ function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -49,15 +50,70 @@ function SignupPage() {
       email: parsed.data.email,
       password: parsed.data.password,
       options: {
-        emailRedirectTo: `${window.location.origin}/app`,
+        emailRedirectTo: `${window.location.origin}/verify-email`,
         data: { display_name: parsed.data.displayName },
       },
     });
+    if (error) {
+      setLoading(false);
+      return toast.error(error.message);
+    }
+    // Le compte doit être validé par e-mail avant toute connexion.
+    await supabase.auth.signOut();
+    try {
+      await sendVerificationEmail({ data: { email: parsed.data.email } });
+    } catch {
+      toast.error("Compte créé, mais l'envoi de l'e-mail de validation a échoué.");
+    }
     setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("Compte créé. Vérifiez votre boîte e-mail si nécessaire.");
-    navigate({ to: "/app" });
+    setSent(true);
   };
+
+  if (sent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <Link to="/" className="font-serif text-3xl tracking-tight text-primary">Kosy</Link>
+          </div>
+          <Card className="rounded-3xl border-border/60 shadow-none">
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-3">
+                <MailCheck className="h-10 w-10 text-primary" />
+              </div>
+              <CardTitle>Vérifiez votre boîte e-mail</CardTitle>
+              <CardDescription>
+                Un lien de validation vient d'être envoyé à <strong>{email}</strong>. Cliquez dessus pour activer votre compte (lien valable 24 h).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button
+                variant="outline"
+                className="w-full rounded-full"
+                disabled={loading}
+                onClick={async () => {
+                  setLoading(true);
+                  try {
+                    await sendVerificationEmail({ data: { email } });
+                    toast.success("E-mail renvoyé.");
+                  } catch {
+                    toast.error("Envoi impossible pour le moment.");
+                  }
+                  setLoading(false);
+                }}
+              >
+                Renvoyer l'e-mail
+              </Button>
+              <Button asChild className="w-full rounded-full">
+                <Link to="/login">Aller à la connexion</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
