@@ -58,7 +58,14 @@ function SignupPage() {
     });
     if (error) {
       setLoading(false);
-      return toast.error(error.message);
+      const raw = (error as { message?: string }).message?.trim();
+      const message =
+        !raw || raw === "{}"
+          ? "Création du compte impossible pour le moment. Merci de réessayer dans quelques instants."
+          : raw === "Error sending confirmation email"
+            ? "Le service d'e-mail n'est pas disponible. Merci de réessayer plus tard."
+            : raw;
+      return toast.error(message);
     }
     // Le compte doit être validé par e-mail avant toute connexion.
     await supabase.auth.signOut();

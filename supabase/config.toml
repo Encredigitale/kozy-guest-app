@@ -1,1 +1,7 @@
 project_id = "bdzzkijsdtsexsrcfiwb"
+
+[auth.email]
+# La validation d'e-mail est gérée par notre propre flux (Brevo + /verify-email),
+# donc l'e-mail de confirmation natif de Supabase est désactivé.
+enable_confirmations = false
+enable_signup = true
