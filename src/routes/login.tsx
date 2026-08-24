@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 import { sendVerificationEmail } from "@/lib/email-verification.functions";
+import { sendPasswordResetEmail } from "@/lib/password-reset.functions";
+
 
 
 export const Route = createFileRoute("/login")({
@@ -71,14 +73,16 @@ function LoginPage() {
   const onForgot = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    try {
+      await sendPasswordResetEmail({ data: { email } });
+      toast.success("E-mail envoyé si un compte existe.");
+      setForgot(false);
+    } catch {
+      toast.error("Envoi impossible pour le moment. Merci de réessayer plus tard.");
+    }
     setLoading(false);
-    if (error) return toast.error(error.message);
-    toast.success("E-mail envoyé si un compte existe.");
-    setForgot(false);
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
