@@ -41,7 +41,7 @@ export const sendNotification = createServerFn({ method: "POST" })
               "X-Connection-Api-Key": brevoKey,
             },
             body: JSON.stringify({
-              sender: { name: "Kosy", email: "contact@nonvitcha.fr" },
+              sender: { name: "Kosy", email: "contact@obolia.com" },
               to: [{ email: data.emailTo }],
               subject: data.title,
               htmlContent: renderNotificationEmail({
