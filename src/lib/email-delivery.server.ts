@@ -11,17 +11,15 @@ export function getBaseUrl(): string {
 }
 
 export async function sendBrevoEmail(to: string, subject: string, html: string, text: string) {
-  const lovableKey = process.env['LOVABLE_API_KEY'];
-  const brevoKey = process.env['BREVO_API_KEY'];
-  if (!lovableKey || !brevoKey) throw new Error("Configuration e-mail manquante");
+  const brevoDirectKey = process.env['BREVO_DIRECT_API_KEY'];
+  if (!brevoDirectKey) throw new Error("Configuration e-mail manquante");
 
-  const res = await fetch("https://connector-gateway.lovable.dev/brevo/smtp/email", {
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
     method: "POST",
     headers: {
       "content-type": "application/json",
       accept: "application/json",
-      Authorization: `Bearer ${lovableKey}`,
-      "X-Connection-Api-Key": brevoKey,
+      "api-key": brevoDirectKey,
     },
     body: JSON.stringify({
       sender: KOSY_EMAIL_SENDER,
