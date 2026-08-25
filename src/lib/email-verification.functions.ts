@@ -1,52 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
+import { getBaseUrl, sendBrevoEmail } from "@/lib/email-delivery.server";
+import { EMAIL_VERIFICATION_TOKEN_TTL_HOURS, hashEmailVerificationToken } from "@/lib/email-verification.server";
 import { renderKosyEmail } from "@/lib/email-templates";
-
-const TOKEN_TTL_HOURS = 24;
-
-function baseUrl(): string {
-  try {
-    return new URL(getRequest().url).origin;
-  } catch {
-    return "";
-  }
-}
-
-async function hashToken(token: string): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
-  return Array.from(new Uint8Array(digest))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-async function sendBrevoEmail(to: string, subject: string, html: string, text: string) {
-  const lovableKey = process.env['LOVABLE_API_KEY'];
-  const brevoKey = process.env['BREVO_API_KEY'];
-  if (!lovableKey || !brevoKey) throw new Error("Configuration e-mail manquante");
-
-  const res = await fetch("https://connector-gateway.lovable.dev/brevo/smtp/email", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      accept: "application/json",
-      Authorization: `Bearer ${lovableKey}`,
-      "X-Connection-Api-Key": brevoKey,
-    },
-    body: JSON.stringify({
-      sender: { name: "Kosy", email: "contact@obolia.com" },
-      to: [{ email: to }],
-      subject,
-      htmlContent: html,
-      textContent: text,
-    }),
-  });
-  if (!res.ok) {
-    const body = await res.text();
-    console.error(`Brevo verification email failed [${res.status}]: ${body}`);
-    throw new Error("Impossible d'envoyer l'e-mail de vérification");
-  }
-}
 
 /**
  * Envoie (ou renvoie) l'e-mail de validation d'adresse.
@@ -84,22 +40,22 @@ export const sendVerificationEmail = createServerFn({ method: "POST" })
       .is("used_at", null);
 
     const token = crypto.randomUUID().replace(/-/g, "") + crypto.randomUUID().replace(/-/g, "");
-    const tokenHash = await hashToken(token);
-    const expiresAt = new Date(Date.now() + TOKEN_TTL_HOURS * 3600 * 1000).toISOString();
+    const tokenHash = await hashEmailVerificationToken(token);
+    const expiresAt = new Date(Date.now() + EMAIL_VERIFICATION_TOKEN_TTL_HOURS * 3600 * 1000).toISOString();
 
     const { error: insertError } = await supabaseAdmin
       .from("email_verification_tokens")
       .insert({ user_id: user.id, token_hash: tokenHash, expires_at: expiresAt });
     if (insertError) throw new Error(insertError.message);
 
-    const link = `${baseUrl()}/verify-email?token=${token}`;
+    const link = `${getBaseUrl()}/verify-email?token=${token}`;
     const html = renderKosyEmail({
       title: "Confirmez votre adresse e-mail",
       preheader: "Une dernière étape pour activer votre compte Kosy.",
       greeting: profile?.display_name ? `Bonjour ${profile.display_name},` : "Bonjour,",
       paragraphs: [
         "Bienvenue sur Kosy ! Pour sécuriser votre compte, confirmez votre adresse e-mail en cliquant sur le bouton ci-dessous.",
-        `Ce lien est valable ${TOKEN_TTL_HOURS} heures.`,
+        `Ce lien est valable ${EMAIL_VERIFICATION_TOKEN_TTL_HOURS} heures.`,
       ],
       ctaLabel: "Valider mon adresse e-mail",
       ctaUrl: link,
@@ -124,7 +80,7 @@ export const confirmEmailVerification = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const tokenHash = await hashToken(data.token);
+    const tokenHash = await hashEmailVerificationToken(data.token);
 
     const { data: row } = await supabaseAdmin
       .from("email_verification_tokens")
