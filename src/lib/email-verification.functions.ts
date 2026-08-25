@@ -34,7 +34,7 @@ async function sendBrevoEmail(to: string, subject: string, html: string, text: s
       "X-Connection-Api-Key": brevoKey,
     },
     body: JSON.stringify({
-      sender: { name: "Kosy", email: "contact@nonvitcha.fr" },
+      sender: { name: "Kosy", email: "contact@obolia.com" },
       to: [{ email: to }],
       subject,
       htmlContent: html,
