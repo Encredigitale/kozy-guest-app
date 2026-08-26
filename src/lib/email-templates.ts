@@ -1,12 +1,12 @@
 /**
  * Templates d'e-mails Kosy (HTML compatible clients mail : tables + styles inline).
- * Palette alignée sur le design system : terracotta #C2683F, sauge, crème.
+ * Palette alignée sur le design system : Desert Clay — rose poudré, sable, terre cuite.
  */
 
 const BRAND = {
   name: "Kosy",
-  primary: "#C2683F",
-  primaryDark: "#A4522F",
+  primary: "#c17c74",
+  primaryDark: "#a05b54",
   ink: "#2B2320",
   muted: "#8A7B72",
   border: "#EDE5DE",
