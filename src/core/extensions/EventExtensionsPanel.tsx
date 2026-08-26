@@ -16,7 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { SettingsForm } from "@/core/extensions/SettingsForm";
 import { toast } from "sonner";
-import { Puzzle, Settings, AlertTriangle } from "lucide-react";
+import { Puzzle, Settings, AlertTriangle, Lock } from "lucide-react";
+import { conflictingExtensionKeys, isExclusiveWinnerFrom } from "@/core/extensions/exclusivity";
 import { useState } from "react";
 
 /**
@@ -52,6 +53,9 @@ export function EventExtensionsPanel({ eventId }: { eventId: string }) {
     );
   }
 
+  const explicitMap: Record<string, boolean | undefined> = {};
+  for (const r of eventRows) explicitMap[r.extension_key] = r.enabled;
+
   return (
     <Card className="rounded-2xl border-border/60">
       <CardHeader>
@@ -70,7 +74,12 @@ export function EventExtensionsPanel({ eventId }: { eventId: string }) {
           const def = findExtensionByKey(row.key);
           const eventRow = eventRows.find((r) => r.extension_key === row.key);
           // event scope defaults: enabled unless the event has an explicit disable row
-          const enabledForEvent = eventRow ? eventRow.enabled : true;
+          const baseEnabled = eventRow ? eventRow.enabled : true;
+          // Exclusivité : une seule extension du groupe peut rester active.
+          const exclusiveWith = conflictingExtensionKeys(row.key)
+            .map((k) => (rows ?? []).find((r) => r.key === k))
+            .filter((r): r is NonNullable<typeof r> => !!r);
+          const enabledForEvent = baseEnabled && isExclusiveWinnerFrom(explicitMap, row.key);
           const compat = checkExtensionCompatibility(row);
           return (
             <div
@@ -87,7 +96,19 @@ export function EventExtensionsPanel({ eventId }: { eventId: string }) {
                     </Badge>
                   )}
                 </div>
+                  {exclusiveWith.length > 0 && (
+                    <Badge variant="secondary" className="text-[10px] gap-1">
+                      <Lock className="h-2.5 w-2.5" /> Exclusif
+                    </Badge>
+                  )}
+                </div>
                 {row.description && <p className="text-xs text-muted-foreground truncate">{row.description}</p>}
+                {exclusiveWith.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Ne peut pas être activé en même temps que {exclusiveWith.map((r) => r.name).join(", ")}.
+                  </p>
+                )}
+                <div className="hidden">
               </div>
               {def && (def.settingsSchema?.length || def.settingsComponent) && (
                 <EventExtensionSettingsDialog eventId={eventId} extensionKey={row.key} name={row.name} />
