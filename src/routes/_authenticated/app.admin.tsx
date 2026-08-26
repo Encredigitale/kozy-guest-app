@@ -3,6 +3,8 @@ import { useSession } from "@/core/auth/useSession";
 import { CORE_VERSION, DB_VERSION } from "@/core/version";
 import {
   Gauge,
+  Gift,
+
   LayoutGrid,
   MonitorSmartphone,
   Puzzle,
@@ -28,7 +30,9 @@ const SECTIONS: Section[] = [
       { to: "/app/admin", label: "Tableau de bord", Icon: Gauge },
       { to: "/app/admin/event-types", label: "Types d'événement", Icon: Tags },
       { to: "/app/admin/menu-components", label: "Composantes de repas", Icon: UtensilsCrossed },
+      { to: "/app/admin/contribution-types", label: "Types d'apports", Icon: Gift },
     ],
+
   },
   {
     title: "Écrans",

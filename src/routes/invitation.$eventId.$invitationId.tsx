@@ -8,6 +8,8 @@ import {
   savePublicContribution,
 } from "@/lib/invitations.functions";
 import type { PublicInvitationPayload } from "@/extensions/invitations/public-types";
+import GuestBringsBlock from "@/extensions/guest-brings/GuestBringsBlock";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -220,7 +222,12 @@ function PublicInvitationPage() {
           </CardContent>
         </Card>
 
+        {p.status === "accepted" && token && (
+          <GuestBringsBlock eventId={eventId} invitationId={invitationId} token={token} accepted />
+        )}
+
         {p.status === "accepted" && p.config.contributionsEnabled && (
+
           <Card className="rounded-3xl border-border/60">
             <CardContent className="p-6 space-y-3">
               <h2 className="font-medium">Que souhaitez-vous apporter ?</h2>

@@ -161,7 +161,25 @@ export const EXTENSIONS: ExtensionDefinition[] = [
       },
     ],
   },
+  {
+    key: "guest-brings",
+    name: "Invité apporte",
+    description:
+      "Permet aux invités ayant accepté de préciser ce qu'ils apportent, avec référentiel administrable et résumé pour l'organisateur.",
+    category: "engagement",
+    icon: "Gift",
+    version: "1.0.0",
+    scope: "event",
+    settingsComponent: lazy(() => import("@/extensions/guest-brings/AdminSettings")),
+    widgets: [
+      {
+        key: "ext.guest-brings",
+        component: lazy(() => import("@/extensions/guest-brings/GuestBringsWidget")),
+      },
+    ],
+  },
 ];
+
 
 
 export function findExtensionByKey(key: string): ExtensionDefinition | undefined {
