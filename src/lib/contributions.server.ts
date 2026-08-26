@@ -46,6 +46,10 @@ export async function isContributionsEnabled(eventId: string): Promise<boolean> 
     .maybeSingle();
   if ((override as { enabled?: boolean } | null)?.enabled === false) return false;
 
+  // Exclusivité mutuelle avec « Invité apporte ».
+  const { isExclusiveWinner } = await import("@/lib/extension-exclusivity.server");
+  if (!(await isExclusiveWinner(eventId, "contributions"))) return false;
+
   if (config.eventTypeKeys.length > 0) {
     const typeKey = await loadEventTypeKey(eventId);
     if (!typeKey || !config.eventTypeKeys.includes(typeKey)) return false;
