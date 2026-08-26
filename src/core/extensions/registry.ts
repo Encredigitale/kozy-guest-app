@@ -144,7 +144,25 @@ export const EXTENSIONS: ExtensionDefinition[] = [
     ],
     menu: [{ label: "Mes informations", path: "edit", icon: "UserCircle2", order: 5 }],
   },
+  {
+    key: "invitations",
+    name: "Gestion des invitations",
+    description:
+      "Cycle de vie complet des invitations : invités, liens sécurisés, envoi, réponses, rappels et historique.",
+    category: "engagement",
+    icon: "MailCheck",
+    version: "1.0.0",
+    scope: "event",
+    settingsComponent: lazy(() => import("@/extensions/invitations/AdminSettings")),
+    widgets: [
+      {
+        key: "ext.invitations",
+        component: lazy(() => import("@/extensions/invitations/InvitationsWidget")),
+      },
+    ],
+  },
 ];
+
 
 export function findExtensionByKey(key: string): ExtensionDefinition | undefined {
   return EXTENSIONS.find((e) => e.key === key);
