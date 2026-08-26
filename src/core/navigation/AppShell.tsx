@@ -77,6 +77,7 @@ export function AppShell() {
   // Non-admin users: no sidebar, top header nav only.
   if (!isAdmin) {
     const USER_NAV = [
+      { to: "/app", label: "Accueil", Icon: Home },
       { to: "/app/events", label: "Événements", Icon: Calendar },
       { to: "/app/contacts", label: "Contacts", Icon: BookUser },
       { to: "/app/profile", label: "Profil", Icon: ProfileIcon },
@@ -85,11 +86,13 @@ export function AppShell() {
       <div className="min-h-screen bg-background flex flex-col">
         <header className="h-14 border-b border-border/60 flex items-center justify-between px-4 gap-4 shrink-0">
           <Link to="/app" className="font-serif text-xl tracking-tight text-primary">
-            Framework
+            Kosy
           </Link>
           <nav className="flex items-center gap-1 text-sm">
             {USER_NAV.map(({ to, label, Icon }) => {
-              const active = pathname === to || pathname.startsWith(to);
+              const active = to === "/app"
+                ? pathname === "/app"
+                : pathname === to || pathname.startsWith(`${to}/`);
               return (
                 <Link
                   key={to}
@@ -117,12 +120,13 @@ export function AppShell() {
     );
   }
 
+
   return (
     <div className="min-h-screen bg-background flex">
       <main className="flex-1 overflow-x-hidden flex flex-col">
         <header className="h-14 border-b border-border/60 flex items-center justify-between px-4 gap-2 shrink-0">
           <Link to="/app" className="font-serif text-xl tracking-tight text-primary">
-            Framework
+            Kosy
           </Link>
           <div className="flex items-center gap-2">
             <span className="hidden md:inline text-xs text-muted-foreground truncate max-w-[200px]">
