@@ -12,6 +12,7 @@ const BRAND = {
   muted: "#6888C6",
   border: "#C1DFF4",
   cream: "#FFCA83",
+  pageBg: "#FFEED9",
 };
 
 export type KosyEmailOptions = {
