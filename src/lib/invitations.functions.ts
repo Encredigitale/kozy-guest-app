@@ -308,3 +308,103 @@ export const savePublicContribution = createServerFn({ method: "POST" })
       } as never);
     return await resolvePublicInvitation(data);
   });
+
+/** Enregistre le canal utilisé (lien partagé, SMS, WhatsApp…) et l'état d'envoi. */
+export const markInvitationChannel = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        invitationId: z.string().uuid(),
+        channel: z.enum(["link", "share", "sms", "whatsapp", "email"]),
+        event: z.enum(["link_shared", "sms_requested", "sms_sent"]).default("link_shared"),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: invitation, error } = await context.supabase
+      .from("invitations")
+      .select("id, status")
+      .eq("id", data.invitationId)
+      .eq("organizer_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!invitation) throw new Error("Invitation introuvable");
+
+    const patch: Record<string, unknown> = {
+      channel: data.channel,
+      sent_at: new Date().toISOString(),
+    };
+    if ((invitation as Record<string, any>).status === "draft") patch.status = "sent";
+
+    await context.supabase.from("invitations").update(patch as never).eq("id", data.invitationId);
+    await context.supabase
+      .from("invitation_logs")
+      .insert({
+        invitation_id: data.invitationId,
+        event_type: data.event,
+        metadata: { channel: data.channel },
+      } as never);
+
+    return { ok: true as const };
+  });
+
+/** Envoi SMS automatisé (si une extension fournisseur est connectée). */
+export const sendInvitationSms = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ invitationId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { data: invitation, error } = await context.supabase
+      .from("invitations")
+      .select("*")
+      .eq("id", data.invitationId)
+      .eq("organizer_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!invitation) throw new Error("Invitation introuvable");
+    const inv = invitation as Record<string, any>;
+    if (!inv.phone_e164) throw new Error("Cet invité n'a pas de numéro de téléphone");
+
+    const config = await loadConfig();
+    if (!config.smsAutoEnabled) {
+      return { ok: false as const, reason: "disabled" as const, message: "Les SMS automatisés sont désactivés." };
+    }
+
+    const { data: event } = await context.supabase
+      .from("events")
+      .select("title")
+      .eq("id", inv.event_id)
+      .maybeSingle();
+    const { data: profile } = await context.supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+
+    const { renderSmsText } = await import("@/extensions/invitations/config");
+    const url = invitationUrl(getBaseUrl(), inv.event_id, inv.id, inv.token);
+    const text = renderSmsText(config.templateSms, {
+      host: (profile as { display_name?: string } | null)?.display_name ?? "Un proche",
+      event: (event as { title?: string } | null)?.title ?? "un événement",
+      guest: inv.name ?? "",
+      link: url,
+    });
+
+    await context.supabase
+      .from("invitation_logs")
+      .insert({ invitation_id: inv.id, event_type: "sms_requested", metadata: { channel: "sms" } } as never);
+
+    const { sendSms } = await import("@/lib/messaging.server");
+    const result = await sendSms({ to: inv.phone_e164, text, sender: config.smsSender });
+
+    if (!result.ok) return { ok: false as const, reason: result.reason, message: result.message };
+
+    const patch: Record<string, unknown> = { channel: "sms", sent_at: new Date().toISOString() };
+    if (inv.status === "draft") patch.status = "sent";
+    await context.supabase.from("invitations").update(patch as never).eq("id", inv.id);
+    await context.supabase
+      .from("invitation_logs")
+      .insert({ invitation_id: inv.id, event_type: "sms_sent", metadata: { channel: "sms" } } as never);
+
+    return { ok: true as const, message: "SMS envoyé." };
+  });
