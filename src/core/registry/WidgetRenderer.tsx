@@ -3,6 +3,12 @@ import { Loader2 } from "lucide-react";
 import { useSurfaceWidgets } from "./useRegistry";
 import { resolveWidgetComponent } from "./components";
 import { useSession } from "@/core/auth/useSession";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import type { SurfaceContext, WidgetSize } from "./types";
 
 type Props = {
@@ -16,8 +22,8 @@ type Props = {
   context?: Record<string, unknown>;
   /** Optional fallback when no widget matches the surface. */
   fallback?: React.ReactNode;
-  /** Grid vs stacked rendering. Grid is default. */
-  layout?: "grid" | "stack";
+  /** Grid, stacked or accordion rendering. Grid is default. */
+  layout?: "grid" | "stack" | "accordion";
   /** Include drafts (admin preview only). */
   includeDrafts?: boolean;
 };
@@ -28,6 +34,20 @@ const SIZE_TO_COL: Record<WidgetSize, string> = {
   lg: "md:col-span-8 col-span-12",
   full: "col-span-12",
 };
+
+/** Ordre imposé des blocs sur la page événement. */
+const EVENT_DETAIL_ORDER: string[] = [
+  "event.info",
+  "event.guests",
+  "event.menu",
+  "ext.contributions",
+  "ext.guest-brings",
+];
+
+function orderIndex(component: string): number {
+  const i = EVENT_DETAIL_ORDER.indexOf(component);
+  return i === -1 ? EVENT_DETAIL_ORDER.length + 1 : i;
+}
 
 export function WidgetRenderer({
   surface,
@@ -55,6 +75,37 @@ export function WidgetRenderer({
     return <>{fallback ?? null}</>;
   }
 
+  if (layout === "accordion") {
+    const ordered = [...placements].sort(
+      (a, b) =>
+        orderIndex(a.widget.manifest.component) - orderIndex(b.widget.manifest.component) ||
+        a.order - b.order,
+    );
+    const first = ordered[0];
+    return (
+      <Accordion
+        type="multiple"
+        defaultValue={first ? [first.widget.id] : []}
+        className="space-y-3"
+      >
+        {ordered.map((p) => (
+          <AccordionItem
+            key={p.widget.id}
+            value={p.widget.id}
+            className="rounded-2xl border border-border/60 bg-card px-4 last:border-b"
+          >
+            <AccordionTrigger className="text-sm font-medium hover:no-underline">
+              {p.widget.name}
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <RenderOne placement={p} extra={context} bare />
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    );
+  }
+
   if (layout === "stack") {
     return (
       <div className="space-y-6">
@@ -76,12 +127,16 @@ export function WidgetRenderer({
   );
 }
 
+
 function RenderOne({
   placement,
   extra,
+  bare,
 }: {
   placement: import("./types").ResolvedPlacement;
   extra?: Record<string, unknown>;
+  /** Aplatit la carte du widget quand il est déjà encadré (accordéon). */
+  bare?: boolean;
 }) {
   const { widget: w, config } = placement;
   const Component = resolveWidgetComponent(w.manifest.component);
@@ -89,9 +144,16 @@ function RenderOne({
     return null;
   }
   const merged = { ...config, ...(extra ?? {}) };
-  return (
+  const content = (
     <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Chargement…</div>}>
       <Component config={merged} />
     </Suspense>
   );
+  if (!bare) return content;
+  return (
+    <div className="[&>*]:border-0 [&>*]:bg-transparent [&>*]:shadow-none [&>*]:rounded-none [&>*]:p-0">
+      {content}
+    </div>
+  );
 }
+
