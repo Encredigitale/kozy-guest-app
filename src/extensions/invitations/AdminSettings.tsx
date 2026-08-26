@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { COUNTRIES } from "@/lib/phone";
 import { DEFAULT_INVITATIONS_CONFIG, type InvitationChannel, type InvitationsConfig } from "./config";
 import { useInvitationsConfig, useSaveInvitationsConfig } from "./useInvitations";
 
