@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import type { WidgetProps } from "@/core/registry/components";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/core/auth/useSession";
+import { sendEventInvitation } from "@/lib/event-invitations.functions";
 import { useEvent, useParticipants } from "@/widgets/event-shared/queries";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,6 +59,8 @@ export default function EventGuestsWidget({ config }: WidgetProps) {
   const { data: ev } = useEvent(eventId);
   const { data: participants = [], isLoading } = useParticipants(eventId);
   const [newEmail, setNewEmail] = useState("");
+  const [sendingId, setSendingId] = useState<string | null>(null);
+  const sendInvitation = useServerFn(sendEventInvitation);
   const isOrganizer = ev?.organizer_id === user?.id;
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["event", eventId, "participants"] });
@@ -64,11 +68,40 @@ export default function EventGuestsWidget({ config }: WidgetProps) {
   const add = async () => {
     const email = newEmail.trim();
     if (!email) return;
-    const { error } = await supabase.from("event_participants").insert({ event_id: eventId, email });
+    const { data: participant, error } = await supabase
+      .from("event_participants")
+      .insert({ event_id: eventId, email })
+      .select("id")
+      .single();
     if (error) return toast.error(error.message);
-    setNewEmail("");
-    toast.success("Invité ajouté.");
-    invalidate();
+    setSendingId(participant.id);
+    try {
+      await sendInvitation({ data: { eventId, participantId: participant.id } });
+      setNewEmail("");
+      toast.success("Invitation envoyée.");
+      invalidate();
+    } catch (error) {
+      toast.error("L'invité a été ajouté, mais l'e-mail n'a pas pu être envoyé.", {
+        description: error instanceof Error ? error.message : undefined,
+      });
+      invalidate();
+    } finally {
+      setSendingId(null);
+    }
+  };
+
+  const resend = async (participantId: string) => {
+    setSendingId(participantId);
+    try {
+      await sendInvitation({ data: { eventId, participantId } });
+      toast.success("Invitation envoyée.");
+    } catch (error) {
+      toast.error("L'e-mail n'a pas pu être envoyé.", {
+        description: error instanceof Error ? error.message : undefined,
+      });
+    } finally {
+      setSendingId(null);
+    }
   };
 
   const remove = async (id: string) => {
@@ -106,7 +139,7 @@ export default function EventGuestsWidget({ config }: WidgetProps) {
               onKeyDown={(e) => e.key === "Enter" && add()}
               className="rounded-2xl h-11 bg-background"
             />
-            <Button onClick={add} className="rounded-full h-11 px-4 shrink-0">
+            <Button onClick={add} disabled={sendingId !== null} className="rounded-full h-11 px-4 shrink-0">
               <UserPlus className="h-4 w-4 mr-2" />
               Inviter
             </Button>
@@ -162,7 +195,8 @@ export default function EventGuestsWidget({ config }: WidgetProps) {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 rounded-full"
-                        onClick={() => toast.info("Envoi d'invitation", { description: "Fonctionnalité à brancher au service d'envoi." })}
+                        onClick={() => resend(p.id)}
+                        disabled={sendingId === p.id || !p.email}
                         title="Envoyer l'invitation"
                       >
                         <Mail className="h-4 w-4 text-muted-foreground" />
