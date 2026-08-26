@@ -83,6 +83,86 @@ export type Database = {
         }
         Relationships: []
       }
+      contribution_choices: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          label: string
+          sort_order: number
+          type_id: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          label: string
+          sort_order?: number
+          type_id: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          label?: string
+          sort_order?: number
+          type_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contribution_choices_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "contribution_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contribution_types: {
+        Row: {
+          active: boolean
+          allow_free_text: boolean
+          allow_subchoices: boolean
+          created_at: string
+          event_type_keys: string[]
+          icon: string
+          id: string
+          key: string
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          allow_free_text?: boolean
+          allow_subchoices?: boolean
+          created_at?: string
+          event_type_keys?: string[]
+          icon?: string
+          id?: string
+          key: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          allow_free_text?: boolean
+          allow_subchoices?: boolean
+          created_at?: string
+          event_type_keys?: string[]
+          icon?: string
+          id?: string
+          key?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       dashboard_layout: {
         Row: {
           created_at: string
@@ -450,6 +530,86 @@ export type Database = {
           version?: string
         }
         Relationships: []
+      }
+      guest_contributions: {
+        Row: {
+          choice_id: string | null
+          contact_id: string | null
+          contribution_type_id: string | null
+          created_at: string
+          event_id: string
+          guest_user_id: string | null
+          id: string
+          invitation_id: string
+          label: string
+          note: string | null
+          quantity: number | null
+          status: string
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          choice_id?: string | null
+          contact_id?: string | null
+          contribution_type_id?: string | null
+          created_at?: string
+          event_id: string
+          guest_user_id?: string | null
+          id?: string
+          invitation_id: string
+          label: string
+          note?: string | null
+          quantity?: number | null
+          status?: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          choice_id?: string | null
+          contact_id?: string | null
+          contribution_type_id?: string | null
+          created_at?: string
+          event_id?: string
+          guest_user_id?: string | null
+          id?: string
+          invitation_id?: string
+          label?: string
+          note?: string | null
+          quantity?: number | null
+          status?: string
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guest_contributions_choice_id_fkey"
+            columns: ["choice_id"]
+            isOneToOne: false
+            referencedRelation: "contribution_choices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guest_contributions_contribution_type_id_fkey"
+            columns: ["contribution_type_id"]
+            isOneToOne: false
+            referencedRelation: "contribution_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guest_contributions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "guest_contributions_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "invitations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       invitation_logs: {
         Row: {
