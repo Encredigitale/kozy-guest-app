@@ -960,6 +960,7 @@ export type Database = {
       }
       invitations: {
         Row: {
+          channel: string | null
           contact_id: string | null
           created_at: string
           email: string | null
@@ -972,6 +973,7 @@ export type Database = {
           opened_at: string | null
           organizer_id: string
           phone: string | null
+          phone_e164: string | null
           responded_at: string | null
           revoked_at: string | null
           sent_at: string | null
@@ -980,6 +982,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          channel?: string | null
           contact_id?: string | null
           created_at?: string
           email?: string | null
@@ -992,6 +995,7 @@ export type Database = {
           opened_at?: string | null
           organizer_id: string
           phone?: string | null
+          phone_e164?: string | null
           responded_at?: string | null
           revoked_at?: string | null
           sent_at?: string | null
@@ -1000,6 +1004,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          channel?: string | null
           contact_id?: string | null
           created_at?: string
           email?: string | null
@@ -1012,6 +1017,7 @@ export type Database = {
           opened_at?: string | null
           organizer_id?: string
           phone?: string | null
+          phone_e164?: string | null
           responded_at?: string | null
           revoked_at?: string | null
           sent_at?: string | null
