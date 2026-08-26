@@ -3,6 +3,12 @@ import { Loader2 } from "lucide-react";
 import { useSurfaceWidgets } from "./useRegistry";
 import { resolveWidgetComponent } from "./components";
 import { useSession } from "@/core/auth/useSession";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import type { SurfaceContext, WidgetSize } from "./types";
 
 type Props = {
@@ -16,8 +22,8 @@ type Props = {
   context?: Record<string, unknown>;
   /** Optional fallback when no widget matches the surface. */
   fallback?: React.ReactNode;
-  /** Grid vs stacked rendering. Grid is default. */
-  layout?: "grid" | "stack";
+  /** Grid, stacked or accordion rendering. Grid is default. */
+  layout?: "grid" | "stack" | "accordion";
   /** Include drafts (admin preview only). */
   includeDrafts?: boolean;
 };
@@ -28,6 +34,21 @@ const SIZE_TO_COL: Record<WidgetSize, string> = {
   lg: "md:col-span-8 col-span-12",
   full: "col-span-12",
 };
+
+/** Ordre imposé des blocs sur la page événement. */
+const EVENT_DETAIL_ORDER: string[] = [
+  "event.info",
+  "event.guests",
+  "event.menu",
+  "contributions",
+  "guest-brings",
+];
+
+function orderIndex(component: string): number {
+  const i = EVENT_DETAIL_ORDER.indexOf(component);
+  return i === -1 ? EVENT_DETAIL_ORDER.length + 1 : i;
+}
+
 
 export function WidgetRenderer({
   surface,
