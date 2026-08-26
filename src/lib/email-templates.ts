@@ -1,16 +1,17 @@
 /**
  * Templates d'e-mails Kosy (HTML compatible clients mail : tables + styles inline).
- * Palette alignée sur le design system : Desert Clay — rose poudré, sable, terre cuite.
+ * Palette alignée sur le design system Kosy : bleu marine, bleu bardeau, bleu dragée,
+ * rouge tomette, saumon, bisque et lin.
  */
 
 const BRAND = {
   name: "Kosy",
-  primary: "#c17c74",
-  primaryDark: "#a05b54",
-  ink: "#2B2320",
-  muted: "#8A7B72",
-  border: "#EDE5DE",
-  cream: "#FBF8F5",
+  primary: "#6888C6",
+  primaryDark: "#892E63",
+  ink: "#892E63",
+  muted: "#6888C6",
+  border: "#C1DFF4",
+  cream: "#FFCA83",
 };
 
 export type KosyEmailOptions = {
