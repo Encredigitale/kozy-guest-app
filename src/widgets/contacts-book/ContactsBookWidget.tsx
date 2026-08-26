@@ -8,13 +8,38 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { BookUser, Plus, Trash2 } from "lucide-react";
+import { BookUser, Check, Pencil, Plus, Trash2, X } from "lucide-react";
 
 export default function ContactsBookWidget({ config }: WidgetProps) {
   const scope = { scope_type: "global" as const, scope_id: null };
   const { items, isLoading, create, update, remove, upsertSingle } = useWidgetItems("contacts.book", scope);
 
   const [draft, setDraft] = useState<Record<string, unknown>>({ name: "", email: "", phone: "" });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState({ name: "", email: "", phone: "" });
+
+  const startEdit = (id: string, payload: Record<string, unknown>) => {
+    setEditingId(id);
+    setEditDraft({
+      name: String(payload.name ?? ""),
+      email: String(payload.email ?? ""),
+      phone: String(payload.phone ?? ""),
+    });
+  };
+
+  const saveEdit = (item: { id: string; payload: Record<string, unknown> }) => {
+    if (!editDraft.name.trim()) return toast.error("Le nom est obligatoire.");
+    update.mutate(
+      { id: item.id, patch: { payload: { ...item.payload, ...editDraft, name: editDraft.name.trim() } } },
+      {
+        onSuccess: () => {
+          setEditingId(null);
+          toast.success("Contact modifié.");
+        },
+        onError: (error) => toast.error(error instanceof Error ? error.message : "Modification impossible."),
+      },
+    );
+  };
 
   const add = () => {
     if (!draft.name) return toast.error("Champ requis manquant.");
@@ -47,19 +72,64 @@ export default function ContactsBookWidget({ config }: WidgetProps) {
         ) : (
           <ul className="space-y-1">
             {items.map((i) => (
-              <li key={i.id} className="flex items-center gap-2 group py-1.5 border-b border-border/40 last:border-0">
-                <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{String(i.payload.name ?? "")}</p>
-                <p className="text-xs text-muted-foreground truncate">{String(i.payload.email ?? "")}</p>
-                <p className="text-xs text-muted-foreground truncate">{String(i.payload.phone ?? "")}</p>
-              </div>
-                <button
-                  onClick={() => remove.mutate(i.id)}
-                  className="opacity-0 group-hover:opacity-100 transition"
-                  aria-label="Supprimer"
-                >
-                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                </button>
+              <li key={i.id} className="group py-1.5 border-b border-border/40 last:border-0">
+                {editingId === i.id ? (
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <Input
+                        value={editDraft.name}
+                        onChange={(e) => setEditDraft({ ...editDraft, name: e.target.value })}
+                        placeholder="Nom du contact"
+                      />
+                      <Input
+                        type="email"
+                        value={editDraft.email}
+                        onChange={(e) => setEditDraft({ ...editDraft, email: e.target.value })}
+                        placeholder="email@exemple.com"
+                      />
+                      <Input
+                        value={editDraft.phone}
+                        onChange={(e) => setEditDraft({ ...editDraft, phone: e.target.value })}
+                        placeholder="+33 …"
+                      />
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button variant="ghost" size="sm" className="rounded-full" onClick={() => setEditingId(null)}>
+                        <X className="h-3.5 w-3.5" /> Annuler
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="rounded-full"
+                        disabled={update.isPending}
+                        onClick={() => saveEdit(i)}
+                      >
+                        <Check className="h-3.5 w-3.5" /> Enregistrer
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{String(i.payload.name ?? "")}</p>
+                      <p className="text-xs text-muted-foreground truncate">{String(i.payload.email ?? "")}</p>
+                      <p className="text-xs text-muted-foreground truncate">{String(i.payload.phone ?? "")}</p>
+                    </div>
+                    <button
+                      onClick={() => startEdit(i.id, i.payload)}
+                      className="opacity-0 group-hover:opacity-100 transition"
+                      aria-label="Modifier"
+                    >
+                      <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                    </button>
+                    <button
+                      onClick={() => remove.mutate(i.id)}
+                      className="opacity-0 group-hover:opacity-100 transition"
+                      aria-label="Supprimer"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                    </button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
