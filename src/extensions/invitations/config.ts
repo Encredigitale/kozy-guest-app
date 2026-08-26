@@ -21,7 +21,22 @@ export type InvitationsConfig = {
   templateInvitation: string;
   templateReminder: string;
   templateConfirmation: string;
+  /** Canal téléphone : autorise l'invitation via un numéro. */
+  phoneEnabled: boolean;
+  /** Partage SMS depuis le téléphone de l'organisateur (MVP sans fournisseur). */
+  smsShareEnabled: boolean;
+  /** Envoi SMS automatisé via une extension fournisseur (à venir). */
+  smsAutoEnabled: boolean;
+  /** Codes pays autorisés (vide = tous). */
+  allowedCountries: string[];
+  /** Pays par défaut du sélecteur. */
+  defaultCountry: string;
+  /** Modèle du SMS ({host}, {event}, {guest}, {link}). */
+  templateSms: string;
+  /** Expéditeur SMS si le fournisseur le permet. */
+  smsSender: string;
 };
+
 
 export const DEFAULT_INVITATIONS_CONFIG: InvitationsConfig = {
   eventTypeKeys: [],
