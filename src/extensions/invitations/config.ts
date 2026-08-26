@@ -21,7 +21,22 @@ export type InvitationsConfig = {
   templateInvitation: string;
   templateReminder: string;
   templateConfirmation: string;
+  /** Canal téléphone : autorise l'invitation via un numéro. */
+  phoneEnabled: boolean;
+  /** Partage SMS depuis le téléphone de l'organisateur (MVP sans fournisseur). */
+  smsShareEnabled: boolean;
+  /** Envoi SMS automatisé via une extension fournisseur (à venir). */
+  smsAutoEnabled: boolean;
+  /** Codes pays autorisés (vide = tous). */
+  allowedCountries: string[];
+  /** Pays par défaut du sélecteur. */
+  defaultCountry: string;
+  /** Modèle du SMS ({host}, {event}, {guest}, {link}). */
+  templateSms: string;
+  /** Expéditeur SMS si le fournisseur le permet. */
+  smsSender: string;
 };
+
 
 export const DEFAULT_INVITATIONS_CONFIG: InvitationsConfig = {
   eventTypeKeys: [],
@@ -31,13 +46,20 @@ export const DEFAULT_INVITATIONS_CONFIG: InvitationsConfig = {
   responseDeadlineDays: 1,
   expiresDays: 30,
   maxReminders: 2,
-  channels: ["link", "share", "email"],
+  channels: ["link", "share", "email", "sms"],
   inviteWithoutContact: true,
   guestVisibility: "organizer",
   remindersEnabled: true,
   templateInvitation: "{host} vous invite à {event}.",
   templateReminder: "Petit rappel : vous n'avez pas encore répondu à cette invitation.",
   templateConfirmation: "Votre participation est confirmée. À bientôt !",
+  phoneEnabled: true,
+  smsShareEnabled: true,
+  smsAutoEnabled: false,
+  allowedCountries: [],
+  defaultCountry: "FR",
+  templateSms: "{guest}, {host} vous invite à {event}. Consultez votre invitation et répondez ici : {link}",
+  smsSender: "Kosy",
 };
 
 export function normalizeConfig(raw: unknown): InvitationsConfig {
@@ -75,4 +97,27 @@ export const STATUS_LABELS: Record<InvitationStatus, string> = {
 
 export function invitationUrl(origin: string, eventId: string, invitationId: string, token: string) {
   return `${origin}/invitation/${eventId}/${invitationId}?token=${token}`;
+}
+
+/** Canal utilisé pour joindre l'invité (colonne invitations.channel). */
+export const CHANNEL_LABELS: Record<string, string> = {
+  email: "E-mail",
+  sms: "SMS",
+  link: "Lien partagé",
+  share: "Lien partagé",
+  whatsapp: "WhatsApp",
+};
+
+/** Construit le texte du SMS/WhatsApp à partir du modèle administrable. */
+export function renderSmsText(
+  template: string,
+  vars: { host: string; event: string; guest: string; link: string },
+) {
+  return template
+    .replace(/\{host\}/g, vars.host)
+    .replace(/\{event\}/g, vars.event)
+    .replace(/\{guest\}/g, vars.guest)
+    .replace(/\{link\}/g, vars.link)
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }

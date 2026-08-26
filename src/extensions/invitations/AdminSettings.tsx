@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
+import { COUNTRIES } from "@/lib/phone";
 import { DEFAULT_INVITATIONS_CONFIG, type InvitationChannel, type InvitationsConfig } from "./config";
 import { useInvitationsConfig, useSaveInvitationsConfig } from "./useInvitations";
 
@@ -131,6 +132,73 @@ export default function InvitationsAdminSettings() {
               {c.soon && <span className="text-[10px] text-muted-foreground">(à venir)</span>}
             </label>
           ))}
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="space-y-3">
+        <Label className="text-xs uppercase tracking-wide text-muted-foreground">Téléphone &amp; SMS</Label>
+        {([
+          { key: "phoneEnabled", label: "Invitation par téléphone", description: "Rechercher et inviter avec un numéro." },
+          { key: "smsShareEnabled", label: "Partage SMS depuis le téléphone", description: "Ouvre l'app SMS avec le message prérempli." },
+          { key: "smsAutoEnabled", label: "SMS automatisés", description: "Nécessite une extension fournisseur SMS." },
+        ] as const).map((r) => (
+          <div key={r.key} className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm">{r.label}</p>
+              <p className="text-xs text-muted-foreground">{r.description}</p>
+            </div>
+            <Switch checked={Boolean(form[r.key])} onCheckedChange={(v) => set(r.key, v as never)} />
+          </div>
+        ))}
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <Label className="text-xs">Pays par défaut</Label>
+            <select
+              value={form.defaultCountry}
+              onChange={(e) => set("defaultCountry", e.target.value)}
+              className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+            >
+              {COUNTRIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.flag} {c.name} (+{c.dial})
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1">
+            <Label className="text-xs">Expéditeur SMS</Label>
+            <Input value={form.smsSender} onChange={(e) => set("smsSender", e.target.value)} maxLength={11} />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-xs">Pays autorisés (aucun coché = tous)</Label>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            {COUNTRIES.map((c) => (
+              <label key={c.code} className="flex items-center gap-2 text-sm">
+                <Checkbox
+                  checked={form.allowedCountries.includes(c.code)}
+                  onCheckedChange={() =>
+                    setForm((f) => {
+                      const list = new Set(f.allowedCountries);
+                      if (list.has(c.code)) list.delete(c.code);
+                      else list.add(c.code);
+                      return { ...f, allowedCountries: Array.from(list) };
+                    })
+                  }
+                />
+                {c.flag} {c.code}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <Label className="text-xs">Modèle du SMS ({"{guest}"}, {"{host}"}, {"{event}"}, {"{link}"})</Label>
+          <Textarea rows={3} value={form.templateSms} onChange={(e) => set("templateSms", e.target.value)} />
         </div>
       </div>
 

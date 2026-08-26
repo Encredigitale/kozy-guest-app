@@ -11,6 +11,8 @@ export type InvitationRow = {
   name: string | null;
   email: string | null;
   phone: string | null;
+  phone_e164: string | null;
+  channel: string | null;
   status: InvitationStatus;
   token: string;
   message: string | null;
@@ -133,6 +135,7 @@ export function useContactBook() {
           name: (p.name as string) ?? "",
           email: (p.email as string) ?? "",
           phone: (p.phone as string) ?? "",
+          phoneE164: (p.phone_e164 as string) ?? "",
           group: (p.group as string) ?? "",
           avatarUrl: (p.avatar_url as string) ?? "",
         };

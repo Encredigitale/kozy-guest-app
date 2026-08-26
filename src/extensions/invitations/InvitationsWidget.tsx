@@ -3,7 +3,13 @@ import { useServerFn } from "@tanstack/react-start";
 import type { WidgetProps } from "@/core/registry/components";
 import { useSession } from "@/core/auth/useSession";
 import { useEvent } from "@/widgets/event-shared/queries";
-import { createInvitation, sendInvitation } from "@/lib/invitations.functions";
+import {
+  createInvitation,
+  markInvitationChannel,
+  sendInvitation,
+  sendInvitationSms,
+} from "@/lib/invitations.functions";
+import { COUNTRIES, DEFAULT_COUNTRY, looksLikePhone, maskPhone, toE164 } from "@/lib/phone";
 import {
   useContactBook,
   useEventInvitations,
@@ -11,7 +17,7 @@ import {
   useInvitationsConfig,
   type InvitationRow,
 } from "./useInvitations";
-import { STATUS_LABELS, invitationUrl, type InvitationStatus } from "./config";
+import { CHANNEL_LABELS, STATUS_LABELS, invitationUrl, renderSmsText, type InvitationStatus } from "./config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +37,8 @@ import { toast } from "sonner";
 import {
   Copy,
   ExternalLink,
+  MessageSquare,
+  Phone,
   History,
   Mail,
   MoreHorizontal,
@@ -80,6 +88,9 @@ export default function InvitationsWidget({ config }: WidgetProps) {
   const [search, setSearch] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [country, setCountry] = useState(DEFAULT_COUNTRY);
+  const [showForm, setShowForm] = useState(false);
   const [saveContact, setSaveContact] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
@@ -88,18 +99,35 @@ export default function InvitationsWidget({ config }: WidgetProps) {
 
   const addInvitation = useServerFn(createInvitation);
   const send = useServerFn(sendInvitation);
+  const markChannel = useServerFn(markInvitationChannel);
+  const sendSms = useServerFn(sendInvitationSms);
 
   const isOrganizer = !!ev && !!user && ev.organizer_id === user.id;
   const origin = typeof window === "undefined" ? "" : window.location.origin;
 
+  const searchIsPhone = looksLikePhone(search);
+  const searchE164 = searchIsPhone ? toE164(search, cfg?.defaultCountry ?? country) : null;
+
   const suggestions = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return [];
+    const qDigits = q.replace(/\D/g, "");
     return contacts
-      .filter((c) => `${c.name} ${c.email}`.toLowerCase().includes(q))
+      .filter((c) => {
+        const haystack = `${c.name} ${c.email}`.toLowerCase();
+        if (haystack.includes(q)) return true;
+        if (!qDigits) return false;
+        const cDigits = `${c.phone} ${c.phoneE164}`.replace(/\D/g, "");
+        return cDigits.includes(qDigits);
+      })
       .filter((c) => !invitations.some((i) => i.contact_id === c.id || (c.email && i.email === c.email)))
       .slice(0, 5);
   }, [contacts, search, invitations]);
+
+  const recent = useMemo(
+    () => contacts.filter((c) => !invitations.some((i) => i.contact_id === c.id)).slice(-3).reverse(),
+    [contacts, invitations],
+  );
 
   const counts = useMemo(() => {
     const by = (s: InvitationStatus) => invitations.filter((i) => i.status === s).length;
@@ -112,7 +140,13 @@ export default function InvitationsWidget({ config }: WidgetProps) {
     };
   }, [invitations]);
 
-  const add = async (input: { name?: string; email?: string; contactId?: string | null; save: boolean }) => {
+  const add = async (input: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    contactId?: string | null;
+    save: boolean;
+  }) => {
     setAdding(true);
     try {
       const result = await addInvitation({
@@ -120,6 +154,8 @@ export default function InvitationsWidget({ config }: WidgetProps) {
           eventId,
           name: input.name || undefined,
           email: input.email || undefined,
+          phone: input.phone || undefined,
+          country,
           contactId: input.contactId ?? null,
           saveToContacts: input.save,
         },
@@ -127,7 +163,10 @@ export default function InvitationsWidget({ config }: WidgetProps) {
       setSearch("");
       setName("");
       setEmail("");
+      setPhone("");
+      setShowForm(false);
       invalidate();
+
       const created = result.invitation as unknown as InvitationRow;
       if (created.email) {
         try {
@@ -164,16 +203,41 @@ export default function InvitationsWidget({ config }: WidgetProps) {
 
   const link = (inv: InvitationRow) => invitationUrl(origin, inv.event_id, inv.id, inv.token);
 
+  const track = async (inv: InvitationRow, channel: "link" | "share" | "sms" | "whatsapp") => {
+    try {
+      await markChannel({
+        data: {
+          invitationId: inv.id,
+          channel,
+          event: channel === "sms" ? "sms_requested" : "link_shared",
+        },
+      });
+      invalidate();
+    } catch {
+      /* le suivi ne bloque jamais le partage */
+    }
+  };
+
+  const smsText = (inv: InvitationRow) =>
+    renderSmsText(cfg?.templateSms ?? "{guest}, {host} vous invite à {event} : {link}", {
+      guest: inv.name ?? "",
+      host: user?.user_metadata?.display_name ?? "Un proche",
+      event: ev?.title ?? "un événement",
+      link: link(inv),
+    });
+
   const copy = async (inv: InvitationRow) => {
     await navigator.clipboard.writeText(link(inv));
     toast.success("Lien copié.");
+    track(inv, "link");
   };
 
   const share = async (inv: InvitationRow) => {
     const url = link(inv);
     if (typeof navigator !== "undefined" && "share" in navigator) {
       try {
-        await navigator.share({ title: ev?.title ?? "Invitation", url });
+        await navigator.share({ title: ev?.title ?? "Invitation", text: smsText(inv), url });
+        track(inv, "share");
         return;
       } catch {
         /* partage annulé */
@@ -181,6 +245,38 @@ export default function InvitationsWidget({ config }: WidgetProps) {
     }
     await navigator.clipboard.writeText(url);
     toast.success("Lien copié.");
+    track(inv, "link");
+  };
+
+  /** MVP : ouvre l'app SMS du téléphone avec destinataire et texte préremplis. */
+  const shareBySms = (inv: InvitationRow) => {
+    const to = inv.phone_e164 ?? inv.phone ?? "";
+    window.location.href = `sms:${to}?&body=${encodeURIComponent(smsText(inv))}`;
+    track(inv, "sms");
+  };
+
+  const shareByWhatsapp = (inv: InvitationRow) => {
+    const to = (inv.phone_e164 ?? "").replace(/\D/g, "");
+    const url = to
+      ? `https://wa.me/${to}?text=${encodeURIComponent(smsText(inv))}`
+      : `https://wa.me/?text=${encodeURIComponent(smsText(inv))}`;
+    window.open(url, "_blank", "noopener");
+    track(inv, "whatsapp");
+  };
+
+  /** Envoi SMS automatisé via le service de messagerie (si un fournisseur est connecté). */
+  const autoSms = async (inv: InvitationRow) => {
+    setBusyId(inv.id);
+    try {
+      const result = await sendSms({ data: { invitationId: inv.id } });
+      if (result.ok) toast.success(result.message);
+      else toast.error(result.message);
+      invalidate();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Envoi SMS impossible.");
+    } finally {
+      setBusyId(null);
+    }
   };
 
   const cancel = (inv: InvitationRow) =>
@@ -188,6 +284,7 @@ export default function InvitationsWidget({ config }: WidgetProps) {
       { id: inv.id, patch: { status: "cancelled", revoked_at: new Date().toISOString() } },
       { onSuccess: () => toast.success("Invitation annulée.") },
     );
+
 
   if (isLoading) return <div className="text-sm text-muted-foreground">Chargement…</div>;
 
@@ -227,9 +324,10 @@ export default function InvitationsWidget({ config }: WidgetProps) {
 
         {isOrganizer && (
           <div className="space-y-3 rounded-2xl border border-border/60 bg-background p-3">
+            <p className="text-sm font-medium">Ajouter des invités</p>
             <div className="relative">
               <Input
-                placeholder="Rechercher dans mon carnet d'adresses…"
+                placeholder={cfg?.phoneEnabled === false ? "Nom ou e-mail" : "Nom, e-mail ou téléphone"}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="rounded-2xl h-11"
@@ -241,17 +339,19 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                       <button
                         type="button"
                         disabled={adding}
-                        onClick={() => add({ name: c.name, email: c.email, contactId: c.id, save: false })}
+                        onClick={() =>
+                          add({ name: c.name, email: c.email, phone: c.phone || c.phoneE164, contactId: c.id, save: false })
+                        }
                         className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-accent"
                       >
                         <Avatar className="h-9 w-9">
                           {c.avatarUrl ? <AvatarImage src={c.avatarUrl} alt="" /> : null}
-                          <AvatarFallback>{initials(c.name || c.email)}</AvatarFallback>
+                          <AvatarFallback>{initials(c.name || c.email || c.phone)}</AvatarFallback>
                         </Avatar>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-sm font-medium">{c.name || c.email}</span>
+                          <span className="block truncate text-sm font-medium">{c.name || c.email || maskPhone(c.phone, c.phoneE164)}</span>
                           <span className="block truncate text-xs text-muted-foreground">
-                            {[c.email, c.phone, c.group].filter(Boolean).join(" · ")}
+                            {[c.email, maskPhone(c.phone, c.phoneE164), c.group].filter(Boolean).join(" · ")}
                           </span>
                         </span>
                         <span className="text-xs text-muted-foreground">Ajouter</span>
@@ -262,46 +362,142 @@ export default function InvitationsWidget({ config }: WidgetProps) {
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <Input
-                placeholder="Prénom et nom"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="rounded-2xl h-11"
-              />
-              <Input
-                type="email"
-                placeholder="email@exemple.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="rounded-2xl h-11"
-              />
-            </div>
+            {search.trim() && suggestions.length === 0 && !showForm && (
+              <div className="rounded-2xl border border-dashed border-border p-3 space-y-2">
+                <p className="text-sm text-muted-foreground">Aucun contact trouvé</p>
+                <Button
+                  variant="outline"
+                  className="rounded-full h-10"
+                  onClick={() => {
+                    if (searchIsPhone) setPhone(search.trim());
+                    else if (search.includes("@")) setEmail(search.trim());
+                    else setName(search.trim());
+                    setShowForm(true);
+                  }}
+                >
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  {searchE164 ? `Inviter le ${search.trim()}` : "Ajouter un nouveau contact"}
+                </Button>
+              </div>
+            )}
 
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              {cfg?.inviteWithoutContact ? (
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="save-contact"
-                    checked={saveContact}
-                    onCheckedChange={(v) => setSaveContact(v === true)}
-                  />
-                  <Label htmlFor="save-contact" className="text-xs text-muted-foreground">
-                    Enregistrer dans mes contacts
-                  </Label>
+            {!search.trim() && !showForm && recent.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Contacts récents</p>
+                <div className="flex flex-wrap gap-2">
+                  {recent.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      disabled={adding}
+                      onClick={() =>
+                        add({ name: c.name, email: c.email, phone: c.phone || c.phoneE164, contactId: c.id, save: false })
+                      }
+                      className="rounded-full border border-border px-3 py-1.5 text-xs hover:bg-accent"
+                    >
+                      {c.name || c.email || maskPhone(c.phone, c.phoneE164)}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(true)}
+                    className="rounded-full border border-dashed border-border px-3 py-1.5 text-xs hover:bg-accent"
+                  >
+                    + Ajouter un nouveau contact
+                  </button>
                 </div>
-              ) : (
-                <span className="text-xs text-muted-foreground">Le contact sera enregistré dans le carnet.</span>
-              )}
-              <Button
-                onClick={() => add({ name, email, save: cfg?.inviteWithoutContact ? saveContact : true })}
-                disabled={adding || (!name.trim() && !email.trim())}
-                className="rounded-full h-11 px-4"
-              >
-                <UserPlus className="h-4 w-4 mr-2" />
-                {saveContact || !cfg?.inviteWithoutContact ? "Créer et inviter" : "Inviter"}
-              </Button>
-            </div>
+              </div>
+            )}
+
+            {showForm && (
+              <div className="space-y-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <Input
+                    placeholder="Prénom (obligatoire)"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="rounded-2xl h-11"
+                  />
+                  <Input
+                    type="email"
+                    placeholder="email@exemple.com (facultatif)"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="rounded-2xl h-11"
+                  />
+                </div>
+
+                {cfg?.phoneEnabled !== false && (
+                  <div className="flex gap-2">
+                    <select
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                      className="h-11 rounded-2xl border border-input bg-background px-2 text-sm"
+                      aria-label="Indicatif pays"
+                    >
+                      {COUNTRIES.filter(
+                        (c) => !cfg?.allowedCountries?.length || cfg.allowedCountries.includes(c.code),
+                      ).map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.flag} +{c.dial}
+                        </option>
+                      ))}
+                    </select>
+                    <Input
+                      type="tel"
+                      placeholder="06 12 34 56 78"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="rounded-2xl h-11 flex-1"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {showForm && (
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                {cfg?.inviteWithoutContact ? (
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="save-contact"
+                      checked={saveContact}
+                      onCheckedChange={(v) => setSaveContact(v === true)}
+                    />
+                    <Label htmlFor="save-contact" className="text-xs text-muted-foreground">
+                      Enregistrer dans mes contacts
+                    </Label>
+                  </div>
+                ) : (
+                  <span className="text-xs text-muted-foreground">Le contact sera enregistré dans le carnet.</span>
+                )}
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    className="rounded-full h-11"
+                    onClick={() => {
+                      setShowForm(false);
+                      setName("");
+                      setEmail("");
+                      setPhone("");
+                    }}
+                  >
+                    Annuler
+                  </Button>
+                  <Button
+                    onClick={() =>
+                      add({ name, email, phone, save: cfg?.inviteWithoutContact ? saveContact : true })
+                    }
+                    disabled={adding || (!name.trim() && !email.trim() && !phone.trim())}
+                    className="rounded-full h-11 px-4"
+                  >
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Ajouter et inviter
+                  </Button>
+                </div>
+              </div>
+            )}
+
           </div>
         )}
 
@@ -312,7 +508,9 @@ export default function InvitationsWidget({ config }: WidgetProps) {
         ) : (
           <ul className="space-y-2">
             {invitations.map((inv) => {
-              const label = inv.name || inv.email || "Invité";
+              const masked = maskPhone(inv.phone, inv.phone_e164);
+              const label = inv.name || inv.email || masked || "Invité";
+              const hasPhone = !!(inv.phone_e164 || inv.phone);
               return (
                 <li
                   key={inv.id}
@@ -330,7 +528,15 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                         </Badge>
                       )}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate">{inv.email ?? "Sans e-mail"}</p>
+                    <p className="flex items-center gap-1.5 text-xs text-muted-foreground truncate">
+                      {hasPhone && <Phone className="h-3 w-3 shrink-0" />}
+                      {[inv.email, masked].filter(Boolean).join(" · ") || "Sans coordonnées"}
+                      {inv.channel && (
+                        <span className="text-[10px] uppercase tracking-wide">
+                          · {CHANNEL_LABELS[inv.channel as keyof typeof CHANNEL_LABELS] ?? inv.channel}
+                        </span>
+                      )}
+                    </p>
                   </div>
                   <Badge className={`rounded-full text-[10px] px-2 py-0.5 ${STATUS_STYLES[inv.status]}`}>
                     {inv.status === "draft" ? "Invitation non envoyée" : STATUS_LABELS[inv.status]}
@@ -358,6 +564,21 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                               <Mail className="h-4 w-4 mr-2" /> Envoyer un rappel
                             </DropdownMenuItem>
                           </>
+                        )}
+                        {channels.includes("sms") && hasPhone && (
+                          <>
+                            <DropdownMenuItem onClick={() => shareBySms(inv)}>
+                              <MessageSquare className="h-4 w-4 mr-2" /> Envoyer par SMS
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => autoSms(inv)}>
+                              <Send className="h-4 w-4 mr-2" /> Envoyer le SMS automatiquement
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {channels.includes("whatsapp") && (
+                          <DropdownMenuItem onClick={() => shareByWhatsapp(inv)}>
+                            <Share2 className="h-4 w-4 mr-2" /> Partager via WhatsApp
+                          </DropdownMenuItem>
                         )}
                         {channels.includes("link") && (
                           <DropdownMenuItem onClick={() => copy(inv)}>
