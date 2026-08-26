@@ -98,3 +98,26 @@ export const STATUS_LABELS: Record<InvitationStatus, string> = {
 export function invitationUrl(origin: string, eventId: string, invitationId: string, token: string) {
   return `${origin}/invitation/${eventId}/${invitationId}?token=${token}`;
 }
+
+/** Canal utilisé pour joindre l'invité (colonne invitations.channel). */
+export const CHANNEL_LABELS: Record<string, string> = {
+  email: "E-mail",
+  sms: "SMS",
+  link: "Lien partagé",
+  share: "Lien partagé",
+  whatsapp: "WhatsApp",
+};
+
+/** Construit le texte du SMS/WhatsApp à partir du modèle administrable. */
+export function renderSmsText(
+  template: string,
+  vars: { host: string; event: string; guest: string; link: string },
+) {
+  return template
+    .replace(/\{host\}/g, vars.host)
+    .replace(/\{event\}/g, vars.event)
+    .replace(/\{guest\}/g, vars.guest)
+    .replace(/\{link\}/g, vars.link)
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
