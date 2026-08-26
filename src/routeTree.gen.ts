@@ -28,6 +28,7 @@ import { Route as AuthenticatedAppAdminRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/app.events.index'
 import { Route as AuthenticatedAppAdminIndexRouteImport } from './routes/_authenticated/app.admin.index'
 import { Route as ApiPublicV1MeRouteImport } from './routes/api/public/v1/me'
+import { Route as ApiPublicInvitationsRemindersRouteImport } from './routes/api/public/invitations/reminders'
 import { Route as AuthenticatedAppXSplatRouteImport } from './routes/_authenticated/app.x.$'
 import { Route as AuthenticatedAppWSplatRouteImport } from './routes/_authenticated/app.w.$'
 import { Route as AuthenticatedAppEventsNewRouteImport } from './routes/_authenticated/app.events.new'
@@ -140,6 +141,12 @@ const ApiPublicV1MeRoute = ApiPublicV1MeRouteImport.update({
   path: '/api/public/v1/me',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicInvitationsRemindersRoute =
+  ApiPublicInvitationsRemindersRouteImport.update({
+    id: '/api/public/invitations/reminders',
+    path: '/api/public/invitations/reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedAppXSplatRoute = AuthenticatedAppXSplatRouteImport.update({
   id: '/x/$',
   path: '/x/$',
@@ -237,6 +244,7 @@ export interface FileRoutesByFullPath {
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
   '/app/w/$': typeof AuthenticatedAppWSplatRoute
   '/app/x/$': typeof AuthenticatedAppXSplatRoute
+  '/api/public/invitations/reminders': typeof ApiPublicInvitationsRemindersRoute
   '/api/public/v1/me': typeof ApiPublicV1MeRoute
   '/app/admin/': typeof AuthenticatedAppAdminIndexRoute
   '/app/events/': typeof AuthenticatedAppEventsIndexRoute
@@ -266,6 +274,7 @@ export interface FileRoutesByTo {
   '/app/events/new': typeof AuthenticatedAppEventsNewRoute
   '/app/w/$': typeof AuthenticatedAppWSplatRoute
   '/app/x/$': typeof AuthenticatedAppXSplatRoute
+  '/api/public/invitations/reminders': typeof ApiPublicInvitationsRemindersRoute
   '/api/public/v1/me': typeof ApiPublicV1MeRoute
   '/app/admin': typeof AuthenticatedAppAdminIndexRoute
   '/app/events': typeof AuthenticatedAppEventsIndexRoute
@@ -300,6 +309,7 @@ export interface FileRoutesById {
   '/_authenticated/app/events/new': typeof AuthenticatedAppEventsNewRoute
   '/_authenticated/app/w/$': typeof AuthenticatedAppWSplatRoute
   '/_authenticated/app/x/$': typeof AuthenticatedAppXSplatRoute
+  '/api/public/invitations/reminders': typeof ApiPublicInvitationsRemindersRoute
   '/api/public/v1/me': typeof ApiPublicV1MeRoute
   '/_authenticated/app/admin/': typeof AuthenticatedAppAdminIndexRoute
   '/_authenticated/app/events/': typeof AuthenticatedAppEventsIndexRoute
@@ -334,6 +344,7 @@ export interface FileRouteTypes {
     | '/app/events/new'
     | '/app/w/$'
     | '/app/x/$'
+    | '/api/public/invitations/reminders'
     | '/api/public/v1/me'
     | '/app/admin/'
     | '/app/events/'
@@ -363,6 +374,7 @@ export interface FileRouteTypes {
     | '/app/events/new'
     | '/app/w/$'
     | '/app/x/$'
+    | '/api/public/invitations/reminders'
     | '/api/public/v1/me'
     | '/app/admin'
     | '/app/events'
@@ -396,6 +408,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/events/new'
     | '/_authenticated/app/w/$'
     | '/_authenticated/app/x/$'
+    | '/api/public/invitations/reminders'
     | '/api/public/v1/me'
     | '/_authenticated/app/admin/'
     | '/_authenticated/app/events/'
@@ -411,6 +424,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   InvitationEventIdInvitationIdRoute: typeof InvitationEventIdInvitationIdRoute
+  ApiPublicInvitationsRemindersRoute: typeof ApiPublicInvitationsRemindersRoute
   ApiPublicV1MeRoute: typeof ApiPublicV1MeRoute
 }
 
@@ -547,6 +561,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/v1/me'
       fullPath: '/api/public/v1/me'
       preLoaderRoute: typeof ApiPublicV1MeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/invitations/reminders': {
+      id: '/api/public/invitations/reminders'
+      path: '/api/public/invitations/reminders'
+      fullPath: '/api/public/invitations/reminders'
+      preLoaderRoute: typeof ApiPublicInvitationsRemindersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/app/x/$': {
@@ -747,6 +768,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   InvitationEventIdInvitationIdRoute: InvitationEventIdInvitationIdRoute,
+  ApiPublicInvitationsRemindersRoute: ApiPublicInvitationsRemindersRoute,
   ApiPublicV1MeRoute: ApiPublicV1MeRoute,
 }
 export const routeTree = rootRouteImport
