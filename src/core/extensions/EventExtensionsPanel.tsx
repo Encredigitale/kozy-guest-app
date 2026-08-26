@@ -95,7 +95,6 @@ export function EventExtensionsPanel({ eventId }: { eventId: string }) {
                       <AlertTriangle className="h-2.5 w-2.5" /> Incompatible
                     </Badge>
                   )}
-                </div>
                   {exclusiveWith.length > 0 && (
                     <Badge variant="secondary" className="text-[10px] gap-1">
                       <Lock className="h-2.5 w-2.5" /> Exclusif
@@ -108,7 +107,6 @@ export function EventExtensionsPanel({ eventId }: { eventId: string }) {
                     Ne peut pas être activé en même temps que {exclusiveWith.map((r) => r.name).join(", ")}.
                   </p>
                 )}
-                <div className="hidden">
               </div>
               {def && (def.settingsSchema?.length || def.settingsComponent) && (
                 <EventExtensionSettingsDialog eventId={eventId} extensionKey={row.key} name={row.name} />
