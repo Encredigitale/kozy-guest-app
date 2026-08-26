@@ -203,16 +203,41 @@ export default function InvitationsWidget({ config }: WidgetProps) {
 
   const link = (inv: InvitationRow) => invitationUrl(origin, inv.event_id, inv.id, inv.token);
 
+  const track = async (inv: InvitationRow, channel: "link" | "share" | "sms" | "whatsapp") => {
+    try {
+      await markChannel({
+        data: {
+          invitationId: inv.id,
+          channel,
+          event: channel === "sms" ? "sms_requested" : "link_shared",
+        },
+      });
+      invalidate();
+    } catch {
+      /* le suivi ne bloque jamais le partage */
+    }
+  };
+
+  const smsText = (inv: InvitationRow) =>
+    renderSmsText(cfg?.templateSms ?? "{guest}, {host} vous invite à {event} : {link}", {
+      guest: inv.name ?? "",
+      host: user?.user_metadata?.display_name ?? "Un proche",
+      event: ev?.title ?? "un événement",
+      link: link(inv),
+    });
+
   const copy = async (inv: InvitationRow) => {
     await navigator.clipboard.writeText(link(inv));
     toast.success("Lien copié.");
+    track(inv, "link");
   };
 
   const share = async (inv: InvitationRow) => {
     const url = link(inv);
     if (typeof navigator !== "undefined" && "share" in navigator) {
       try {
-        await navigator.share({ title: ev?.title ?? "Invitation", url });
+        await navigator.share({ title: ev?.title ?? "Invitation", text: smsText(inv), url });
+        track(inv, "share");
         return;
       } catch {
         /* partage annulé */
@@ -220,6 +245,38 @@ export default function InvitationsWidget({ config }: WidgetProps) {
     }
     await navigator.clipboard.writeText(url);
     toast.success("Lien copié.");
+    track(inv, "link");
+  };
+
+  /** MVP : ouvre l'app SMS du téléphone avec destinataire et texte préremplis. */
+  const shareBySms = (inv: InvitationRow) => {
+    const to = inv.phone_e164 ?? inv.phone ?? "";
+    window.location.href = `sms:${to}?&body=${encodeURIComponent(smsText(inv))}`;
+    track(inv, "sms");
+  };
+
+  const shareByWhatsapp = (inv: InvitationRow) => {
+    const to = (inv.phone_e164 ?? "").replace(/\D/g, "");
+    const url = to
+      ? `https://wa.me/${to}?text=${encodeURIComponent(smsText(inv))}`
+      : `https://wa.me/?text=${encodeURIComponent(smsText(inv))}`;
+    window.open(url, "_blank", "noopener");
+    track(inv, "whatsapp");
+  };
+
+  /** Envoi SMS automatisé via le service de messagerie (si un fournisseur est connecté). */
+  const autoSms = async (inv: InvitationRow) => {
+    setBusyId(inv.id);
+    try {
+      const result = await sendSms({ data: { invitationId: inv.id } });
+      if (result.ok) toast.success(result.message);
+      else toast.error(result.message);
+      invalidate();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Envoi SMS impossible.");
+    } finally {
+      setBusyId(null);
+    }
   };
 
   const cancel = (inv: InvitationRow) =>
@@ -227,6 +284,7 @@ export default function InvitationsWidget({ config }: WidgetProps) {
       { id: inv.id, patch: { status: "cancelled", revoked_at: new Date().toISOString() } },
       { onSuccess: () => toast.success("Invitation annulée.") },
     );
+
 
   if (isLoading) return <div className="text-sm text-muted-foreground">Chargement…</div>;
 
