@@ -508,7 +508,9 @@ export default function InvitationsWidget({ config }: WidgetProps) {
         ) : (
           <ul className="space-y-2">
             {invitations.map((inv) => {
-              const label = inv.name || inv.email || "Invité";
+              const masked = maskPhone(inv.phone, inv.phone_e164);
+              const label = inv.name || inv.email || masked || "Invité";
+              const hasPhone = !!(inv.phone_e164 || inv.phone);
               return (
                 <li
                   key={inv.id}
@@ -526,7 +528,15 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                         </Badge>
                       )}
                     </p>
-                    <p className="text-xs text-muted-foreground truncate">{inv.email ?? "Sans e-mail"}</p>
+                    <p className="flex items-center gap-1.5 text-xs text-muted-foreground truncate">
+                      {hasPhone && <Phone className="h-3 w-3 shrink-0" />}
+                      {[inv.email, masked].filter(Boolean).join(" · ") || "Sans coordonnées"}
+                      {inv.channel && (
+                        <span className="text-[10px] uppercase tracking-wide">
+                          · {CHANNEL_LABELS[inv.channel as keyof typeof CHANNEL_LABELS] ?? inv.channel}
+                        </span>
+                      )}
+                    </p>
                   </div>
                   <Badge className={`rounded-full text-[10px] px-2 py-0.5 ${STATUS_STYLES[inv.status]}`}>
                     {inv.status === "draft" ? "Invitation non envoyée" : STATUS_LABELS[inv.status]}
@@ -554,6 +564,21 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                               <Mail className="h-4 w-4 mr-2" /> Envoyer un rappel
                             </DropdownMenuItem>
                           </>
+                        )}
+                        {channels.includes("sms") && hasPhone && (
+                          <>
+                            <DropdownMenuItem onClick={() => shareBySms(inv)}>
+                              <MessageSquare className="h-4 w-4 mr-2" /> Envoyer par SMS
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => autoSms(inv)}>
+                              <Send className="h-4 w-4 mr-2" /> Envoyer le SMS automatiquement
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {channels.includes("whatsapp") && (
+                          <DropdownMenuItem onClick={() => shareByWhatsapp(inv)}>
+                            <Share2 className="h-4 w-4 mr-2" /> Partager via WhatsApp
+                          </DropdownMenuItem>
                         )}
                         {channels.includes("link") && (
                           <DropdownMenuItem onClick={() => copy(inv)}>
