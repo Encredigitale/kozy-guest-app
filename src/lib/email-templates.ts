@@ -6,13 +6,13 @@
 
 const BRAND = {
   name: "Kosy",
-  primary: "#6888C6",
-  primaryDark: "#892E63",
-  ink: "#892E63",
+  primary: "#03224C",
+  primaryDark: "#6888C6",
+  ink: "#03224C",
   muted: "#6888C6",
   border: "#C1DFF4",
   cream: "#FFCA83",
-  pageBg: "#FFEED9",
+  pageBg: "#C1DFF4",
 };
 
 export type KosyEmailOptions = {
