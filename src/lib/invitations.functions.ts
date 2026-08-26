@@ -101,7 +101,7 @@ export const createInvitation = createServerFn({ method: "POST" })
         .select("payload")
         .eq("id", contactId)
         .maybeSingle();
-      const payload = ((contact?.payload ?? {}) as Record<string, unknown>) ?? {};
+      const payload = (contact?.payload ?? {}) as Record<string, unknown>;
       if (!payload.phone_e164) {
         await context.supabase
           .from("widget_items")
