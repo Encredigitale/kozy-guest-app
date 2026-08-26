@@ -213,7 +213,19 @@ export function AppShell() {
       <main className="flex-1 overflow-x-hidden flex flex-col">
         <header className="h-14 border-b border-border/60 flex items-center justify-end px-4 gap-2 shrink-0">
           <NotificationBell />
+          <Link
+            to="/app/profile"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:bg-accent"
+          >
+            <ProfileIcon className="h-4 w-4" />
+            <span className="hidden sm:inline">Profil</span>
+          </Link>
+          <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground">
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline ml-2">Déconnexion</span>
+          </Button>
         </header>
+
         <div className="flex-1 overflow-y-auto">
           <Outlet />
         </div>
