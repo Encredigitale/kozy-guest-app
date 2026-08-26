@@ -34,9 +34,44 @@ export const createInvitation = createServerFn({ method: "POST" })
     if (!event) throw new Error("Événement introuvable ou accès refusé");
 
     const config = await loadConfig();
-    if (!data.email && !data.phone && !data.name) throw new Error("Renseignez au moins un nom ou un e-mail");
+    if (!data.email && !data.phone && !data.name) throw new Error("Renseignez au moins un nom, un e-mail ou un téléphone");
     if (!data.contactId && data.saveToContacts === false && !config.inviteWithoutContact) {
       throw new Error("L'invitation sans enregistrement du contact est désactivée");
+    }
+
+    let phoneE164: string | null = null;
+    if (data.phone) {
+      if (!config.phoneEnabled) throw new Error("Le canal téléphone est désactivé");
+      phoneE164 = toE164(data.phone, data.country ?? config.defaultCountry);
+      if (!phoneE164) throw new Error("Numéro de téléphone invalide");
+      const allowed = config.allowedCountries ?? [];
+      if (allowed.length > 0) {
+        const { COUNTRIES } = await import("@/lib/phone");
+        const ok = allowed.some((code) => {
+          const c = COUNTRIES.find((x) => x.code === code);
+          return c && phoneE164!.startsWith(`+${c.dial}`);
+        });
+        if (!ok) throw new Error("Ce pays n'est pas autorisé pour les invitations par téléphone");
+      }
+    }
+
+    // Doublons : même e-mail ou même numéro déjà invité sur cet événement.
+    const { data: existing } = await context.supabase
+      .from("invitations")
+      .select("id, name, email, phone_e164, status")
+      .eq("event_id", data.eventId);
+    const duplicate = (existing ?? []).find((row) => {
+      const r = row as Record<string, any>;
+      if (r.status === "cancelled") return false;
+      if (phoneE164 && r.phone_e164 === phoneE164) return true;
+      if (data.email && r.email && r.email.toLowerCase() === data.email.toLowerCase()) return true;
+      return false;
+    }) as Record<string, any> | undefined;
+    if (duplicate) {
+      const label = duplicate.name || duplicate.email || "Cette personne";
+      const err = new Error(`${label} est déjà invité(e) à cet événement.`);
+      (err as Error & { invitationId?: string }).invitationId = duplicate.id;
+      throw err;
     }
 
     let contactId = data.contactId ?? null;
@@ -48,21 +83,44 @@ export const createInvitation = createServerFn({ method: "POST" })
           widget_key: "contacts.book",
           scope_type: "global",
           scope_id: null,
-          payload: { name: data.name ?? data.email, email: data.email, phone: data.phone } as never,
+          payload: {
+            name: data.name ?? data.email ?? data.phone,
+            email: data.email,
+            phone: data.phone,
+            phone_e164: phoneE164,
+          } as never,
         })
         .select("id")
         .single();
       if (error) throw new Error(error.message);
       contactId = contact.id;
+    } else if (contactId && phoneE164) {
+      // Enrichit le contact existant avec le numéro normalisé.
+      const { data: contact } = await context.supabase
+        .from("widget_items")
+        .select("payload")
+        .eq("id", contactId)
+        .maybeSingle();
+      const payload = ((contact?.payload ?? {}) as Record<string, unknown>) ?? {};
+      if (!payload.phone_e164) {
+        await context.supabase
+          .from("widget_items")
+          .update({ payload: { ...payload, phone: data.phone ?? payload.phone, phone_e164: phoneE164 } as never })
+          .eq("id", contactId);
+      }
     }
 
     // Le contact correspond-il à un membre de l'application ?
     let guestUserId: string | null = null;
-    if (data.email) {
+    if (data.email || phoneE164) {
       try {
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data: users } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
-        const match = users?.users.find((u) => u.email?.toLowerCase() === data.email!.toLowerCase());
+        const match = users?.users.find(
+          (u) =>
+            (data.email && u.email?.toLowerCase() === data.email.toLowerCase()) ||
+            (phoneE164 && u.phone && `+${u.phone.replace(/\D/g, "")}` === phoneE164),
+        );
         guestUserId = match?.id ?? null;
       } catch (error) {
         console.error("[invitations] member lookup failed", error);
@@ -84,6 +142,7 @@ export const createInvitation = createServerFn({ method: "POST" })
         name: data.name ?? null,
         email: data.email ?? null,
         phone: data.phone ?? null,
+        phone_e164: phoneE164,
         token: generateToken(),
         status: "draft",
         expires_at: expiresAt,
@@ -91,6 +150,7 @@ export const createInvitation = createServerFn({ method: "POST" })
       .select("*")
       .single();
     if (error) throw new Error(error.message);
+
 
     await context.supabase
       .from("invitation_logs")
