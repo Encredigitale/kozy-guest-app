@@ -451,6 +451,137 @@ export type Database = {
         }
         Relationships: []
       }
+      invitation_logs: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          invitation_id: string
+          metadata: Json
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          invitation_id: string
+          metadata?: Json
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          invitation_id?: string
+          metadata?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitation_logs_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "invitations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invitation_settings: {
+        Row: {
+          created_at: string
+          key: string
+          settings: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          key?: string
+          settings?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          key?: string
+          settings?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      invitations: {
+        Row: {
+          contact_id: string | null
+          created_at: string
+          email: string | null
+          event_id: string
+          expires_at: string | null
+          guest_user_id: string | null
+          id: string
+          message: string | null
+          name: string | null
+          opened_at: string | null
+          organizer_id: string
+          phone: string | null
+          responded_at: string | null
+          revoked_at: string | null
+          sent_at: string | null
+          status: Database["public"]["Enums"]["invitation_status"]
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string
+          email?: string | null
+          event_id: string
+          expires_at?: string | null
+          guest_user_id?: string | null
+          id?: string
+          message?: string | null
+          name?: string | null
+          opened_at?: string | null
+          organizer_id: string
+          phone?: string | null
+          responded_at?: string | null
+          revoked_at?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string
+          email?: string | null
+          event_id?: string
+          expires_at?: string | null
+          guest_user_id?: string | null
+          id?: string
+          message?: string | null
+          name?: string | null
+          opened_at?: string | null
+          organizer_id?: string
+          phone?: string | null
+          responded_at?: string | null
+          revoked_at?: string | null
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitations_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "widget_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       menu_components: {
         Row: {
           active: boolean
@@ -699,6 +830,15 @@ export type Database = {
       contact_group: "family" | "friends" | "colleagues" | "neighbors" | "other"
       contact_source: "personal" | "imported" | "member"
       event_status: "draft" | "published" | "archived"
+      invitation_status:
+        | "draft"
+        | "sent"
+        | "opened"
+        | "accepted"
+        | "declined"
+        | "maybe"
+        | "cancelled"
+        | "expired"
       notification_channel: "inapp" | "email" | "push"
       notification_status: "pending" | "sent" | "failed"
       participant_role: "organizer" | "guest"
@@ -834,6 +974,16 @@ export const Constants = {
       contact_group: ["family", "friends", "colleagues", "neighbors", "other"],
       contact_source: ["personal", "imported", "member"],
       event_status: ["draft", "published", "archived"],
+      invitation_status: [
+        "draft",
+        "sent",
+        "opened",
+        "accepted",
+        "declined",
+        "maybe",
+        "cancelled",
+        "expired",
+      ],
       notification_channel: ["inapp", "email", "push"],
       notification_status: ["pending", "sent", "failed"],
       participant_role: ["organizer", "guest"],
