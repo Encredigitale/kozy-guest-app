@@ -40,15 +40,14 @@ const EVENT_DETAIL_ORDER: string[] = [
   "event.info",
   "event.guests",
   "event.menu",
-  "contributions",
-  "guest-brings",
+  "ext.contributions",
+  "ext.guest-brings",
 ];
 
 function orderIndex(component: string): number {
   const i = EVENT_DETAIL_ORDER.indexOf(component);
   return i === -1 ? EVENT_DETAIL_ORDER.length + 1 : i;
 }
-
 
 export function WidgetRenderer({
   surface,
@@ -76,6 +75,37 @@ export function WidgetRenderer({
     return <>{fallback ?? null}</>;
   }
 
+  if (layout === "accordion") {
+    const ordered = [...placements].sort(
+      (a, b) =>
+        orderIndex(a.widget.manifest.component) - orderIndex(b.widget.manifest.component) ||
+        a.order - b.order,
+    );
+    const first = ordered[0];
+    return (
+      <Accordion
+        type="multiple"
+        defaultValue={first ? [first.widget.id] : []}
+        className="space-y-3"
+      >
+        {ordered.map((p) => (
+          <AccordionItem
+            key={p.widget.id}
+            value={p.widget.id}
+            className="rounded-2xl border border-border/60 bg-card px-4 last:border-b"
+          >
+            <AccordionTrigger className="text-sm font-medium hover:no-underline">
+              {p.widget.name}
+            </AccordionTrigger>
+            <AccordionContent className="pb-4">
+              <RenderOne placement={p} extra={context} bare />
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    );
+  }
+
   if (layout === "stack") {
     return (
       <div className="space-y-6">
@@ -96,6 +126,7 @@ export function WidgetRenderer({
     </div>
   );
 }
+
 
 function RenderOne({
   placement,
