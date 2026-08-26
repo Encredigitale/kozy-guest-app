@@ -10,6 +10,7 @@ import type {
   WidgetRow,
   WidgetSize,
 } from "./types";
+import { isExclusiveWinnerFrom } from "@/core/extensions/exclusivity";
 
 export const widgetsQueryOptions = queryOptions({
   queryKey: ["core", "widgets"],
@@ -46,6 +47,23 @@ export function useEventWidgets(eventId?: string) {
         .eq("event_id", eventId!);
       if (error) throw error;
       return (data ?? []) as unknown as EventWidgetRow[];
+    },
+    staleTime: 15_000,
+  });
+}
+
+/** Per-event extension activation rows (used to hide extension widgets). */
+export function useEventExtensionRows(eventId?: string) {
+  return useQuery({
+    queryKey: ["core", "event_extensions", eventId],
+    enabled: !!eventId,
+    queryFn: async (): Promise<Array<{ extension_key: string; enabled: boolean }>> => {
+      const { data, error } = await supabase
+        .from("event_extensions")
+        .select("extension_key, enabled")
+        .eq("event_id", eventId!);
+      if (error) throw error;
+      return (data ?? []) as unknown as Array<{ extension_key: string; enabled: boolean }>;
     },
     staleTime: 15_000,
   });
@@ -94,6 +112,15 @@ export function useSurfaceWidgets(surface: string, ctx: SurfaceContext = {}) {
   );
   const { data: dashboardLayout = [] } = useDashboardLayout(surface === "dashboard" ? null : undefined as never);
   const { data: bindings = [] } = useWidgetRoleBindings();
+  const { data: extensionRows = [] } = useEventExtensionRows(
+    surface === "event.detail" ? ctx.eventId : undefined,
+  );
+
+  const extensionStateMap = useMemo(() => {
+    const m: Record<string, boolean | undefined> = {};
+    for (const r of extensionRows) m[r.extension_key] = r.enabled;
+    return m;
+  }, [extensionRows]);
 
   const enabledIds = useMemo(() => new Set(q.data.map((w) => w.id)), [q.data]);
 
@@ -129,6 +156,14 @@ export function useSurfaceWidgets(surface: string, ctx: SurfaceContext = {}) {
       .filter((w) => w.manifest?.surface === surface)
       .filter((w) => w.manifest?.visible !== false)
       .filter((w) => (ctx.includeDrafts || ctx.isAdmin ? true : (w.status ?? "published") === "published"))
+      .filter((w) => {
+        // Extension widgets (ext.<key>) : respecter la désactivation par événement
+        // et l'exclusivité mutuelle entre extensions.
+        if (surface !== "event.detail" || !ctx.eventId || !w.id.startsWith("ext.")) return true;
+        const key = w.id.slice(4);
+        if (extensionStateMap[key] === false) return false;
+        return isExclusiveWinnerFrom(extensionStateMap, key);
+      })
       .map<ResolvedPlacement | null>((w) => {
         // Event override: hides the widget when disabled explicitly
         if (surface === "event.detail" && ctx.eventId) {
