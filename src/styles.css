@@ -18,13 +18,13 @@
  * 2. Register it in @theme inline as --color-<name>: var(--<name>)
  *
  * Palette Kosy actuelle :
- *   - Bleu marine   #892E63  oklch(0.452 0.137 347.981)
- *   - Bleu bardeau  #6888C6  oklch(0.629 0.101 262.929)
- *   - Bleu dragée   #C1DFF4  oklch(0.888 0.043 238.580)
- *   - Rouge tomette #CF5946  oklch(0.610 0.154 31.172)
- *   - Saumon        #FD8E55  oklch(0.756 0.152 46.546)
- *   - Bisque        #FFCA83  oklch(0.871 0.107 73.747)
- *   - Lin           #FFEED9  oklch(0.957 0.033 73.183)
+ *   - Bleu marine   #03224C  oklch(0.26 0.087 217.429)
+ *   - Bleu bardeau  #6888C6  oklch(0.631 0.075 228.699)
+ *   - Bleu dragée   #C1DFF4  oklch(0.892 0.015 221.737)
+ *   - Rouge tomette #CF5946  oklch(0.611 0.158 19.876)
+ *   - Saumon        #FD8E55  oklch(0.757 0.162 27.109)
+ *   - Bisque        #FFCA83  oklch(0.872 0.115 39.518)
+ *   - Lin           #FFEED9  oklch(0.96 0.058 35.461)
  */
 
 @theme inline {
