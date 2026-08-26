@@ -86,11 +86,7 @@ function RenderOne({
   const { widget: w, config } = placement;
   const Component = resolveWidgetComponent(w.manifest.component);
   if (!Component) {
-    return (
-      <div className="p-4 rounded-lg border border-destructive/40 text-xs text-destructive">
-        Composant <span className="font-mono">{w.manifest.component}</span> introuvable.
-      </div>
-    );
+    return null;
   }
   const merged = { ...config, ...(extra ?? {}) };
   return (
