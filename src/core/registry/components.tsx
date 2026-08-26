@@ -18,7 +18,6 @@ const registry: Record<string, WidgetComponent> = {
   "event.guests": lazy(() => import("@/widgets/event-guests/EventGuestsWidget")),
   
   "event.contributions": lazy(() => import("@/widgets/event-contributions/EventContributionsWidget")),
-  "event.type": lazy(() => import("@/widgets/event-type/EventTypeWidget")),
   "event.menu": lazy(() => import("@/widgets/event-menu/EventMenuWidget")),
   "event.checklist": lazy(() => import("@/widgets/event-checklist/EventChecklistWidget")),
   "event.planning": lazy(() => import("@/widgets/event-planning/EventPlanningWidget")),
