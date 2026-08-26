@@ -141,7 +141,9 @@ export function AppShell() {
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline ml-2">Déconnexion</span>
           </Button>
+          </div>
         </header>
+
 
         <div className="flex-1 overflow-y-auto">
           <Outlet />
