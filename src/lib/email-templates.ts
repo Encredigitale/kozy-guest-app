@@ -1,16 +1,18 @@
 /**
  * Templates d'e-mails Kosy (HTML compatible clients mail : tables + styles inline).
- * Palette alignée sur le design system : Desert Clay — rose poudré, sable, terre cuite.
+ * Palette alignée sur le design system Kosy : bleu marine, bleu bardeau, bleu dragée,
+ * rouge tomette, saumon, bisque et lin.
  */
 
 const BRAND = {
   name: "Kosy",
-  primary: "#c17c74",
-  primaryDark: "#a05b54",
-  ink: "#2B2320",
-  muted: "#8A7B72",
-  border: "#EDE5DE",
-  cream: "#FBF8F5",
+  primary: "#6888C6",
+  primaryDark: "#892E63",
+  ink: "#892E63",
+  muted: "#6888C6",
+  border: "#C1DFF4",
+  cream: "#FFCA83",
+  pageBg: "#FFEED9",
 };
 
 export type KosyEmailOptions = {
@@ -98,9 +100,9 @@ export function renderKosyEmail(options: KosyEmailOptions): string {
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>${escapeHtml(title)}</title>
   </head>
-  <body style="margin:0;padding:0;background:#F3EEE9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
+  <body style="margin:0;padding:0;background:${BRAND.pageBg};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(preheader)}</div>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F3EEE9;padding:32px 16px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BRAND.pageBg};padding:32px 16px;">
       <tr>
         <td align="center">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:24px;overflow:hidden;border:1px solid ${BRAND.border};">
