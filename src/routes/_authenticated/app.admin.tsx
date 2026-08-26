@@ -3,6 +3,9 @@ import { useSession } from "@/core/auth/useSession";
 import { CORE_VERSION, DB_VERSION } from "@/core/version";
 import {
   Gauge,
+  CalendarDays,
+  BookUser,
+
   LayoutGrid,
   MonitorSmartphone,
   Puzzle,
@@ -26,6 +29,7 @@ const SECTIONS: Section[] = [
     title: "Core",
     items: [
       { to: "/app/admin", label: "Tableau de bord", Icon: Gauge },
+      { to: "/app/events", label: "Événements", Icon: CalendarDays },
       { to: "/app/admin/event-types", label: "Types d'événement", Icon: Tags },
       { to: "/app/admin/menu-components", label: "Composantes de repas", Icon: UtensilsCrossed },
     ],
@@ -39,8 +43,10 @@ const SECTIONS: Section[] = [
     items: [
       { to: "/app/admin/studio", label: "Studio", Icon: Wand2 },
       { to: "/app/admin/registry", label: "Registry", Icon: LayoutGrid },
+      { to: "/app/contacts", label: "Contacts", Icon: BookUser },
     ],
   },
+
   {
     title: "Plugins",
     items: [
