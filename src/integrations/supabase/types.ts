@@ -83,6 +83,42 @@ export type Database = {
         }
         Relationships: []
       }
+      contribution_categories: {
+        Row: {
+          active: boolean
+          created_at: string
+          event_type_keys: string[]
+          icon: string
+          id: string
+          key: string
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          event_type_keys?: string[]
+          icon?: string
+          id?: string
+          key: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          event_type_keys?: string[]
+          icon?: string
+          id?: string
+          key?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       contribution_choices: {
         Row: {
           active: boolean
@@ -117,6 +153,231 @@ export type Database = {
             columns: ["type_id"]
             isOneToOne: false
             referencedRelation: "contribution_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contribution_commitments: {
+        Row: {
+          contact_id: string | null
+          created_at: string
+          guest_name: string | null
+          id: string
+          invitation_id: string | null
+          need_id: string
+          note: string | null
+          quantity: number
+          status: Database["public"]["Enums"]["contribution_commitment_status"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string
+          guest_name?: string | null
+          id?: string
+          invitation_id?: string | null
+          need_id: string
+          note?: string | null
+          quantity?: number
+          status?: Database["public"]["Enums"]["contribution_commitment_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string
+          guest_name?: string | null
+          id?: string
+          invitation_id?: string | null
+          need_id?: string
+          note?: string | null
+          quantity?: number
+          status?: Database["public"]["Enums"]["contribution_commitment_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contribution_commitments_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "invitations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contribution_commitments_need_id_fkey"
+            columns: ["need_id"]
+            isOneToOne: false
+            referencedRelation: "contribution_needs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contribution_logs: {
+        Row: {
+          action: string
+          actor_label: string | null
+          created_at: string
+          event_id: string
+          id: string
+          metadata: Json
+          need_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_label?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          metadata?: Json
+          need_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_label?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          metadata?: Json
+          need_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contribution_logs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contribution_needs: {
+        Row: {
+          allow_overcommitment: boolean
+          category_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          event_id: string
+          id: string
+          label: string
+          need_type: Database["public"]["Enums"]["contribution_need_type"]
+          priority: Database["public"]["Enums"]["contribution_need_priority"]
+          status: Database["public"]["Enums"]["contribution_need_status"]
+          target_quantity: number
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          allow_overcommitment?: boolean
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_id: string
+          id?: string
+          label: string
+          need_type?: Database["public"]["Enums"]["contribution_need_type"]
+          priority?: Database["public"]["Enums"]["contribution_need_priority"]
+          status?: Database["public"]["Enums"]["contribution_need_status"]
+          target_quantity?: number
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          allow_overcommitment?: boolean
+          category_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          event_id?: string
+          id?: string
+          label?: string
+          need_type?: Database["public"]["Enums"]["contribution_need_type"]
+          priority?: Database["public"]["Enums"]["contribution_need_priority"]
+          status?: Database["public"]["Enums"]["contribution_need_status"]
+          target_quantity?: number
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contribution_needs_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "contribution_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contribution_needs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contribution_needs_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "contribution_units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contribution_suggestions: {
+        Row: {
+          active: boolean
+          category_id: string | null
+          created_at: string
+          event_type_key: string | null
+          id: string
+          label: string
+          need_type: Database["public"]["Enums"]["contribution_need_type"]
+          sort_order: number
+          target_quantity: number | null
+          unit_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category_id?: string | null
+          created_at?: string
+          event_type_key?: string | null
+          id?: string
+          label: string
+          need_type?: Database["public"]["Enums"]["contribution_need_type"]
+          sort_order?: number
+          target_quantity?: number | null
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category_id?: string | null
+          created_at?: string
+          event_type_key?: string | null
+          id?: string
+          label?: string
+          need_type?: Database["public"]["Enums"]["contribution_need_type"]
+          sort_order?: number
+          target_quantity?: number | null
+          unit_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contribution_suggestions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "contribution_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contribution_suggestions_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "contribution_units"
             referencedColumns: ["id"]
           },
         ]
@@ -157,6 +418,39 @@ export type Database = {
           icon?: string
           id?: string
           key?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      contribution_units: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          key: string
+          kind: Database["public"]["Enums"]["contribution_unit_kind"]
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          key: string
+          kind?: Database["public"]["Enums"]["contribution_unit_kind"]
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          key?: string
+          kind?: Database["public"]["Enums"]["contribution_unit_kind"]
           label?: string
           sort_order?: number
           updated_at?: string
@@ -983,12 +1277,29 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      commit_contribution: {
+        Args: {
+          _commitment_id?: string
+          _contact_id?: string
+          _guest_name?: string
+          _invitation_id: string
+          _need_id: string
+          _note?: string
+          _quantity: number
+          _user_id?: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "user"
       contact_group: "family" | "friends" | "colleagues" | "neighbors" | "other"
       contact_source: "personal" | "imported" | "member"
+      contribution_commitment_status: "active" | "cancelled"
+      contribution_need_priority: "normal" | "important" | "high"
+      contribution_need_status: "open" | "closed" | "cancelled"
+      contribution_need_type: "quantity" | "unique" | "people" | "money"
+      contribution_unit_kind: "quantity" | "money" | "none"
       event_status: "draft" | "published" | "archived"
       invitation_status:
         | "draft"
@@ -1133,6 +1444,11 @@ export const Constants = {
       app_role: ["admin", "user"],
       contact_group: ["family", "friends", "colleagues", "neighbors", "other"],
       contact_source: ["personal", "imported", "member"],
+      contribution_commitment_status: ["active", "cancelled"],
+      contribution_need_priority: ["normal", "important", "high"],
+      contribution_need_status: ["open", "closed", "cancelled"],
+      contribution_need_type: ["quantity", "unique", "people", "money"],
+      contribution_unit_kind: ["quantity", "money", "none"],
       event_status: ["draft", "published", "archived"],
       invitation_status: [
         "draft",
