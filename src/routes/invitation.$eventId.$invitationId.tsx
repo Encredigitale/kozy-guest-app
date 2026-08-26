@@ -9,6 +9,7 @@ import {
 } from "@/lib/invitations.functions";
 import type { PublicInvitationPayload } from "@/extensions/invitations/public-types";
 import GuestBringsBlock from "@/extensions/guest-brings/GuestBringsBlock";
+import ContributionsBlock from "@/extensions/contributions/ContributionsBlock";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -221,6 +222,10 @@ function PublicInvitationPage() {
             )}
           </CardContent>
         </Card>
+
+        {p.status === "accepted" && token && (
+          <ContributionsBlock eventId={eventId} invitationId={invitationId} token={token} accepted />
+        )}
 
         {p.status === "accepted" && token && (
           <GuestBringsBlock eventId={eventId} invitationId={invitationId} token={token} accepted />

@@ -178,6 +178,23 @@ export const EXTENSIONS: ExtensionDefinition[] = [
       },
     ],
   },
+  {
+    key: "contributions",
+    name: "Contributions",
+    description:
+      "Moteur générique de besoins collaboratifs : l'organisateur définit des besoins, les invités s'engagent, la couverture se calcule automatiquement.",
+    category: "engagement",
+    icon: "HandHeart",
+    version: "1.0.0",
+    scope: "event",
+    settingsComponent: lazy(() => import("@/extensions/contributions/AdminSettings")),
+    widgets: [
+      {
+        key: "ext.contributions",
+        component: lazy(() => import("@/extensions/contributions/ContributionsWidget")),
+      },
+    ],
+  },
 ];
 
 
