@@ -3,6 +3,8 @@ import { useSession } from "@/core/auth/useSession";
 import { CORE_VERSION, DB_VERSION } from "@/core/version";
 import {
   Gauge,
+  Gift,
+
   LayoutGrid,
   MonitorSmartphone,
   Puzzle,
