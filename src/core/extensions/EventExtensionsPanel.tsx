@@ -120,7 +120,16 @@ export function EventExtensionsPanel({ eventId }: { eventId: string }) {
                     {
                       onSuccess: () => {
                         qc.invalidateQueries({ queryKey: extensionsQueryOptions.queryKey });
-                        toast.success(checked ? "Extension activée pour cet événement" : "Extension désactivée pour cet événement");
+                        qc.invalidateQueries({ queryKey: ["core", "event_extensions", eventId] });
+                        if (!checked) {
+                          toast.success("Extension désactivée pour cet événement");
+                        } else if (exclusiveWith.length > 0) {
+                          toast.success(
+                            `Extension activée — ${exclusiveWith.map((r) => r.name).join(", ")} désactivée pour cet événement`,
+                          );
+                        } else {
+                          toast.success("Extension activée pour cet événement");
+                        }
                       },
                       onError: (e: unknown) =>
                         toast.error(e instanceof Error ? e.message : "Erreur"),
