@@ -39,6 +39,7 @@ import { Route as AuthenticatedAppAdminRegistryRouteImport } from './routes/_aut
 import { Route as AuthenticatedAppAdminMenuComponentsRouteImport } from './routes/_authenticated/app.admin.menu-components'
 import { Route as AuthenticatedAppAdminExtensionsRouteImport } from './routes/_authenticated/app.admin.extensions'
 import { Route as AuthenticatedAppAdminEventTypesRouteImport } from './routes/_authenticated/app.admin.event-types'
+import { Route as AuthenticatedAppAdminContributionTypesRouteImport } from './routes/_authenticated/app.admin.contribution-types'
 import { Route as AuthenticatedAppAdminExtensionsInstallRouteImport } from './routes/_authenticated/app.admin.extensions.install'
 import { Route as AuthenticatedAppAdminExtensionsKeyRouteImport } from './routes/_authenticated/app.admin.extensions.$key'
 
@@ -205,6 +206,12 @@ const AuthenticatedAppAdminEventTypesRoute =
     path: '/event-types',
     getParentRoute: () => AuthenticatedAppAdminRoute,
   } as any)
+const AuthenticatedAppAdminContributionTypesRoute =
+  AuthenticatedAppAdminContributionTypesRouteImport.update({
+    id: '/contribution-types',
+    path: '/contribution-types',
+    getParentRoute: () => AuthenticatedAppAdminRoute,
+  } as any)
 const AuthenticatedAppAdminExtensionsInstallRoute =
   AuthenticatedAppAdminExtensionsInstallRouteImport.update({
     id: '/install',
@@ -234,6 +241,7 @@ export interface FileRoutesByFullPath {
   '/app/tokens': typeof AuthenticatedAppTokensRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/app/': typeof AuthenticatedAppIndexRoute
+  '/app/admin/contribution-types': typeof AuthenticatedAppAdminContributionTypesRoute
   '/app/admin/event-types': typeof AuthenticatedAppAdminEventTypesRoute
   '/app/admin/extensions': typeof AuthenticatedAppAdminExtensionsRouteWithChildren
   '/app/admin/menu-components': typeof AuthenticatedAppAdminMenuComponentsRoute
@@ -264,6 +272,7 @@ export interface FileRoutesByTo {
   '/app/tokens': typeof AuthenticatedAppTokensRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/app': typeof AuthenticatedAppIndexRoute
+  '/app/admin/contribution-types': typeof AuthenticatedAppAdminContributionTypesRoute
   '/app/admin/event-types': typeof AuthenticatedAppAdminEventTypesRoute
   '/app/admin/extensions': typeof AuthenticatedAppAdminExtensionsRouteWithChildren
   '/app/admin/menu-components': typeof AuthenticatedAppAdminMenuComponentsRoute
@@ -299,6 +308,7 @@ export interface FileRoutesById {
   '/_authenticated/app/tokens': typeof AuthenticatedAppTokensRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
+  '/_authenticated/app/admin/contribution-types': typeof AuthenticatedAppAdminContributionTypesRoute
   '/_authenticated/app/admin/event-types': typeof AuthenticatedAppAdminEventTypesRoute
   '/_authenticated/app/admin/extensions': typeof AuthenticatedAppAdminExtensionsRouteWithChildren
   '/_authenticated/app/admin/menu-components': typeof AuthenticatedAppAdminMenuComponentsRoute
@@ -334,6 +344,7 @@ export interface FileRouteTypes {
     | '/app/tokens'
     | '/invitation/$eventId/$invitationId'
     | '/app/'
+    | '/app/admin/contribution-types'
     | '/app/admin/event-types'
     | '/app/admin/extensions'
     | '/app/admin/menu-components'
@@ -364,6 +375,7 @@ export interface FileRouteTypes {
     | '/app/tokens'
     | '/invitation/$eventId/$invitationId'
     | '/app'
+    | '/app/admin/contribution-types'
     | '/app/admin/event-types'
     | '/app/admin/extensions'
     | '/app/admin/menu-components'
@@ -398,6 +410,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/tokens'
     | '/invitation/$eventId/$invitationId'
     | '/_authenticated/app/'
+    | '/_authenticated/app/admin/contribution-types'
     | '/_authenticated/app/admin/event-types'
     | '/_authenticated/app/admin/extensions'
     | '/_authenticated/app/admin/menu-components'
@@ -640,6 +653,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAdminEventTypesRouteImport
       parentRoute: typeof AuthenticatedAppAdminRoute
     }
+    '/_authenticated/app/admin/contribution-types': {
+      id: '/_authenticated/app/admin/contribution-types'
+      path: '/contribution-types'
+      fullPath: '/app/admin/contribution-types'
+      preLoaderRoute: typeof AuthenticatedAppAdminContributionTypesRouteImport
+      parentRoute: typeof AuthenticatedAppAdminRoute
+    }
     '/_authenticated/app/admin/extensions/install': {
       id: '/_authenticated/app/admin/extensions/install'
       path: '/install'
@@ -676,6 +696,7 @@ const AuthenticatedAppAdminExtensionsRouteWithChildren =
   )
 
 interface AuthenticatedAppAdminRouteChildren {
+  AuthenticatedAppAdminContributionTypesRoute: typeof AuthenticatedAppAdminContributionTypesRoute
   AuthenticatedAppAdminEventTypesRoute: typeof AuthenticatedAppAdminEventTypesRoute
   AuthenticatedAppAdminExtensionsRoute: typeof AuthenticatedAppAdminExtensionsRouteWithChildren
   AuthenticatedAppAdminMenuComponentsRoute: typeof AuthenticatedAppAdminMenuComponentsRoute
@@ -686,6 +707,8 @@ interface AuthenticatedAppAdminRouteChildren {
 }
 
 const AuthenticatedAppAdminRouteChildren: AuthenticatedAppAdminRouteChildren = {
+  AuthenticatedAppAdminContributionTypesRoute:
+    AuthenticatedAppAdminContributionTypesRoute,
   AuthenticatedAppAdminEventTypesRoute: AuthenticatedAppAdminEventTypesRoute,
   AuthenticatedAppAdminExtensionsRoute:
     AuthenticatedAppAdminExtensionsRouteWithChildren,
