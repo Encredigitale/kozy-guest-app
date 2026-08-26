@@ -28,7 +28,9 @@ const SECTIONS: Section[] = [
       { to: "/app/admin", label: "Tableau de bord", Icon: Gauge },
       { to: "/app/admin/event-types", label: "Types d'événement", Icon: Tags },
       { to: "/app/admin/menu-components", label: "Composantes de repas", Icon: UtensilsCrossed },
+      { to: "/app/admin/contribution-types", label: "Types d'apports", Icon: Gift },
     ],
+
   },
   {
     title: "Écrans",
