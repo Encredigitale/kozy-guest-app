@@ -3,7 +3,13 @@ import { useServerFn } from "@tanstack/react-start";
 import type { WidgetProps } from "@/core/registry/components";
 import { useSession } from "@/core/auth/useSession";
 import { useEvent } from "@/widgets/event-shared/queries";
-import { createInvitation, sendInvitation } from "@/lib/invitations.functions";
+import {
+  createInvitation,
+  markInvitationChannel,
+  sendInvitation,
+  sendInvitationSms,
+} from "@/lib/invitations.functions";
+import { COUNTRIES, DEFAULT_COUNTRY, looksLikePhone, maskPhone, toE164 } from "@/lib/phone";
 import {
   useContactBook,
   useEventInvitations,
@@ -11,7 +17,7 @@ import {
   useInvitationsConfig,
   type InvitationRow,
 } from "./useInvitations";
-import { STATUS_LABELS, invitationUrl, type InvitationStatus } from "./config";
+import { CHANNEL_LABELS, STATUS_LABELS, invitationUrl, renderSmsText, type InvitationStatus } from "./config";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +37,8 @@ import { toast } from "sonner";
 import {
   Copy,
   ExternalLink,
+  MessageSquare,
+  Phone,
   History,
   Mail,
   MoreHorizontal,
