@@ -46,13 +46,20 @@ export const DEFAULT_INVITATIONS_CONFIG: InvitationsConfig = {
   responseDeadlineDays: 1,
   expiresDays: 30,
   maxReminders: 2,
-  channels: ["link", "share", "email"],
+  channels: ["link", "share", "email", "sms"],
   inviteWithoutContact: true,
   guestVisibility: "organizer",
   remindersEnabled: true,
   templateInvitation: "{host} vous invite à {event}.",
   templateReminder: "Petit rappel : vous n'avez pas encore répondu à cette invitation.",
   templateConfirmation: "Votre participation est confirmée. À bientôt !",
+  phoneEnabled: true,
+  smsShareEnabled: true,
+  smsAutoEnabled: false,
+  allowedCountries: [],
+  defaultCountry: "FR",
+  templateSms: "{guest}, {host} vous invite à {event}. Consultez votre invitation et répondez ici : {link}",
+  smsSender: "Kosy",
 };
 
 export function normalizeConfig(raw: unknown): InvitationsConfig {
