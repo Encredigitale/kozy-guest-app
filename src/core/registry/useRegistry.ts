@@ -216,7 +216,7 @@ export function useSurfaceWidgets(surface: string, ctx: SurfaceContext = {}) {
         (w.manifest?.dependencies ?? []).every((d) => enabledIds.has(d)),
       )
       .sort((a, b) => a.order - b.order);
-  }, [q.data, surface, ctx.eventType, ctx.eventId, ctx.isAdmin, ctx.roles, ctx.contextualRoles, ctx.includeDrafts, enabledIds, eventOverrideMap, dashboardMap, roleBindingsByWidget]);
+  }, [q.data, surface, ctx.eventType, ctx.eventId, ctx.isAdmin, ctx.roles, ctx.contextualRoles, ctx.includeDrafts, enabledIds, eventOverrideMap, dashboardMap, roleBindingsByWidget, extensionStateMap]);
 
   return { ...q, data: placements };
 }
