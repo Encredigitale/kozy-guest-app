@@ -1,4 +1,10 @@
 import { normalizeConfig, type InvitationsConfig } from "@/extensions/invitations/config";
+import type {
+  PublicInvitationError,
+  PublicInvitationPayload,
+} from "@/extensions/invitations/public-types";
+
+export type { PublicInvitationError, PublicInvitationPayload };
 
 export function generateToken(): string {
   const bytes = new Uint8Array(24);
@@ -16,34 +22,7 @@ export async function loadConfig(): Promise<InvitationsConfig> {
   return normalizeConfig((data as { settings?: unknown } | null)?.settings);
 }
 
-export type PublicInvitationError =
-  | "invalid_token"
-  | "expired"
-  | "cancelled_event"
-  | "deleted";
 
-export type PublicInvitationPayload = {
-  invitationId: string;
-  eventId: string;
-  guestName: string | null;
-  status: string;
-  event: {
-    title: string;
-    description: string | null;
-    startsAt: string | null;
-    endsAt: string | null;
-    location: string | null;
-    typeLabel: string | null;
-    organizerName: string | null;
-  };
-  config: {
-    allowMaybe: boolean;
-    allowChangeResponse: boolean;
-    contributionsEnabled: boolean;
-  };
-  responseClosed: boolean;
-  contribution: string | null;
-};
 
 /** Vérifie le token côté serveur et renvoie une charge utile publique minimale. */
 export async function resolvePublicInvitation(input: {

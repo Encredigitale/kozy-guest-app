@@ -7,7 +7,7 @@ import {
   respondToInvitation,
   savePublicContribution,
 } from "@/lib/invitations.functions";
-import type { PublicInvitationPayload } from "@/lib/invitations.server";
+import type { PublicInvitationPayload } from "@/extensions/invitations/public-types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
