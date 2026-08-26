@@ -5,15 +5,19 @@ import { getBaseUrl, sendBrevoEmail } from "@/lib/email-delivery.server";
 import { renderInvitationEmail } from "@/lib/email-templates";
 import { generateToken, loadConfig, resolvePublicInvitation } from "@/lib/invitations.server";
 import { invitationUrl } from "@/extensions/invitations/config";
+import { toE164 } from "@/lib/phone";
 
 const guestSchema = z.object({
   eventId: z.string().uuid(),
   name: z.string().trim().max(120).optional(),
   email: z.string().trim().email().max(255).optional(),
   phone: z.string().trim().max(40).optional(),
+  /** Code pays ISO utilisé pour normaliser le numéro saisi. */
+  country: z.string().trim().length(2).optional(),
   contactId: z.string().uuid().nullable().optional(),
   saveToContacts: z.boolean().optional(),
 });
+
 
 /** Crée une invitation (contact existant, membre, nouveau contact ou invité ponctuel). */
 export const createInvitation = createServerFn({ method: "POST" })
