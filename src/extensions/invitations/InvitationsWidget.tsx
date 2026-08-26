@@ -80,6 +80,9 @@ export default function InvitationsWidget({ config }: WidgetProps) {
   const [search, setSearch] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [country, setCountry] = useState(DEFAULT_COUNTRY);
+  const [showForm, setShowForm] = useState(false);
   const [saveContact, setSaveContact] = useState(true);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
@@ -88,18 +91,35 @@ export default function InvitationsWidget({ config }: WidgetProps) {
 
   const addInvitation = useServerFn(createInvitation);
   const send = useServerFn(sendInvitation);
+  const markChannel = useServerFn(markInvitationChannel);
+  const sendSms = useServerFn(sendInvitationSms);
 
   const isOrganizer = !!ev && !!user && ev.organizer_id === user.id;
   const origin = typeof window === "undefined" ? "" : window.location.origin;
 
+  const searchIsPhone = looksLikePhone(search);
+  const searchE164 = searchIsPhone ? toE164(search, cfg?.defaultCountry ?? country) : null;
+
   const suggestions = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return [];
+    const qDigits = q.replace(/\D/g, "");
     return contacts
-      .filter((c) => `${c.name} ${c.email}`.toLowerCase().includes(q))
+      .filter((c) => {
+        const haystack = `${c.name} ${c.email}`.toLowerCase();
+        if (haystack.includes(q)) return true;
+        if (!qDigits) return false;
+        const cDigits = `${c.phone} ${c.phoneE164}`.replace(/\D/g, "");
+        return cDigits.includes(qDigits);
+      })
       .filter((c) => !invitations.some((i) => i.contact_id === c.id || (c.email && i.email === c.email)))
       .slice(0, 5);
   }, [contacts, search, invitations]);
+
+  const recent = useMemo(
+    () => contacts.filter((c) => !invitations.some((i) => i.contact_id === c.id)).slice(-3).reverse(),
+    [contacts, invitations],
+  );
 
   const counts = useMemo(() => {
     const by = (s: InvitationStatus) => invitations.filter((i) => i.status === s).length;
@@ -112,7 +132,13 @@ export default function InvitationsWidget({ config }: WidgetProps) {
     };
   }, [invitations]);
 
-  const add = async (input: { name?: string; email?: string; contactId?: string | null; save: boolean }) => {
+  const add = async (input: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    contactId?: string | null;
+    save: boolean;
+  }) => {
     setAdding(true);
     try {
       const result = await addInvitation({
@@ -120,6 +146,8 @@ export default function InvitationsWidget({ config }: WidgetProps) {
           eventId,
           name: input.name || undefined,
           email: input.email || undefined,
+          phone: input.phone || undefined,
+          country,
           contactId: input.contactId ?? null,
           saveToContacts: input.save,
         },
@@ -127,7 +155,10 @@ export default function InvitationsWidget({ config }: WidgetProps) {
       setSearch("");
       setName("");
       setEmail("");
+      setPhone("");
+      setShowForm(false);
       invalidate();
+
       const created = result.invitation as unknown as InvitationRow;
       if (created.email) {
         try {
