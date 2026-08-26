@@ -126,7 +126,7 @@ export function AppShell() {
       <main className="flex-1 overflow-x-hidden flex flex-col">
         <header className="h-14 border-b border-border/60 flex items-center justify-between px-4 gap-2 shrink-0">
           <Link to="/app" className="font-serif text-xl tracking-tight text-primary">
-            Framework
+            Kosy
           </Link>
           <div className="flex items-center gap-2">
             <span className="hidden md:inline text-xs text-muted-foreground truncate max-w-[200px]">
