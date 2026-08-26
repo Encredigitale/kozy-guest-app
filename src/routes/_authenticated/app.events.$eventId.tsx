@@ -28,7 +28,7 @@ function EventDetailPage() {
         <ChevronLeft className="h-4 w-4" /> Retour
       </Link>
       <WidgetRenderer surface="event.detail" layout="accordion" eventId={eventId} contextualRoles={contextualRoles} context={{ eventId }} />
-      {isOrganizer && <EventExtensionsPanel eventId={eventId} />}
+      {isAdmin && <EventExtensionsPanel eventId={eventId} />}
     </div>
   );
 }
