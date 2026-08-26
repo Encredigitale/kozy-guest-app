@@ -324,9 +324,10 @@ export default function InvitationsWidget({ config }: WidgetProps) {
 
         {isOrganizer && (
           <div className="space-y-3 rounded-2xl border border-border/60 bg-background p-3">
+            <p className="text-sm font-medium">Ajouter des invités</p>
             <div className="relative">
               <Input
-                placeholder="Rechercher dans mon carnet d'adresses…"
+                placeholder={cfg?.phoneEnabled === false ? "Nom ou e-mail" : "Nom, e-mail ou téléphone"}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="rounded-2xl h-11"
@@ -338,17 +339,19 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                       <button
                         type="button"
                         disabled={adding}
-                        onClick={() => add({ name: c.name, email: c.email, contactId: c.id, save: false })}
+                        onClick={() =>
+                          add({ name: c.name, email: c.email, phone: c.phone || c.phoneE164, contactId: c.id, save: false })
+                        }
                         className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-accent"
                       >
                         <Avatar className="h-9 w-9">
                           {c.avatarUrl ? <AvatarImage src={c.avatarUrl} alt="" /> : null}
-                          <AvatarFallback>{initials(c.name || c.email)}</AvatarFallback>
+                          <AvatarFallback>{initials(c.name || c.email || c.phone)}</AvatarFallback>
                         </Avatar>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate text-sm font-medium">{c.name || c.email}</span>
+                          <span className="block truncate text-sm font-medium">{c.name || c.email || maskPhone(c.phone, c.phoneE164)}</span>
                           <span className="block truncate text-xs text-muted-foreground">
-                            {[c.email, c.phone, c.group].filter(Boolean).join(" · ")}
+                            {[c.email, maskPhone(c.phone, c.phoneE164), c.group].filter(Boolean).join(" · ")}
                           </span>
                         </span>
                         <span className="text-xs text-muted-foreground">Ajouter</span>
@@ -359,46 +362,142 @@ export default function InvitationsWidget({ config }: WidgetProps) {
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <Input
-                placeholder="Prénom et nom"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="rounded-2xl h-11"
-              />
-              <Input
-                type="email"
-                placeholder="email@exemple.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="rounded-2xl h-11"
-              />
-            </div>
+            {search.trim() && suggestions.length === 0 && !showForm && (
+              <div className="rounded-2xl border border-dashed border-border p-3 space-y-2">
+                <p className="text-sm text-muted-foreground">Aucun contact trouvé</p>
+                <Button
+                  variant="outline"
+                  className="rounded-full h-10"
+                  onClick={() => {
+                    if (searchIsPhone) setPhone(search.trim());
+                    else if (search.includes("@")) setEmail(search.trim());
+                    else setName(search.trim());
+                    setShowForm(true);
+                  }}
+                >
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  {searchE164 ? `Inviter le ${search.trim()}` : "Ajouter un nouveau contact"}
+                </Button>
+              </div>
+            )}
 
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              {cfg?.inviteWithoutContact ? (
-                <div className="flex items-center gap-2">
-                  <Checkbox
-                    id="save-contact"
-                    checked={saveContact}
-                    onCheckedChange={(v) => setSaveContact(v === true)}
-                  />
-                  <Label htmlFor="save-contact" className="text-xs text-muted-foreground">
-                    Enregistrer dans mes contacts
-                  </Label>
+            {!search.trim() && !showForm && recent.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">Contacts récents</p>
+                <div className="flex flex-wrap gap-2">
+                  {recent.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      disabled={adding}
+                      onClick={() =>
+                        add({ name: c.name, email: c.email, phone: c.phone || c.phoneE164, contactId: c.id, save: false })
+                      }
+                      className="rounded-full border border-border px-3 py-1.5 text-xs hover:bg-accent"
+                    >
+                      {c.name || c.email || maskPhone(c.phone, c.phoneE164)}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(true)}
+                    className="rounded-full border border-dashed border-border px-3 py-1.5 text-xs hover:bg-accent"
+                  >
+                    + Ajouter un nouveau contact
+                  </button>
                 </div>
-              ) : (
-                <span className="text-xs text-muted-foreground">Le contact sera enregistré dans le carnet.</span>
-              )}
-              <Button
-                onClick={() => add({ name, email, save: cfg?.inviteWithoutContact ? saveContact : true })}
-                disabled={adding || (!name.trim() && !email.trim())}
-                className="rounded-full h-11 px-4"
-              >
-                <UserPlus className="h-4 w-4 mr-2" />
-                {saveContact || !cfg?.inviteWithoutContact ? "Créer et inviter" : "Inviter"}
-              </Button>
-            </div>
+              </div>
+            )}
+
+            {showForm && (
+              <div className="space-y-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <Input
+                    placeholder="Prénom (obligatoire)"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="rounded-2xl h-11"
+                  />
+                  <Input
+                    type="email"
+                    placeholder="email@exemple.com (facultatif)"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="rounded-2xl h-11"
+                  />
+                </div>
+
+                {cfg?.phoneEnabled !== false && (
+                  <div className="flex gap-2">
+                    <select
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value)}
+                      className="h-11 rounded-2xl border border-input bg-background px-2 text-sm"
+                      aria-label="Indicatif pays"
+                    >
+                      {COUNTRIES.filter(
+                        (c) => !cfg?.allowedCountries?.length || cfg.allowedCountries.includes(c.code),
+                      ).map((c) => (
+                        <option key={c.code} value={c.code}>
+                          {c.flag} +{c.dial}
+                        </option>
+                      ))}
+                    </select>
+                    <Input
+                      type="tel"
+                      placeholder="06 12 34 56 78"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="rounded-2xl h-11 flex-1"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {showForm && (
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                {cfg?.inviteWithoutContact ? (
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="save-contact"
+                      checked={saveContact}
+                      onCheckedChange={(v) => setSaveContact(v === true)}
+                    />
+                    <Label htmlFor="save-contact" className="text-xs text-muted-foreground">
+                      Enregistrer dans mes contacts
+                    </Label>
+                  </div>
+                ) : (
+                  <span className="text-xs text-muted-foreground">Le contact sera enregistré dans le carnet.</span>
+                )}
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    className="rounded-full h-11"
+                    onClick={() => {
+                      setShowForm(false);
+                      setName("");
+                      setEmail("");
+                      setPhone("");
+                    }}
+                  >
+                    Annuler
+                  </Button>
+                  <Button
+                    onClick={() =>
+                      add({ name, email, phone, save: cfg?.inviteWithoutContact ? saveContact : true })
+                    }
+                    disabled={adding || (!name.trim() && !email.trim() && !phone.trim())}
+                    className="rounded-full h-11 px-4"
+                  >
+                    <UserPlus className="h-4 w-4 mr-2" />
+                    Ajouter et inviter
+                  </Button>
+                </div>
+              </div>
+            )}
+
           </div>
         )}
 
