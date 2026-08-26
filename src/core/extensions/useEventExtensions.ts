@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import type { EventExtensionRow } from "./types";
+import { conflictingExtensionKeys } from "./exclusivity";
 
 /** Per-event activation/deactivation of extensions. */
 export function useEventExtensions(eventId: string) {
@@ -22,16 +23,21 @@ export function useEventExtensions(eventId: string) {
 
   const setEnabled = useMutation({
     mutationFn: async (input: { extensionKey: string; enabled: boolean }) => {
+      // Exclusivité mutuelle : activer une extension désactive les extensions
+      // du même groupe (ex. « Contributions » vs « Invité apporte »).
+      const rows = [
+        { event_id: eventId, extension_key: input.extensionKey, enabled: input.enabled },
+        ...(input.enabled
+          ? conflictingExtensionKeys(input.extensionKey).map((k) => ({
+              event_id: eventId,
+              extension_key: k,
+              enabled: false,
+            }))
+          : []),
+      ];
       const { error } = await supabase
         .from("event_extensions")
-        .upsert(
-          {
-            event_id: eventId,
-            extension_key: input.extensionKey,
-            enabled: input.enabled,
-          },
-          { onConflict: "event_id,extension_key" },
-        );
+        .upsert(rows, { onConflict: "event_id,extension_key" });
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: key }),

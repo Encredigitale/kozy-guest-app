@@ -30,6 +30,8 @@ import {
   type NeedType,
 } from "./config";
 import { NeedIcon } from "./icons";
+import { useSession } from "@/core/auth/useSession";
+import { useEvent } from "@/widgets/event-shared/queries";
 import {
   useContributionCatalog,
   useContributionsConfig,
@@ -62,6 +64,10 @@ const emptyDraft = (allowOver: boolean): DraftNeed => ({
 
 export default function ContributionsWidget({ config }: WidgetProps) {
   const eventId = (config?.eventId as string) ?? "";
+  const { user } = useSession();
+  const { data: eventRow } = useEvent(eventId);
+  // Seul le créateur de l'événement peut définir et gérer les besoins.
+  const isOrganizer = !!user && !!eventRow && eventRow.organizer_id === user.id;
   const { data: catalog } = useContributionCatalog();
   const { data: settings } = useContributionsConfig();
   const { needs, commitments, isLoading, createNeed, updateNeed, deleteNeed } = useEventNeeds(eventId);
@@ -151,14 +157,16 @@ export default function ContributionsWidget({ config }: WidgetProps) {
               <CardDescription>Ce qu'il nous manque pour cet événement.</CardDescription>
             </div>
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            className="rounded-full"
-            onClick={() => setDraft(emptyDraft(settings?.allowOvercommitmentDefault ?? false))}
-          >
-            <Plus className="mr-1 h-4 w-4" /> Ajouter un besoin
-          </Button>
+          {isOrganizer && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-full"
+              onClick={() => setDraft(emptyDraft(settings?.allowOvercommitmentDefault ?? false))}
+            >
+              <Plus className="mr-1 h-4 w-4" /> Ajouter un besoin
+            </Button>
+          )}
         </div>
       </CardHeader>
 
@@ -168,9 +176,11 @@ export default function ContributionsWidget({ config }: WidgetProps) {
         {!isLoading && rows.length === 0 && (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              Aucun besoin pour le moment. Ajoutez ce dont vous avez besoin, vos invités pourront s'en charger.
+              {isOrganizer
+                ? "Aucun besoin pour le moment. Ajoutez ce dont vous avez besoin, vos invités pourront s'en charger."
+                : "L'organisateur n'a pas encore défini de besoins pour cet événement."}
             </p>
-            {suggestions.length > 0 && (
+            {isOrganizer && suggestions.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {suggestions.map((s) => (
                   <Button
@@ -259,6 +269,7 @@ export default function ContributionsWidget({ config }: WidgetProps) {
                 </ul>
               )}
 
+              {isOrganizer && (
               <div className="flex flex-wrap gap-2 pt-1">
                 <Button
                   size="sm"
@@ -303,6 +314,7 @@ export default function ContributionsWidget({ config }: WidgetProps) {
                   <Trash2 className="mr-1 h-3 w-3" /> Supprimer
                 </Button>
               </div>
+              )}
             </div>
           ))}
         </div>

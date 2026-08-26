@@ -39,6 +39,10 @@ export async function isGuestBringsEnabled(eventId: string, eventTypeKey: string
     .maybeSingle();
   if ((override as { enabled?: boolean } | null)?.enabled === false) return false;
 
+  // Exclusivité mutuelle avec le plugin « Contributions ».
+  const { isExclusiveWinner } = await import("@/lib/extension-exclusivity.server");
+  if (!(await isExclusiveWinner(eventId, "guest-brings"))) return false;
+
   if (config.eventTypeKeys.length > 0 && (!eventTypeKey || !config.eventTypeKeys.includes(eventTypeKey))) {
     return false;
   }
