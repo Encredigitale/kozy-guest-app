@@ -131,9 +131,12 @@ export function WidgetRenderer({
 function RenderOne({
   placement,
   extra,
+  bare,
 }: {
   placement: import("./types").ResolvedPlacement;
   extra?: Record<string, unknown>;
+  /** Aplatit la carte du widget quand il est déjà encadré (accordéon). */
+  bare?: boolean;
 }) {
   const { widget: w, config } = placement;
   const Component = resolveWidgetComponent(w.manifest.component);
@@ -141,9 +144,16 @@ function RenderOne({
     return null;
   }
   const merged = { ...config, ...(extra ?? {}) };
-  return (
+  const content = (
     <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Chargement…</div>}>
       <Component config={merged} />
     </Suspense>
   );
+  if (!bare) return content;
+  return (
+    <div className="[&>*]:border-0 [&>*]:bg-transparent [&>*]:shadow-none [&>*]:rounded-none [&>*]:p-0">
+      {content}
+    </div>
+  );
 }
+
