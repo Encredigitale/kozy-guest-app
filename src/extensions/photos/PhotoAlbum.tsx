@@ -90,7 +90,7 @@ export default function PhotoAlbum({
   const pendingUploads = useMemo(() => queue.filter((q) => q.status !== "done"), [queue]);
   const remaining = Math.max(0, access.maxPerEvent - total);
 
-  const pick = (files: FileList | null, ref: React.RefObject<HTMLInputElement>) => {
+  const pick = (files: FileList | null, ref: React.RefObject<HTMLInputElement | null>) => {
     if (!files || files.length === 0) return;
     const list = Array.from(files).slice(0, access.maxPerUpload);
     if (list.length > remaining) {
