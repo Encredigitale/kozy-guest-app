@@ -231,6 +231,8 @@ function PublicInvitationPage() {
           <GuestBringsBlock eventId={eventId} invitationId={invitationId} token={token} accepted />
         )}
 
+        {token && <PhotosBlock eventId={eventId} invitationId={invitationId} token={token} />}
+
         {p.status === "accepted" && p.config.contributionsEnabled && (
 
           <Card className="rounded-3xl border-border/60">
