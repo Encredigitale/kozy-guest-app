@@ -45,7 +45,9 @@ export const listEventPhotos = createServerFn({ method: "POST" })
     const config = await loadPhotosConfig();
     const db = await admin();
 
-    const statuses = access.canModerate ? ["published", "hidden"] : ["published"];
+    const statuses: Array<"published" | "hidden"> = access.canModerate
+      ? ["published", "hidden"]
+      : ["published"];
     const { data: rows, count } = await db
       .from("event_photos")
       .select("*", { count: "exact" })
