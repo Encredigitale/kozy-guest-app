@@ -195,6 +195,23 @@ export const EXTENSIONS: ExtensionDefinition[] = [
       },
     ],
   },
+  {
+    key: "photos",
+    name: "Photos de l'événement",
+    description:
+      "Album collaboratif privé : ajout depuis mobile, optimisation automatique, visionneuse, modération et signalements.",
+    category: "memories",
+    icon: "Camera",
+    version: "1.0.0",
+    scope: "event",
+    settingsComponent: lazy(() => import("@/extensions/photos/AdminSettings")),
+    widgets: [
+      {
+        key: "ext.photos",
+        component: lazy(() => import("@/extensions/photos/PhotosWidget")),
+      },
+    ],
+  },
 ];
 
 
