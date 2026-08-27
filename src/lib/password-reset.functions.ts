@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getBaseUrl, sendBrevoEmail } from "@/lib/email-delivery.server";
-import { renderKosyEmail } from "@/lib/email-templates";
+import { renderKozyEmail } from "@/lib/email-templates";
 
 /**
  * Envoie l'e-mail de réinitialisation via Brevo (le SMTP Supabase n'est pas utilisé).
@@ -25,9 +25,9 @@ export const sendPasswordResetEmail = createServerFn({ method: "POST" })
     // Compte inexistant : on reste neutre.
     if (error || !link?.properties?.action_link) return { ok: true as const };
 
-    const html = renderKosyEmail({
+    const html = renderKozyEmail({
       title: "Réinitialisation de votre mot de passe",
-      preheader: "Choisissez un nouveau mot de passe Kosy.",
+      preheader: "Choisissez un nouveau mot de passe Kozy.",
       greeting: "Bonjour,",
       paragraphs: [
         "Vous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour en choisir un nouveau.",
@@ -41,7 +41,7 @@ export const sendPasswordResetEmail = createServerFn({ method: "POST" })
 
     await sendBrevoEmail(
       email,
-      "Réinitialisation de votre mot de passe — Kosy",
+      "Réinitialisation de votre mot de passe — Kozy",
       html,
       `Réinitialisez votre mot de passe : ${link.properties.action_link}`,
     );

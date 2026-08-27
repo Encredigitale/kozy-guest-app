@@ -169,6 +169,9 @@ export function useSurfaceWidgets(surface: string, ctx: SurfaceContext = {}) {
         if (surface === "event.detail" && ctx.eventId) {
           const ov = eventOverrideMap.get(w.id);
           if (ov && ov.enabled === false) return null;
+          // Sélection à la création : si l'événement a une sélection de blocs,
+          // n'afficher que ceux-ci (les extensions restent pilotées par event_extensions).
+          if (!ov && eventOverrideMap.size > 0 && !w.id.startsWith("ext.")) return null;
           const size = (ov?.size ?? w.size ?? "full") as WidgetSize;
           const order = ov ? ov.position : (w.manifest?.order ?? 0);
           return {

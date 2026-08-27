@@ -21,7 +21,7 @@ export const Route = createFileRoute("/signup")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Créer un compte — Framework" },
+      { title: "Créer un compte — Kozy" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -83,7 +83,7 @@ function SignupPage() {
       <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <Link to="/" className="font-serif text-3xl tracking-tight text-primary">Kosy</Link>
+            <Link to="/" className="font-serif text-3xl tracking-tight text-primary">Kozy</Link>
           </div>
           <Card className="rounded-3xl border-border/60 shadow-none">
             <CardHeader className="text-center">
@@ -128,7 +128,7 @@ function SignupPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="font-serif text-3xl tracking-tight text-primary">Framework</Link>
+          <Link to="/" className="font-serif text-3xl tracking-tight text-primary">Kozy</Link>
         </div>
         <Card className="rounded-3xl border-border/60 shadow-none">
           <CardHeader>

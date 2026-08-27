@@ -96,11 +96,13 @@ export default function EventInfoWidget({ config }: WidgetProps) {
               </div>
             )}
             <div className="min-w-0">
-              <CardTitle className="text-lg font-serif tracking-tight truncate">{ev.title}</CardTitle>
+              <CardTitle className="text-lg font-serif tracking-tight break-words">{ev.title}</CardTitle>
               {typeKey && <p className="text-xs text-muted-foreground mt-0.5">{typeLabel}</p>}
             </div>
           </div>
-          <Badge className="mt-2" variant={ev.status === "published" ? "default" : "secondary"}>{ev.status}</Badge>
+          <Badge className="mt-2" variant={ev.status === "published" ? "default" : "secondary"}>
+            {ev.status === "published" ? "Publié" : ev.status === "archived" ? "Archivé" : "Brouillon"}
+          </Badge>
         </div>
         {isOrganizer && (
           <div className="flex gap-2">
@@ -114,13 +116,13 @@ export default function EventInfoWidget({ config }: WidgetProps) {
           <Input value={draft.title} disabled={!isOrganizer} onChange={(e) => setDraft({ ...draft, title: e.target.value })} /></div>
         <div className="space-y-2"><Label>Description</Label>
           <Textarea value={draft.description ?? ""} disabled={!isOrganizer} onChange={(e) => setDraft({ ...draft, description: e.target.value })} /></div>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-2"><Label>Date de début</Label>
-            <Input type="datetime-local" disabled={!isOrganizer}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="space-y-2 min-w-0"><Label>Date de début</Label>
+            <Input className="w-full min-w-0" type="datetime-local" disabled={!isOrganizer}
               value={draft.starts_at ? new Date(draft.starts_at).toISOString().slice(0, 16) : ""}
               onChange={(e) => setDraft({ ...draft, starts_at: e.target.value ? new Date(e.target.value).toISOString() : null })} /></div>
-          <div className="space-y-2"><Label>Lieu</Label>
-            <Input value={draft.location ?? ""} disabled={!isOrganizer} onChange={(e) => setDraft({ ...draft, location: e.target.value })} /></div>
+          <div className="space-y-2 min-w-0"><Label>Lieu</Label>
+            <Input className="w-full min-w-0" value={draft.location ?? ""} disabled={!isOrganizer} onChange={(e) => setDraft({ ...draft, location: e.target.value })} /></div>
         </div>
         {isOrganizer && (
           <>

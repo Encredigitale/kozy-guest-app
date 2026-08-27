@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useActiveExtensions } from "@/core/extensions";
 
 export const Route = createFileRoute("/_authenticated/app/x/$")({
-  head: () => ({ meta: [{ title: "Extension — Framework" }] }),
+  head: () => ({ meta: [{ title: "Extension — Kozy" }] }),
   component: ExtensionHost,
 });
 

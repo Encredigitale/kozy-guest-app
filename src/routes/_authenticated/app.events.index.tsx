@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app/events/")({
-  head: () => ({ meta: [{ title: "Événements — Framework" }] }),
+  head: () => ({ meta: [{ title: "Événements — Kozy" }] }),
   component: EventsListPage,
 });
 

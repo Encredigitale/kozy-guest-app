@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/app/profile")({
-  head: () => ({ meta: [{ title: "Mon profil — Framework" }] }),
+  head: () => ({ meta: [{ title: "Mon profil — Kozy" }] }),
   component: ProfilePage,
 });
 

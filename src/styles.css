@@ -17,7 +17,7 @@
  * 1. Add the variable to :root (light value) and .dark (dark value)
  * 2. Register it in @theme inline as --color-<name>: var(--<name>)
  *
- * Palette Kosy actuelle :
+ * Palette Kozy actuelle :
  *   - Bleu marine   #03224C  oklch(0.26 0.087 217.429)
  *   - Bleu bardeau  #6888C6  oklch(0.631 0.075 228.699)
  *   - Bleu dragée   #C1DFF4  oklch(0.892 0.015 221.737)

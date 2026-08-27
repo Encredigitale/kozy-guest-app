@@ -1,6 +1,6 @@
 import { getRequest } from "@tanstack/react-start/server";
 
-export const KOSY_EMAIL_SENDER = { name: "Kosy", email: "contact@obolia.com" } as const;
+export const KOSY_EMAIL_SENDER = { name: "Kozy", email: "contact@obolia.com" } as const;
 
 export function getBaseUrl(): string {
   try {

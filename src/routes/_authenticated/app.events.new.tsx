@@ -7,7 +7,7 @@ import { useSurfaceWidgets } from "@/core/registry/useRegistry";
 import { resolveWidgetComponent } from "@/core/registry/components";
 
 export const Route = createFileRoute("/_authenticated/app/events/new")({
-  head: () => ({ meta: [{ title: "Nouvel événement — Framework" }] }),
+  head: () => ({ meta: [{ title: "Nouvel événement — Kozy" }] }),
   component: NewEventPage,
 });
 

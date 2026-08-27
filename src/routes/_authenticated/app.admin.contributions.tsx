@@ -23,12 +23,12 @@ import {
 export const Route = createFileRoute("/_authenticated/app/admin/contributions")({
   head: () => ({
     meta: [
-      { title: "Contributions — Référentiels | Kosy Admin" },
+      { title: "Contributions — Référentiels | Kozy Admin" },
       {
         name: "description",
         content: "Administrez les catégories, unités et suggestions du plugin Contributions.",
       },
-      { property: "og:title", content: "Contributions — Référentiels | Kosy Admin" },
+      { property: "og:title", content: "Contributions — Référentiels | Kozy Admin" },
       { property: "og:description", content: "Catégories, unités, suggestions et paramètres des contributions." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
