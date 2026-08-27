@@ -17,7 +17,7 @@ import { Plus, Trash2 } from "lucide-react";
 import type { WidgetManifest, WidgetRow } from "@/core/registry/types";
 
 export const Route = createFileRoute("/_authenticated/app/admin/registry")({
-  head: () => ({ meta: [{ title: "Registry — Framework" }] }),
+  head: () => ({ meta: [{ title: "Registry — Kozy" }] }),
   component: RegistryPage,
 });
 

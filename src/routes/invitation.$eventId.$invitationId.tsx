@@ -22,9 +22,9 @@ export const Route = createFileRoute("/invitation/$eventId/$invitationId")({
   validateSearch: z.object({ token: z.string().optional() }),
   head: () => ({
     meta: [
-      { title: "Votre invitation — Kosy" },
+      { title: "Votre invitation — Kozy" },
       { name: "description", content: "Consultez votre invitation et répondez en un clic, sans créer de compte." },
-      { property: "og:title", content: "Votre invitation — Kosy" },
+      { property: "og:title", content: "Votre invitation — Kozy" },
       { property: "og:description", content: "Consultez votre invitation et répondez en un clic." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

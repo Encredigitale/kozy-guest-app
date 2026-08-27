@@ -11,8 +11,8 @@ export const Route = createFileRoute("/verify-email")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Validation de votre e-mail — Kosy" },
-      { name: "description", content: "Confirmez votre adresse e-mail pour activer votre compte Kosy." },
+      { title: "Validation de votre e-mail — Kozy" },
+      { name: "description", content: "Confirmez votre adresse e-mail pour activer votre compte Kozy." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -42,7 +42,7 @@ function VerifyEmailPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="font-serif text-3xl tracking-tight text-primary">Kosy</Link>
+          <Link to="/" className="font-serif text-3xl tracking-tight text-primary">Kozy</Link>
         </div>
         <Card className="rounded-3xl border-border/60 shadow-none">
           <CardHeader className="text-center">

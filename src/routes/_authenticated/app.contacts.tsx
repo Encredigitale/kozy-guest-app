@@ -5,7 +5,7 @@ import { resolveWidgetComponent } from "@/core/registry/components";
 export const Route = createFileRoute("/_authenticated/app/contacts")({
   head: () => ({
     meta: [
-      { title: "Contacts — Framework" },
+      { title: "Contacts — Kozy" },
       { name: "description", content: "Votre carnet d'adresses personnel." },
     ],
   }),

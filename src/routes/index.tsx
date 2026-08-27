@@ -13,13 +13,13 @@ const heroImg = heroAsset.url;
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Kosy — Organisez vos moments et gardez-en le souvenir" },
+      { title: "Kozy — Organisez vos moments et gardez-en le souvenir" },
       {
         name: "description",
         content:
-          "Kosy vous aide à organiser vos repas, anniversaires et moments entre proches, puis à en garder le souvenir.",
+          "Kozy vous aide à organiser vos repas, anniversaires et moments entre proches, puis à en garder le souvenir.",
       },
-      { property: "og:title", content: "Kosy" },
+      { property: "og:title", content: "Kozy" },
       {
         property: "og:description",
         content: "Organisez vos moments et gardez-en le souvenir.",
@@ -63,7 +63,7 @@ function Landing() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="max-w-6xl mx-auto flex items-center justify-between px-6 py-5">
-        <div className="font-serif text-2xl tracking-tight text-primary">Kosy</div>
+        <div className="font-serif text-2xl tracking-tight text-primary">Kozy</div>
         <Button asChild variant="ghost" size="sm">
           <Link to="/login">Se connecter</Link>
         </Button>
@@ -172,7 +172,7 @@ function Landing() {
             Prêt à créer votre prochain moment ?
           </h2>
           <p className="text-muted-foreground mb-8">
-            Rejoignez Kosy et rassemblez ceux qui comptent.
+            Rejoignez Kozy et rassemblez ceux qui comptent.
           </p>
           <Button asChild size="lg" className="rounded-full px-10">
             <Link to="/signup">Commencer</Link>
@@ -182,8 +182,8 @@ function Landing() {
 
       <footer className="border-t border-border/60">
         <div className="max-w-6xl mx-auto px-6 py-8 text-sm text-muted-foreground flex flex-wrap gap-4 justify-between">
-          <div>© {new Date().getFullYear()} Kosy</div>
-          <div className="font-serif text-primary">Kosy</div>
+          <div>© {new Date().getFullYear()} Kozy</div>
+          <div className="font-serif text-primary">Kozy</div>
         </div>
       </footer>
     </div>

@@ -10,10 +10,10 @@ import { Plus, Sparkles } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
     meta: [
-      { title: "Accueil — Kosy" },
-      { name: "description", content: "Votre tableau de bord Kosy." },
-      { property: "og:title", content: "Accueil — Kosy" },
-      { property: "og:description", content: "Votre tableau de bord Kosy." },
+      { title: "Accueil — Kozy" },
+      { name: "description", content: "Votre tableau de bord Kozy." },
+      { property: "og:title", content: "Accueil — Kozy" },
+      { property: "og:description", content: "Votre tableau de bord Kozy." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

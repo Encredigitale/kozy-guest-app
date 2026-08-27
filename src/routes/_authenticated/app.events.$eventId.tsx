@@ -6,7 +6,7 @@ import { useEvent, useParticipants } from "@/widgets/event-shared/queries";
 import { EventExtensionsPanel } from "@/core/extensions/EventExtensionsPanel";
 
 export const Route = createFileRoute("/_authenticated/app/events/$eventId")({
-  head: () => ({ meta: [{ title: "Événement — Framework" }] }),
+  head: () => ({ meta: [{ title: "Événement — Kozy" }] }),
   component: EventDetailPage,
 });
 

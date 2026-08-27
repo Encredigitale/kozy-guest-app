@@ -14,7 +14,7 @@ import type { WidgetRow } from "@/core/registry/types";
 export const Route = createFileRoute("/_authenticated/app/admin/screens")({
   head: () => ({
     meta: [
-      { title: "Gestion des écrans — Admin Kosy" },
+      { title: "Gestion des écrans — Admin Kozy" },
       { name: "description", content: "Surfaces d'affichage de l'application et widgets associés." },
     ],
   }),
