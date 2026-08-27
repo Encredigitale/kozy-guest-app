@@ -601,6 +601,108 @@ export type Database = {
           },
         ]
       }
+      event_photos: {
+        Row: {
+          author_label: string | null
+          created_at: string
+          crop_height: number | null
+          crop_width: number | null
+          crop_x: number | null
+          crop_y: number | null
+          deleted_at: string | null
+          description: string | null
+          event_id: string
+          height: number
+          id: string
+          invitation_id: string | null
+          is_cover: boolean
+          large_storage_path: string
+          medium_storage_path: string
+          mime_type: string
+          moderation_status: string
+          optimized_file_size: number
+          original_file_size: number
+          original_retention_until: string | null
+          original_storage_path: string | null
+          status: Database["public"]["Enums"]["event_photo_status"]
+          thumbnail_storage_path: string
+          updated_at: string
+          uploaded_by_user_id: string | null
+          width: number
+        }
+        Insert: {
+          author_label?: string | null
+          created_at?: string
+          crop_height?: number | null
+          crop_width?: number | null
+          crop_x?: number | null
+          crop_y?: number | null
+          deleted_at?: string | null
+          description?: string | null
+          event_id: string
+          height?: number
+          id?: string
+          invitation_id?: string | null
+          is_cover?: boolean
+          large_storage_path: string
+          medium_storage_path: string
+          mime_type?: string
+          moderation_status?: string
+          optimized_file_size?: number
+          original_file_size?: number
+          original_retention_until?: string | null
+          original_storage_path?: string | null
+          status?: Database["public"]["Enums"]["event_photo_status"]
+          thumbnail_storage_path: string
+          updated_at?: string
+          uploaded_by_user_id?: string | null
+          width?: number
+        }
+        Update: {
+          author_label?: string | null
+          created_at?: string
+          crop_height?: number | null
+          crop_width?: number | null
+          crop_x?: number | null
+          crop_y?: number | null
+          deleted_at?: string | null
+          description?: string | null
+          event_id?: string
+          height?: number
+          id?: string
+          invitation_id?: string | null
+          is_cover?: boolean
+          large_storage_path?: string
+          medium_storage_path?: string
+          mime_type?: string
+          moderation_status?: string
+          optimized_file_size?: number
+          original_file_size?: number
+          original_retention_until?: string | null
+          original_storage_path?: string | null
+          status?: Database["public"]["Enums"]["event_photo_status"]
+          thumbnail_storage_path?: string
+          updated_at?: string
+          uploaded_by_user_id?: string | null
+          width?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_photos_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_photos_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "invitations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_types: {
         Row: {
           active: boolean
@@ -1120,6 +1222,66 @@ export type Database = {
         }
         Relationships: []
       }
+      photo_reports: {
+        Row: {
+          comment: string | null
+          created_at: string
+          event_id: string
+          id: string
+          moderated_at: string | null
+          moderated_by: string | null
+          photo_id: string
+          reason: string
+          reported_by: string | null
+          reporter_label: string | null
+          status: Database["public"]["Enums"]["photo_report_status"]
+          updated_at: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          photo_id: string
+          reason: string
+          reported_by?: string | null
+          reporter_label?: string | null
+          status?: Database["public"]["Enums"]["photo_report_status"]
+          updated_at?: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          moderated_at?: string | null
+          moderated_by?: string | null
+          photo_id?: string
+          reason?: string
+          reported_by?: string | null
+          reporter_label?: string | null
+          status?: Database["public"]["Enums"]["photo_report_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_reports_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "photo_reports_photo_id_fkey"
+            columns: ["photo_id"]
+            isOneToOne: false
+            referencedRelation: "event_photos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1306,6 +1468,7 @@ export type Database = {
       contribution_need_status: "open" | "closed" | "cancelled"
       contribution_need_type: "quantity" | "unique" | "people" | "money"
       contribution_unit_kind: "quantity" | "money" | "none"
+      event_photo_status: "processing" | "published" | "hidden" | "deleted"
       event_status: "draft" | "published" | "archived"
       invitation_status:
         | "draft"
@@ -1319,6 +1482,12 @@ export type Database = {
       notification_channel: "inapp" | "email" | "push"
       notification_status: "pending" | "sent" | "failed"
       participant_role: "organizer" | "guest"
+      photo_report_status:
+        | "pending"
+        | "reviewed"
+        | "hidden"
+        | "rejected"
+        | "deleted"
       rsvp_status: "pending" | "accepted" | "declined"
     }
     CompositeTypes: {
@@ -1455,6 +1624,7 @@ export const Constants = {
       contribution_need_status: ["open", "closed", "cancelled"],
       contribution_need_type: ["quantity", "unique", "people", "money"],
       contribution_unit_kind: ["quantity", "money", "none"],
+      event_photo_status: ["processing", "published", "hidden", "deleted"],
       event_status: ["draft", "published", "archived"],
       invitation_status: [
         "draft",
@@ -1469,6 +1639,13 @@ export const Constants = {
       notification_channel: ["inapp", "email", "push"],
       notification_status: ["pending", "sent", "failed"],
       participant_role: ["organizer", "guest"],
+      photo_report_status: [
+        "pending",
+        "reviewed",
+        "hidden",
+        "rejected",
+        "deleted",
+      ],
       rsvp_status: ["pending", "accepted", "declined"],
     },
   },
