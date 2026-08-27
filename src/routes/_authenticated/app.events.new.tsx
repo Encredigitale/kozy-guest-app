@@ -65,7 +65,17 @@ function NewEventPage() {
         position: i,
       }));
       await supabase.from("event_widgets" as never).insert(rows as never);
+      // Extensions sélectionnées (ext.*) : activer l'extension pour l'événement.
+      const extRows = selectedWidgets
+        .filter((id) => id.startsWith("ext."))
+        .map((id) => ({ event_id: data.id, extension_key: id.slice(4), enabled: true }));
+      if (extRows.length > 0) {
+        await supabase
+          .from("event_extensions")
+          .upsert(extRows, { onConflict: "event_id,extension_key" });
+      }
     }
+
     setSaving(false);
     toast.success("Événement créé.");
     navigate({ to: "/app/events/$eventId", params: { eventId: data.id } });
