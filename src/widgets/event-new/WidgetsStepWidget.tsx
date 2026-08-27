@@ -25,7 +25,7 @@ export default function WidgetsStepWidget() {
       <CardContent className="p-6 space-y-6">
         <div>
           <p className="text-xs uppercase tracking-wider text-muted-foreground">Étape {stepIndex + 1} / {stepCount}</p>
-          <h2 className="text-xl font-serif tracking-tight text-primary mt-1">Widgets activés</h2>
+          <h2 className="text-xl font-serif tracking-tight text-primary mt-1">Blocs activés</h2>
           <p className="text-sm text-muted-foreground mt-1">Cochez ceux qui apparaîtront sur la page de votre événement.</p>
         </div>
         <div className="space-y-2 max-h-96 overflow-y-auto pr-2">

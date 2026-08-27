@@ -17,9 +17,9 @@ export default function InfoStepWidget() {
         <div className="space-y-4">
           <div className="space-y-2"><Label>Titre</Label><Input value={title} onChange={(e) => setTitle(e.target.value)} required /></div>
           <div className="space-y-2"><Label>Description</Label><Textarea value={description} onChange={(e) => setDescription(e.target.value)} /></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div className="space-y-2"><Label>Date de début</Label><Input type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} /></div>
-            <div className="space-y-2"><Label>Lieu</Label><Input value={location} onChange={(e) => setLocation(e.target.value)} /></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2 min-w-0"><Label>Date de début</Label><Input className="w-full min-w-0" type="datetime-local" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} /></div>
+            <div className="space-y-2 min-w-0"><Label>Lieu</Label><Input className="w-full min-w-0" value={location} onChange={(e) => setLocation(e.target.value)} /></div>
           </div>
         </div>
         <div className="flex justify-between">
