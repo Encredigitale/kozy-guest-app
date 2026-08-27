@@ -10,6 +10,7 @@ import {
 import type { PublicInvitationPayload } from "@/extensions/invitations/public-types";
 import GuestBringsBlock from "@/extensions/guest-brings/GuestBringsBlock";
 import ContributionsBlock from "@/extensions/contributions/ContributionsBlock";
+import PhotosBlock from "@/extensions/photos/PhotosBlock";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
