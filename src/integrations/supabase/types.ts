@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      allergies: {
+        Row: {
+          active: boolean
+          allows_custom: boolean
+          created_at: string
+          id: string
+          key: string
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          allows_custom?: boolean
+          created_at?: string
+          id?: string
+          key: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          allows_custom?: boolean
+          created_at?: string
+          id?: string
+          key?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       api_tokens: {
         Row: {
           created_at: string
@@ -927,6 +960,39 @@ export type Database = {
         }
         Relationships: []
       }
+      food_preferences: {
+        Row: {
+          active: boolean
+          allows_custom: boolean
+          created_at: string
+          id: string
+          key: string
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          allows_custom?: boolean
+          created_at?: string
+          id?: string
+          key: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          allows_custom?: boolean
+          created_at?: string
+          id?: string
+          key?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       guest_contributions: {
         Row: {
           choice_id: string | null
@@ -1144,6 +1210,42 @@ export type Database = {
           },
         ]
       }
+      legal_documents: {
+        Row: {
+          content: string
+          created_at: string
+          doc_type: string
+          id: string
+          published_at: string | null
+          requires_acceptance: boolean
+          title: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          content?: string
+          created_at?: string
+          doc_type: string
+          id?: string
+          published_at?: string | null
+          requires_acceptance?: boolean
+          title: string
+          updated_at?: string
+          version: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          doc_type?: string
+          id?: string
+          published_at?: string | null
+          requires_acceptance?: boolean
+          title?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
       menu_components: {
         Row: {
           active: boolean
@@ -1282,6 +1384,39 @@ export type Database = {
           },
         ]
       }
+      profile_field_config: {
+        Row: {
+          created_at: string
+          field_key: string
+          id: string
+          label: string
+          locked: boolean
+          sort_order: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          field_key: string
+          id?: string
+          label: string
+          locked?: boolean
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          field_key?: string
+          id?: string
+          label?: string
+          locked?: boolean
+          sort_order?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1307,6 +1442,142 @@ export type Database = {
           display_name?: string | null
           email_verified_at?: string | null
           preferences?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_allergies: {
+        Row: {
+          allergy_id: string | null
+          created_at: string
+          custom_value: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          allergy_id?: string | null
+          created_at?: string
+          custom_value?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          allergy_id?: string | null
+          created_at?: string
+          custom_value?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_allergies_allergy_id_fkey"
+            columns: ["allergy_id"]
+            isOneToOne: false
+            referencedRelation: "allergies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_consents: {
+        Row: {
+          accepted_at: string
+          consent_type: string
+          created_at: string
+          document_version: string
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          consent_type: string
+          created_at?: string
+          document_version: string
+          id?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          accepted_at?: string
+          consent_type?: string
+          created_at?: string
+          document_version?: string
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_food_preferences: {
+        Row: {
+          created_at: string
+          custom_value: string | null
+          id: string
+          preference_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_value?: string | null
+          id?: string
+          preference_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          custom_value?: string | null
+          id?: string
+          preference_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_food_preferences_preference_id_fkey"
+            columns: ["preference_id"]
+            isOneToOne: false
+            referencedRelation: "food_preferences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          created_at: string
+          extra: Json
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          phone_normalized: string | null
+          phone_verified: boolean
+          profile_picture_path: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          extra?: Json
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          phone_normalized?: string | null
+          phone_verified?: boolean
+          profile_picture_path?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          extra?: Json
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          phone_normalized?: string | null
+          phone_verified?: boolean
+          profile_picture_path?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -1457,6 +1728,13 @@ export type Database = {
           _user_id?: string
         }
         Returns: Json
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
     }
     Enums: {
