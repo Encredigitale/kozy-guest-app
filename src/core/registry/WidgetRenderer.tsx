@@ -116,6 +116,23 @@ export function WidgetRenderer({
     );
   }
 
+  if (layout === "grid-2") {
+    const ordered = [...placements].sort(
+      (a, b) =>
+        orderIndex(a.widget.manifest.component) - orderIndex(b.widget.manifest.component) ||
+        a.order - b.order,
+    );
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {ordered.map((p) => (
+          <div key={p.widget.id} className="col-span-1">
+            <RenderOne placement={p} extra={context} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-12 gap-6">
       {placements.map((p) => (
