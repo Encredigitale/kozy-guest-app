@@ -22,8 +22,8 @@ type Props = {
   context?: Record<string, unknown>;
   /** Optional fallback when no widget matches the surface. */
   fallback?: React.ReactNode;
-  /** Grid, stacked or accordion rendering. Grid is default. */
-  layout?: "grid" | "stack" | "accordion";
+  /** Grid, stacked, accordion or 2-column grid rendering. Grid is default. */
+  layout?: "grid" | "stack" | "accordion" | "grid-2";
   /** Include drafts (admin preview only). */
   includeDrafts?: boolean;
 };
@@ -111,6 +111,23 @@ export function WidgetRenderer({
       <div className="space-y-6">
         {placements.map((p) => (
           <RenderOne key={p.widget.id} placement={p} extra={context} />
+        ))}
+      </div>
+    );
+  }
+
+  if (layout === "grid-2") {
+    const ordered = [...placements].sort(
+      (a, b) =>
+        orderIndex(a.widget.manifest.component) - orderIndex(b.widget.manifest.component) ||
+        a.order - b.order,
+    );
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {ordered.map((p) => (
+          <div key={p.widget.id} className="col-span-1">
+            <RenderOne placement={p} extra={context} />
+          </div>
         ))}
       </div>
     );

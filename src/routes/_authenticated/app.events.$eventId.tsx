@@ -27,7 +27,7 @@ function EventDetailPage() {
       <Link to="/app/events" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
         <ChevronLeft className="h-4 w-4" /> Retour
       </Link>
-      <WidgetRenderer surface="event.detail" layout="accordion" eventId={eventId} contextualRoles={contextualRoles} context={{ eventId }} />
+      <WidgetRenderer surface="event.detail" layout="grid-2" eventId={eventId} contextualRoles={contextualRoles} context={{ eventId }} />
       {isAdmin && <EventExtensionsPanel eventId={eventId} />}
     </div>
   );
