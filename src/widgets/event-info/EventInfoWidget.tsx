@@ -17,13 +17,23 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useActiveEventTypes } from "@/core/eventTypes/useEventTypes";
 import {
-  Trash2, Utensils, Briefcase, PartyPopper, Gift, Coffee, Heart, Cake, Music, Baby,
+  Trash2, Pencil, Calendar, MapPin, Utensils, Briefcase, PartyPopper, Gift, Coffee, Heart, Cake, Music, Baby,
   Users, CalendarDays, Sparkles, type LucideIcon,
 } from "lucide-react";
 
 const ICONS: Record<string, LucideIcon> = {
   Utensils, Briefcase, PartyPopper, Gift, Coffee, Heart, Cake, Music, Baby, Users, CalendarDays, Sparkles,
 };
+
+function formatDateDisplay(iso: string | null | undefined) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "—";
+  return new Intl.DateTimeFormat("fr-FR", {
+    weekday: "long", day: "numeric", month: "long", year: "numeric",
+    hour: "2-digit", minute: "2-digit",
+  }).format(d);
+}
 
 export default function EventInfoWidget({ config }: WidgetProps) {
   const eventId = config?.eventId as string;
@@ -35,6 +45,7 @@ export default function EventInfoWidget({ config }: WidgetProps) {
   const { data: participants = [] } = useParticipants(eventId);
   const [draft, setDraft] = useState<EventRow | null>(null);
   const [saving, setSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const { data: eventTypes = [] } = useActiveEventTypes();
 
   useEffect(() => { if (ev) setDraft(ev); }, [ev]);
@@ -44,7 +55,6 @@ export default function EventInfoWidget({ config }: WidgetProps) {
   const typeDef = typeKey ? eventTypes.find((t) => t.key === typeKey) : null;
   const typeLabel = typeKey === "other" ? (typeCustomLabel || "Autre") : (typeDef?.label ?? typeKey);
   const TypeIcon = typeKey === "other" ? Sparkles : (ICONS[typeDef?.icon ?? ""] ?? Sparkles);
-
 
   if (isLoading) return <div className="text-sm text-muted-foreground">Chargement…</div>;
   if (!ev || !draft) return <div className="text-sm text-destructive">Événement introuvable.</div>;
@@ -60,7 +70,13 @@ export default function EventInfoWidget({ config }: WidgetProps) {
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Enregistré.");
+    setIsEditing(false);
     qc.invalidateQueries({ queryKey: ["event", eventId] });
+  };
+
+  const cancelEdit = () => {
+    setDraft(ev);
+    setIsEditing(false);
   };
 
   const del = async () => {
@@ -85,47 +101,85 @@ export default function EventInfoWidget({ config }: WidgetProps) {
     qc.invalidateQueries({ queryKey: ["event", eventId] });
   };
 
+  const statusLabel = ev.status === "published" ? "Publié" : ev.status === "archived" ? "Archivé" : "Brouillon";
+
   return (
     <Card className="rounded-2xl border-border/60">
-      <CardHeader className="flex flex-row items-start justify-between gap-4">
+      <CardHeader className="flex flex-row items-start justify-between gap-3 pb-3">
         <div className="min-w-0">
           <div className="flex items-center gap-3">
             {typeKey && (
-              <div className="h-10 w-10 rounded-xl bg-primary/10 grid place-items-center shrink-0">
-                <TypeIcon className="h-5 w-5 text-primary" />
+              <div className="h-9 w-9 rounded-xl bg-primary/10 grid place-items-center shrink-0">
+                <TypeIcon className="h-4 w-4 text-primary" />
               </div>
             )}
             <div className="min-w-0">
-              <CardTitle className="text-lg font-serif tracking-tight break-words">{ev.title}</CardTitle>
+              <CardTitle className="text-base font-medium tracking-tight break-words">{ev.title}</CardTitle>
               {typeKey && <p className="text-xs text-muted-foreground mt-0.5">{typeLabel}</p>}
             </div>
           </div>
-          <Badge className="mt-2" variant={ev.status === "published" ? "default" : "secondary"}>
-            {ev.status === "published" ? "Publié" : ev.status === "archived" ? "Archivé" : "Brouillon"}
-          </Badge>
+          <div className="flex items-center gap-2 mt-2">
+            <Badge variant={ev.status === "published" ? "default" : "secondary"}>{statusLabel}</Badge>
+            {ev.status !== "published" && isOrganizer && !isEditing && (
+              <Button onClick={publish} size="sm" className="rounded-full h-7 px-3 text-xs">Publier</Button>
+            )}
+          </div>
         </div>
         {isOrganizer && (
-          <div className="flex gap-2">
-            {ev.status !== "published" && <Button onClick={publish} className="rounded-full">Publier</Button>}
-            <Button variant="ghost" size="icon" onClick={del}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+          <div className="flex items-center gap-1">
+            {!isEditing ? (
+              <>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setIsEditing(true)} aria-label="Modifier">
+                  <Pencil className="h-4 w-4 text-muted-foreground" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8" onClick={del} aria-label="Supprimer">
+                  <Trash2 className="h-4 w-4 text-destructive" />
+                </Button>
+              </>
+            ) : (
+              <Button variant="ghost" size="icon" className="h-8 w-8" onClick={cancelEdit} aria-label="Annuler">
+                <span className="sr-only">Annuler</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              </Button>
+            )}
           </div>
         )}
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="space-y-2"><Label>Titre</Label>
-          <Input value={draft.title} disabled={!isOrganizer} onChange={(e) => setDraft({ ...draft, title: e.target.value })} /></div>
-        <div className="space-y-2"><Label>Description</Label>
-          <Textarea value={draft.description ?? ""} disabled={!isOrganizer} onChange={(e) => setDraft({ ...draft, description: e.target.value })} /></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-2 min-w-0"><Label>Date de début</Label>
-            <Input className="w-full min-w-0" type="datetime-local" disabled={!isOrganizer}
-              value={draft.starts_at ? new Date(draft.starts_at).toISOString().slice(0, 16) : ""}
-              onChange={(e) => setDraft({ ...draft, starts_at: e.target.value ? new Date(e.target.value).toISOString() : null })} /></div>
-          <div className="space-y-2 min-w-0"><Label>Lieu</Label>
-            <Input className="w-full min-w-0" value={draft.location ?? ""} disabled={!isOrganizer} onChange={(e) => setDraft({ ...draft, location: e.target.value })} /></div>
-        </div>
-        {isOrganizer && (
-          <>
+      <CardContent className="pt-0">
+        {!isEditing ? (
+          <div className="space-y-3 text-sm">
+            {ev.description ? (
+              <p className="text-muted-foreground leading-relaxed line-clamp-3">{ev.description}</p>
+            ) : (
+              <p className="text-muted-foreground italic">Aucune description</p>
+            )}
+            <div className="flex flex-wrap gap-x-4 gap-y-2 text-muted-foreground">
+              <div className="flex items-center gap-2 min-w-0">
+                <Calendar className="h-4 w-4 shrink-0 text-primary" />
+                <span className="truncate">{formatDateDisplay(ev.starts_at)}</span>
+              </div>
+              {ev.location && (
+                <div className="flex items-center gap-2 min-w-0">
+                  <MapPin className="h-4 w-4 shrink-0 text-primary" />
+                  <span className="truncate">{ev.location}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4 pt-2">
+            <div className="space-y-2"><Label>Titre</Label>
+              <Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} /></div>
+            <div className="space-y-2"><Label>Description</Label>
+              <Textarea value={draft.description ?? ""} onChange={(e) => setDraft({ ...draft, description: e.target.value })} /></div>
+            <div className="grid grid-cols-1 gap-4">
+              <div className="space-y-2 min-w-0"><Label>Date de début</Label>
+                <Input className="w-full min-w-0" type="datetime-local"
+                  value={draft.starts_at ? new Date(draft.starts_at).toISOString().slice(0, 16) : ""}
+                  onChange={(e) => setDraft({ ...draft, starts_at: e.target.value ? new Date(e.target.value).toISOString() : null })} /></div>
+              <div className="space-y-2 min-w-0"><Label>Lieu</Label>
+                <Input className="w-full min-w-0" value={draft.location ?? ""} onChange={(e) => setDraft({ ...draft, location: e.target.value })} /></div>
+            </div>
             <div className="space-y-2">
               <Label>Statut</Label>
               <Select value={draft.status} onValueChange={(v) => setDraft({ ...draft, status: v as EventRow["status"] })}>
@@ -137,8 +191,11 @@ export default function EventInfoWidget({ config }: WidgetProps) {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={save} disabled={saving} className="rounded-full">{saving ? "Enregistrement…" : "Enregistrer"}</Button>
-          </>
+            <div className="flex gap-2">
+              <Button onClick={save} disabled={saving} className="rounded-full">{saving ? "Enregistrement…" : "Enregistrer"}</Button>
+              <Button variant="secondary" onClick={cancelEdit} className="rounded-full">Annuler</Button>
+            </div>
+          </div>
         )}
       </CardContent>
     </Card>
