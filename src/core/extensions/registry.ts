@@ -104,46 +104,26 @@ export const EXTENSIONS: ExtensionDefinition[] = [
   },
   {
     key: "personal-info",
-    name: "Informations personnelles",
-    description: "Fiche personnelle de l'utilisateur (contact, régime, allergies, notes).",
+    name: "Informations utilisateur",
+    description:
+      "Fiche profil de référence : identité, coordonnées, photo, préférences alimentaires, allergies et consentements.",
     category: "profile",
     icon: "UserCircle2",
-    version: "1.0.0",
+    version: "2.0.0",
     scope: "global",
-    settingsSchema: [
-      { key: "birthday", label: "Date de naissance", type: "text" },
-      { key: "phone", label: "Téléphone", type: "text" },
-      { key: "address", label: "Adresse", type: "text" },
-      { key: "city", label: "Ville", type: "text" },
-      {
-        key: "diet",
-        label: "Régime alimentaire",
-        type: "select",
-        default: "any",
-        options: [
-          { value: "any", label: "Aucun" },
-          { value: "vegetarian", label: "Végétarien" },
-          { value: "vegan", label: "Végan" },
-          { value: "gluten-free", label: "Sans gluten" },
-          { value: "halal", label: "Halal" },
-          { value: "kosher", label: "Casher" },
-        ],
-      },
-      { key: "allergies", label: "Allergies", type: "text" },
-      { key: "notes", label: "Notes", type: "textarea" },
-    ],
     widgets: [
-      { key: "ext.personal-info", component: lazy(() => import("@/extensions/personal-info/PersonalInfoWidget")) },
+      { key: "ext.personal-info", component: lazy(() => import("@/extensions/user-info/UserInfoWidget")) },
     ],
     screens: [
       {
         path: "edit",
-        label: "Modifier mes informations",
-        component: lazy(() => import("@/extensions/personal-info/PersonalInfoScreen")),
+        label: "Mon profil",
+        component: lazy(() => import("@/extensions/user-info/ProfileScreen")),
       },
     ],
-    menu: [{ label: "Mes informations", path: "edit", icon: "UserCircle2", order: 5 }],
+    menu: [{ label: "Mon profil", path: "edit", icon: "UserCircle2", order: 5 }],
   },
+
   {
     key: "invitations",
     name: "Gestion des invitations",

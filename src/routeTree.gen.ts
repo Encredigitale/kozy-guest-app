@@ -15,6 +15,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LegalDocTypeRouteImport } from './routes/legal.$docType'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as InvitationEventIdInvitationIdRouteImport } from './routes/invitation.$eventId.$invitationId'
@@ -71,6 +72,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalDocTypeRoute = LegalDocTypeRouteImport.update({
+  id: '/legal/$docType',
+  path: '/legal/$docType',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
@@ -239,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
   '/app': typeof AuthenticatedAppRouteWithChildren
+  '/legal/$docType': typeof LegalDocTypeRoute
   '/app/admin': typeof AuthenticatedAppAdminRouteWithChildren
   '/app/audit': typeof AuthenticatedAppAuditRoute
   '/app/contacts': typeof AuthenticatedAppContactsRoute
@@ -273,6 +280,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/legal/$docType': typeof LegalDocTypeRoute
   '/app/audit': typeof AuthenticatedAppAuditRoute
   '/app/contacts': typeof AuthenticatedAppContactsRoute
   '/app/notifications': typeof AuthenticatedAppNotificationsRoute
@@ -308,6 +316,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
+  '/legal/$docType': typeof LegalDocTypeRoute
   '/_authenticated/app/admin': typeof AuthenticatedAppAdminRouteWithChildren
   '/_authenticated/app/audit': typeof AuthenticatedAppAuditRoute
   '/_authenticated/app/contacts': typeof AuthenticatedAppContactsRoute
@@ -345,6 +354,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/verify-email'
     | '/app'
+    | '/legal/$docType'
     | '/app/admin'
     | '/app/audit'
     | '/app/contacts'
@@ -379,6 +389,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/verify-email'
+    | '/legal/$docType'
     | '/app/audit'
     | '/app/contacts'
     | '/app/notifications'
@@ -413,6 +424,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/verify-email'
     | '/_authenticated/app'
+    | '/legal/$docType'
     | '/_authenticated/app/admin'
     | '/_authenticated/app/audit'
     | '/_authenticated/app/contacts'
@@ -449,6 +461,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
+  LegalDocTypeRoute: typeof LegalDocTypeRoute
   InvitationEventIdInvitationIdRoute: typeof InvitationEventIdInvitationIdRoute
   ApiPublicInvitationsRemindersRoute: typeof ApiPublicInvitationsRemindersRoute
   ApiPublicV1MeRoute: typeof ApiPublicV1MeRoute
@@ -496,6 +509,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/$docType': {
+      id: '/legal/$docType'
+      path: '/legal/$docType'
+      fullPath: '/legal/$docType'
+      preLoaderRoute: typeof LegalDocTypeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/app': {
@@ -813,6 +833,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   VerifyEmailRoute: VerifyEmailRoute,
+  LegalDocTypeRoute: LegalDocTypeRoute,
   InvitationEventIdInvitationIdRoute: InvitationEventIdInvitationIdRoute,
   ApiPublicInvitationsRemindersRoute: ApiPublicInvitationsRemindersRoute,
   ApiPublicV1MeRoute: ApiPublicV1MeRoute,
