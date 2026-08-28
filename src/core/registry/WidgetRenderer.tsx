@@ -22,8 +22,8 @@ type Props = {
   context?: Record<string, unknown>;
   /** Optional fallback when no widget matches the surface. */
   fallback?: React.ReactNode;
-  /** Grid, stacked or accordion rendering. Grid is default. */
-  layout?: "grid" | "stack" | "accordion";
+  /** Grid, stacked, accordion or 2-column grid rendering. Grid is default. */
+  layout?: "grid" | "stack" | "accordion" | "grid-2";
   /** Include drafts (admin preview only). */
   includeDrafts?: boolean;
 };
