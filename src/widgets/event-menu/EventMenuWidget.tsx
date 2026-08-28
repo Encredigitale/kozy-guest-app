@@ -5,22 +5,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { UtensilsCrossed, Plus, Trash2 } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { UtensilsCrossed, Plus, Trash2, Pencil, Check, X } from "lucide-react";
 import { useWidgetItems, scopeFromEventId } from "@/widgets/_shared/useWidgetItems";
 import { useMenuComponentsForType } from "@/core/menu/useMenuComponents";
 import { useEvent } from "@/widgets/event-shared/queries";
 
 // Widget: Menu & Thème
-// Les composantes du repas (apéritif, entrée, plat, grignotage, dessert, boisson…)
-// sont administrées dans /app/admin/menu-components et filtrées par type d'événement.
-// Chaque composante peut recevoir un ou plusieurs choix de mets/boissons.
+// Haut : les choix déjà saisis, groupés par composante, avec modifier / supprimer.
+// Bas : formulaire d'ajout (liste déroulante des composantes + libellé du choix).
 
 const WIDGET_KEY = "event.menu";
 
 function LucideIcon({ name, className }: { name: string; className?: string }) {
   const Cmp = (Icons as unknown as Record<string, React.ComponentType<{ className?: string }>>)[name];
-  const Fallback = UtensilsCrossed;
-  const C = Cmp ?? Fallback;
+  const C = Cmp ?? UtensilsCrossed;
   return <C className={className} />;
 }
 
@@ -42,9 +42,15 @@ export default function EventMenuWidget({ config }: WidgetProps) {
         : allComponents,
     [allComponents, selectedKeys],
   );
-  const { items, create, remove } = useWidgetItems(WIDGET_KEY, scopeFromEventId(eventId));
+  const { items, create, update, remove } = useWidgetItems(WIDGET_KEY, scopeFromEventId(eventId));
 
-  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [componentKey, setComponentKey] = useState<string>("");
+  const [draft, setDraft] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editLabel, setEditLabel] = useState("");
+  const [editComponent, setEditComponent] = useState("");
+
+  const activeComponentKey = componentKey || components[0]?.key || "";
 
   const byComponent = useMemo(() => {
     const map: Record<string, typeof items> = {};
@@ -55,11 +61,24 @@ export default function EventMenuWidget({ config }: WidgetProps) {
     return map;
   }, [items]);
 
-  const add = (componentKey: string) => {
-    const label = (drafts[componentKey] ?? "").trim();
+  const add = () => {
+    const label = draft.trim();
+    if (!label || !activeComponentKey) return;
+    create.mutate({ payload: { component_key: activeComponentKey, label } });
+    setDraft("");
+  };
+
+  const startEdit = (id: string, label: string, key: string) => {
+    setEditingId(id);
+    setEditLabel(label);
+    setEditComponent(key);
+  };
+
+  const saveEdit = (id: string) => {
+    const label = editLabel.trim();
     if (!label) return;
-    create.mutate({ payload: { component_key: componentKey, label } });
-    setDrafts((d) => ({ ...d, [componentKey]: "" }));
+    update.mutate({ id, patch: { payload: { component_key: editComponent, label } } });
+    setEditingId(null);
   };
 
   return (
@@ -78,54 +97,128 @@ export default function EventMenuWidget({ config }: WidgetProps) {
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
+        {/* Partie haute : éléments choisis */}
+        <div className="space-y-3">
+          {items.length === 0 ? (
+            <p className="text-xs text-muted-foreground italic py-4 text-center">
+              Aucun choix pour l'instant. Ajoutez-en un ci-dessous.
+            </p>
+          ) : (
+            components
+              .filter((c) => (byComponent[c.key] ?? []).length > 0)
+              .map((c) => (
+                <div key={c.id} className="rounded-xl border border-border/60 p-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <LucideIcon name={c.icon} className="h-4 w-4 text-primary" />
+                    <p className="text-sm font-medium flex-1">{c.label}</p>
+                    <span className="text-xs text-muted-foreground">{(byComponent[c.key] ?? []).length}</span>
+                  </div>
+                  <ul className="space-y-1">
+                    {(byComponent[c.key] ?? []).map((it) => {
+                      const label = String(it.payload?.["label"] ?? "");
+                      const isEditing = editingId === it.id;
+                      return (
+                        <li key={it.id} className="flex items-center gap-2 py-1">
+                          {isEditing ? (
+                            <>
+                              <Select value={editComponent} onValueChange={setEditComponent}>
+                                <SelectTrigger className="h-9 w-40">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {components.map((opt) => (
+                                    <SelectItem key={opt.key} value={opt.key}>
+                                      {opt.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <Input
+                                className="h-9 flex-1"
+                                value={editLabel}
+                                onChange={(e) => setEditLabel(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && saveEdit(it.id)}
+                                autoFocus
+                              />
+                              <Button size="icon" variant="ghost" onClick={() => saveEdit(it.id)} aria-label="Valider">
+                                <Check className="h-4 w-4 text-primary" />
+                              </Button>
+                              <Button size="icon" variant="ghost" onClick={() => setEditingId(null)} aria-label="Annuler">
+                                <X className="h-4 w-4 text-muted-foreground" />
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              <span className="flex-1 text-sm">{label}</span>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => startEdit(it.id, label, c.key)}
+                                aria-label="Modifier"
+                              >
+                                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+                              </Button>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => remove.mutate(it.id)}
+                                aria-label="Supprimer"
+                              >
+                                <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                              </Button>
+                            </>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))
+          )}
+        </div>
+
+        {/* Partie basse : ajout d'un choix */}
         {components.length === 0 ? (
           <p className="text-xs text-muted-foreground italic py-4 text-center">
             Aucune composante de repas configurée pour ce type d'événement.
           </p>
         ) : (
-          components.map((c) => {
-            const list = byComponent[c.key] ?? [];
-            return (
-              <div key={c.id} className="rounded-xl border border-border/60 p-3 space-y-2">
-                <div className="flex items-center gap-2">
-                  <LucideIcon name={c.icon} className="h-4 w-4 text-primary" />
-                  <p className="text-sm font-medium flex-1">{c.label}</p>
-                  <span className="text-xs text-muted-foreground">{list.length}</span>
-                </div>
-
-                {list.length > 0 && (
-                  <ul className="space-y-1">
-                    {list.map((it) => (
-                      <li key={it.id} className="flex items-center gap-2 group py-1">
-                        <span className="flex-1 text-sm">{String(it.payload?.["label"] ?? "")}</span>
-                        <button
-                          onClick={() => remove.mutate(it.id)}
-                          className="opacity-0 group-hover:opacity-100 transition"
-                          aria-label="Supprimer"
-                        >
-                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                        </button>
-                      </li>
+          <div className="rounded-xl border border-border/60 bg-muted/30 p-3 space-y-3">
+            <p className="text-sm font-medium">Ajouter un choix</p>
+            <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
+              <div className="space-y-1.5 sm:w-48">
+                <Label htmlFor="menu-component">Composante</Label>
+                <Select value={activeComponentKey} onValueChange={setComponentKey}>
+                  <SelectTrigger id="menu-component" className="h-9">
+                    <SelectValue placeholder="Choisir…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {components.map((c) => (
+                      <SelectItem key={c.key} value={c.key}>
+                        {c.label}
+                      </SelectItem>
                     ))}
-                  </ul>
-                )}
-
-                <div className="flex gap-2">
-                  <Input
-                    className="h-9"
-                    value={drafts[c.key] ?? ""}
-                    onChange={(e) => setDrafts((d) => ({ ...d, [c.key]: e.target.value }))}
-                    onKeyDown={(e) => e.key === "Enter" && add(c.key)}
-                    placeholder={`Ajouter un choix de ${c.label.toLowerCase()}…`}
-                  />
-                  <Button onClick={() => add(c.key)} size="icon" variant="secondary" className="rounded-full">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
+                  </SelectContent>
+                </Select>
               </div>
-            );
-          })
+              <div className="space-y-1.5 flex-1">
+                <Label htmlFor="menu-choice">Choix</Label>
+                <Input
+                  id="menu-choice"
+                  className="h-9"
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && add()}
+                  placeholder="Ex. Tarte aux pommes"
+                />
+              </div>
+              <Button onClick={add} className="rounded-full h-9">
+                <Plus className="h-4 w-4 mr-1" />
+                Ajouter
+              </Button>
+            </div>
+          </div>
         )}
       </CardContent>
     </Card>
