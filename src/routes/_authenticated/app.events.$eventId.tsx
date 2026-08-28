@@ -23,7 +23,7 @@ function EventDetailPage() {
   }
 
   return (
-    <div className="p-8 max-w-3xl space-y-6">
+    <div className="p-8 w-full max-w-7xl mx-auto space-y-6">
       <Link to="/app/events" className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
         <ChevronLeft className="h-4 w-4" /> Retour
       </Link>
