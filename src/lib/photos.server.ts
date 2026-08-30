@@ -247,6 +247,7 @@ export async function resolveAccess(eventId: string, auth?: PhotoAuth): Promise<
     canModerate: isOrganizer,
     isOrganizer,
     pending: !canView && part === "pending",
+    eventPassed,
     allowDownload: config.allowDownload,
     showAuthor: isOrganizer || config.showAuthorToGuests,
     photoCount: count ?? 0,
