@@ -108,6 +108,11 @@ export default function PhotoAlbum({
 
   return (
     <div className="space-y-4">
+      {access.enabled && !access.eventPassed && (
+        <p className="text-xs text-muted-foreground italic rounded-2xl border border-border/60 bg-muted/40 p-3">
+          L'album s'ouvrira après l'événement : vous pourrez ajouter vos photos une fois la date passée.
+        </p>
+      )}
       {access.canUpload && !consent && (
         <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 space-y-2">
           <p className="text-sm font-medium">Respect de la vie privée</p>

@@ -188,6 +188,7 @@ export async function resolveAccess(eventId: string, auth?: PhotoAuth): Promise<
     canModerate: false,
     isOrganizer: false,
     pending: false,
+    eventPassed: false,
     allowDownload: false,
     showAuthor: false,
     photoCount: 0,
@@ -219,12 +220,18 @@ export async function resolveAccess(eventId: string, auth?: PhotoAuth): Promise<
     (effective.viewAudience === "all" && part !== "none") ||
     (effective.viewAudience === "confirmed" && part === "confirmed");
 
+  // Ajout de photos uniquement une fois la date de l'événement passée
+  // (ou si aucune date n'est définie).
+  const startsAt = (event as Record<string, any>).starts_at as string | null;
+  const eventPassed = !startsAt || new Date(startsAt).getTime() < Date.now();
+
   const canUpload =
-    isOrganizer ||
-    (effective.collaborative &&
-      effective.uploadAudience === "confirmed" &&
-      part === "confirmed" &&
-      canView);
+    eventPassed &&
+    (isOrganizer ||
+      (effective.collaborative &&
+        effective.uploadAudience === "confirmed" &&
+        part === "confirmed" &&
+        canView));
 
   const db = await admin();
   const { count } = await db
@@ -240,6 +247,7 @@ export async function resolveAccess(eventId: string, auth?: PhotoAuth): Promise<
     canModerate: isOrganizer,
     isOrganizer,
     pending: !canView && part === "pending",
+    eventPassed,
     allowDownload: config.allowDownload,
     showAuthor: isOrganizer || config.showAuthorToGuests,
     photoCount: count ?? 0,
