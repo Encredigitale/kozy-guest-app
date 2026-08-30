@@ -225,13 +225,15 @@ export async function resolveAccess(eventId: string, auth?: PhotoAuth): Promise<
   const startsAt = (event as Record<string, any>).starts_at as string | null;
   const eventPassed = !startsAt || new Date(startsAt).getTime() < Date.now();
 
+  // L'organisateur peut ajouter des photos à tout moment (préparatifs) ;
+  // les invités seulement une fois la date de l'événement passée.
   const canUpload =
-    eventPassed &&
-    (isOrganizer ||
-      (effective.collaborative &&
-        effective.uploadAudience === "confirmed" &&
-        part === "confirmed" &&
-        canView));
+    isOrganizer ||
+    (eventPassed &&
+      effective.collaborative &&
+      effective.uploadAudience === "confirmed" &&
+      part === "confirmed" &&
+      canView);
 
   const db = await admin();
   const { count } = await db
