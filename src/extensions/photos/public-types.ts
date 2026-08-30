@@ -13,6 +13,8 @@ export type PhotoAccess = {
   isOrganizer: boolean;
   /** Invitation en attente de réponse : aperçu seulement. */
   pending: boolean;
+  /** La date de l'événement est passée (ou non définie) : ajout possible. */
+  eventPassed: boolean;
   allowDownload: boolean;
   showAuthor: boolean;
   photoCount: number;

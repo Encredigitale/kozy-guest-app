@@ -188,6 +188,7 @@ export async function resolveAccess(eventId: string, auth?: PhotoAuth): Promise<
     canModerate: false,
     isOrganizer: false,
     pending: false,
+    eventPassed: false,
     allowDownload: false,
     showAuthor: false,
     photoCount: 0,
