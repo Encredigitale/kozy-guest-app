@@ -108,7 +108,7 @@ export default function PhotoAlbum({
 
   return (
     <div className="space-y-4">
-      {access.enabled && !access.eventPassed && (
+      {access.enabled && !access.eventPassed && !access.isOrganizer && (
         <p className="text-xs text-muted-foreground italic rounded-2xl border border-border/60 bg-muted/40 p-3">
           L'album s'ouvrira après l'événement : vous pourrez ajouter vos photos une fois la date passée.
         </p>
