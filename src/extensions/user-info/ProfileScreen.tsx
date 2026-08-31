@@ -35,7 +35,7 @@ import {
   Download,
   Loader2,
   Lock,
-  Mail,
+  
   ShieldCheck,
   Trash2,
   UserCircle2,
