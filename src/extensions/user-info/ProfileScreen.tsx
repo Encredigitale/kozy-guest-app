@@ -156,18 +156,6 @@ export default function ProfileScreen() {
     toast.success("Un lien de modification du mot de passe vous a été envoyé.");
   };
 
-  const changeEmail = async () => {
-    const next = emailForm.value.trim();
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(next)) return toast.error("Adresse e-mail invalide.");
-    setEmailForm((p) => ({ ...p, busy: true }));
-    const { error } = await supabase.auth.updateUser(
-      { email: next },
-      { emailRedirectTo: `${window.location.origin}/app/profile` },
-    );
-    setEmailForm({ open: false, value: "", busy: false });
-    if (error) return toast.error(error.message);
-    toast.success("Un e-mail de confirmation a été envoyé à la nouvelle adresse.");
-  };
 
   const onExport = async () => {
     try {
