@@ -17,7 +17,9 @@ function ContactsPage() {
   return (
     <div className="p-6 md:p-8 max-w-3xl mx-auto">
       <header className="mb-6">
-        <h1 className="font-serif text-3xl md:text-4xl tracking-tight text-primary">Contacts</h1>
+        <h1 className="font-serif text-3xl md:text-4xl tracking-tight text-primary flex items-center gap-2">
+          <BookUser className="h-7 w-7" /> Contacts
+        </h1>
         <p className="text-sm text-muted-foreground mt-2">
           Vos contacts favoris et réutilisables pour vos prochains événements.
         </p>
