@@ -4,20 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 /**
  * Résumé léger d'une fonctionnalité pour la page événement.
  * Chaque plugin expose ici sa propre lecture minimale : le Core ne connaît
- * aucune logique métier, il se contente d'afficher la chaîne renvoyée.
+ * aucune logique métier, il affiche simplement la chaîne renvoyée.
  */
 type SummaryFn = (eventId: string) => Promise<string | null>;
 
-const count = async (
-  table: string,
-  build: (q: ReturnType<typeof supabase.from>) => unknown,
-): Promise<number> => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const q: any = build(supabase.from(table as never) as never);
-  const { count: c, error } = await q;
-  if (error) throw error;
-  return c ?? 0;
-};
+const plural = (n: number, one: string, many: string) => `${n} ${n > 1 ? many : one}`;
 
 const SUMMARIES: Record<string, SummaryFn> = {
   "ext.invitations": async (eventId) => {
@@ -29,22 +20,26 @@ const SUMMARIES: Record<string, SummaryFn> = {
     const rows = data ?? [];
     if (rows.length === 0) return "Aucun invité";
     const accepted = rows.filter((r) => r.status === "accepted").length;
-    const pending = rows.filter((r) => r.status === "sent" || r.status === "opened" || r.status === "draft").length;
-    return `${rows.length} invité${rows.length > 1 ? "s" : ""} · ${accepted} participe${accepted > 1 ? "nt" : ""} · ${pending} en attente`;
+    const pending = rows.filter((r) => ["draft", "sent", "opened"].includes(r.status)).length;
+    return `${plural(rows.length, "invité", "invités")} · ${accepted} participe${accepted > 1 ? "nt" : ""} · ${pending} en attente`;
   },
   "ext.photos": async (eventId) => {
-    const n = await count("event_photos", (q) =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (q as any).select("id", { count: "exact", head: true }).eq("event_id", eventId).is("deleted_at", null),
-    );
-    return n === 0 ? "Album vide" : `${n} photo${n > 1 ? "s" : ""}`;
+    const { count, error } = await supabase
+      .from("event_photos")
+      .select("id", { count: "exact", head: true })
+      .eq("event_id", eventId)
+      .is("deleted_at", null);
+    if (error) throw error;
+    return (count ?? 0) === 0 ? "Album vide" : plural(count ?? 0, "photo", "photos");
   },
   "ext.gifts": async (eventId) => {
-    const n = await count("event_gift", (q) =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (q as any).select("id", { count: "exact", head: true }).eq("event_id", eventId).is("deleted_at", null),
-    );
-    return n === 0 ? "Aucun cadeau" : `${n} cadeau${n > 1 ? "x" : ""}`;
+    const { count, error } = await supabase
+      .from("event_gift")
+      .select("id", { count: "exact", head: true })
+      .eq("event_id", eventId)
+      .is("deleted_at", null);
+    if (error) throw error;
+    return (count ?? 0) === 0 ? "Aucun cadeau" : plural(count ?? 0, "cadeau", "cadeaux");
   },
   "ext.contributions": async (eventId) => {
     const { data, error } = await supabase
@@ -55,26 +50,25 @@ const SUMMARIES: Record<string, SummaryFn> = {
     const rows = data ?? [];
     if (rows.length === 0) return "Aucun besoin défini";
     const closed = rows.filter((r) => r.status === "closed").length;
-    return `${rows.length} besoin${rows.length > 1 ? "s" : ""} · ${closed} couvert${closed > 1 ? "s" : ""}`;
+    return `${plural(rows.length, "besoin", "besoins")} · ${closed} couvert${closed > 1 ? "s" : ""}`;
   },
   "ext.guest-brings": async (eventId) => {
-    const n = await count("guest_contributions", (q) =>
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (q as any).select("id", { count: "exact", head: true }).eq("event_id", eventId),
-    );
-    return n === 0 ? "Rien d'annoncé" : `${n} apport${n > 1 ? "s" : ""} annoncé${n > 1 ? "s" : ""}`;
+    const { count, error } = await supabase
+      .from("guest_contributions")
+      .select("id", { count: "exact", head: true })
+      .eq("event_id", eventId);
+    if (error) throw error;
+    return (count ?? 0) === 0 ? "Rien d'annoncé" : plural(count ?? 0, "apport annoncé", "apports annoncés");
   },
   "event.menu": async (eventId) => {
-    const { data, error } = await supabase
+    const { count, error } = await supabase
       .from("widget_items")
-      .select("payload")
+      .select("id", { count: "exact", head: true })
       .eq("widget_key", "event.menu")
       .eq("scope_type", "event")
       .eq("scope_id", eventId);
     if (error) throw error;
-    const rows = data ?? [];
-    if (rows.length === 0) return "Menu à composer";
-    return `${rows.length} élément${rows.length > 1 ? "s" : ""} au menu`;
+    return (count ?? 0) === 0 ? "Menu à composer" : plural(count ?? 0, "élément au menu", "éléments au menu");
   },
 };
 
