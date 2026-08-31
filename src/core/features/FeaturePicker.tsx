@@ -54,8 +54,8 @@ export function FeaturePicker({ open, onOpenChange, features, onAdd, busyId }: P
         side={isMobile ? "bottom" : "right"}
         className={
           isMobile
-            ? "h-[85dvh] rounded-t-3xl pb-[env(safe-area-inset-bottom)] flex flex-col"
-            : "w-full sm:max-w-md flex flex-col"
+            ? "h-[85dvh] rounded-t-3xl pb-[env(safe-area-inset-bottom)] flex flex-col bg-white"
+            : "w-full sm:max-w-md flex flex-col bg-white"
         }
       >
         <SheetHeader className="text-left">
