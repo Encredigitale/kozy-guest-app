@@ -421,12 +421,18 @@ export default function ProfileScreen() {
       )}
 
       <Section title="Sécurité" icon={<Lock className="h-4 w-4" />}>
-        <div className="flex items-center justify-between gap-3">
-          <div className="text-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0 text-sm">
             <p className="font-medium">Mot de passe</p>
             <p className="text-muted-foreground text-xs">Géré par le système d'authentification.</p>
           </div>
-          <Button size="sm" variant="outline" className="rounded-full" disabled={pwdBusy} onClick={changePassword}>
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full rounded-full sm:w-auto sm:shrink-0"
+            disabled={pwdBusy}
+            onClick={changePassword}
+          >
             {pwdBusy && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />}Modifier mon mot de passe
           </Button>
         </div>
