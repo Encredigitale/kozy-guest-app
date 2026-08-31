@@ -56,39 +56,25 @@ function NewEventPage() {
       toast.error(error?.message ?? "Erreur.");
       return;
     }
-    // Persist per-event widget overrides: activate only selected widgets.
-    if (selectedWidgets.length > 0) {
-      const rows = selectedWidgets.map((widget_id, i) => ({
-        event_id: data.id,
-        widget_id,
-        enabled: true,
-        position: i,
-      }));
-      await supabase.from("event_widgets" as never).insert(rows as never);
-      // Extensions sélectionnées (ext.*) : activer l'extension pour l'événement.
-      const extRows = selectedWidgets
-        .filter((id) => id.startsWith("ext."))
-        .map((id) => ({ event_id: data.id, extension_key: id.slice(4), enabled: true }));
-      if (extRows.length > 0) {
-        await supabase
-          .from("event_extensions")
-          .upsert(extRows, { onConflict: "event_id,extension_key" });
-      }
-    }
-
     setSaving(false);
     toast.success("Événement créé.");
     navigate({ to: "/app/events/$eventId", params: { eventId: data.id } });
   };
 
   const { data: placements } = useSurfaceWidgets("event.new");
+  // Parcours volontairement réduit à 2 étapes : Type puis Informations.
+  // Les fonctionnalités ne sont plus choisies ici mais sur la page événement.
+  const STEP_KEYS = ["event.new.type", "event.new.info"];
   const steps = useMemo(
     () =>
-      placements.filter(
-        (p) =>
-          p.widget.manifest.component !== "event.new.menu" || selectedWidgets.includes("event.menu"),
-      ),
-    [placements, selectedWidgets],
+      placements
+        .filter((p) => STEP_KEYS.includes(p.widget.manifest.component))
+        .sort(
+          (a, b) =>
+            STEP_KEYS.indexOf(a.widget.manifest.component) -
+            STEP_KEYS.indexOf(b.widget.manifest.component),
+        ),
+    [placements],
   );
   const stepCount = steps.length;
 
