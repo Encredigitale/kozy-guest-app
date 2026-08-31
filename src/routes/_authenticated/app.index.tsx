@@ -6,6 +6,7 @@ import { WidgetRenderer } from "@/core/registry/WidgetRenderer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Sparkles } from "lucide-react";
+import { BirthdayNotice } from "@/widgets/contacts-book/BirthdayNotice";
 
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
@@ -68,6 +69,8 @@ function DashboardPage() {
           </Button>
         </div>
       </section>
+
+      <BirthdayNotice />
 
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-sm font-semibold text-foreground">Mon tableau de bord</h2>
