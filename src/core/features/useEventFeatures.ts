@@ -12,6 +12,7 @@ export type FeatureState = "active" | "inactive" | "available";
 
 export type EventFeature = {
   id: string;
+  component: string;
   name: string;
   description: string | null;
   icon: string | null;
@@ -73,6 +74,7 @@ export function useEventFeatures(eventId: string, eventTypeKey?: string | null) 
 
         return {
           id: w.id,
+          component: w.manifest?.component ?? w.id,
           name: w.name,
           description: w.description,
           icon: w.manifest?.icon ?? null,
