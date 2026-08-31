@@ -192,6 +192,20 @@ export const EXTENSIONS: ExtensionDefinition[] = [
       },
     ],
   },
+  {
+    key: "gifts",
+    name: "Cadeaux",
+    description:
+      "Mémoriser les cadeaux offerts pendant l'événement : quoi, à qui et par qui, avec visibilité paramétrable.",
+    category: "memories",
+    icon: "Gift",
+    version: "1.0.0",
+    scope: "event",
+    settingsComponent: lazy(() => import("@/extensions/gifts/AdminSettings")),
+    widgets: [
+      { key: "ext.gifts", component: lazy(() => import("@/extensions/gifts/GiftsWidget")) },
+    ],
+  },
 ];
 
 

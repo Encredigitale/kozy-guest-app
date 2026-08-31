@@ -593,6 +593,117 @@ export type Database = {
           },
         ]
       }
+      event_gift: {
+        Row: {
+          created_at: string
+          created_by_user_id: string | null
+          deleted_at: string | null
+          description: string | null
+          event_id: string
+          gift_date: string | null
+          gift_name: string
+          id: string
+          note: string | null
+          photo_id: string | null
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          created_at?: string
+          created_by_user_id?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          event_id: string
+          gift_date?: string | null
+          gift_name: string
+          id?: string
+          note?: string | null
+          photo_id?: string | null
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          created_at?: string
+          created_by_user_id?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          event_id?: string
+          gift_date?: string | null
+          gift_name?: string
+          id?: string
+          note?: string | null
+          photo_id?: string | null
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_gift_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_gift_photo_id_fkey"
+            columns: ["photo_id"]
+            isOneToOne: false
+            referencedRelation: "event_photos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_gift_person: {
+        Row: {
+          contact_id: string | null
+          created_at: string
+          display_name_snapshot: string
+          gift_id: string
+          id: string
+          manual_name: string | null
+          role: string
+          source_type: string
+          user_id: string | null
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string
+          display_name_snapshot: string
+          gift_id: string
+          id?: string
+          manual_name?: string | null
+          role: string
+          source_type?: string
+          user_id?: string | null
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string
+          display_name_snapshot?: string
+          gift_id?: string
+          id?: string
+          manual_name?: string | null
+          role?: string
+          source_type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_gift_person_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "widget_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_gift_person_gift_id_fkey"
+            columns: ["gift_id"]
+            isOneToOne: false
+            referencedRelation: "event_gift"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_participants: {
         Row: {
           created_at: string
