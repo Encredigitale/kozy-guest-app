@@ -4,6 +4,9 @@ import { BookUser } from "lucide-react";
 import { resolveWidgetComponent } from "@/core/registry/components";
 
 export const Route = createFileRoute("/_authenticated/app/contacts")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    c: typeof search.c === "string" ? search.c : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Contacts — Kozy" },

@@ -26,6 +26,7 @@ export function BirthdayNotice({ windowDays = 15 }: { windowDays?: number }) {
       </ul>
       <Link
         to="/app/contacts"
+        search={{ c: undefined }}
         className="mt-2 inline-flex min-h-11 items-center gap-1 text-xs text-primary hover:underline"
       >
         Voir le carnet d'adresses <ChevronRight className="h-3 w-3" />
