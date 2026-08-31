@@ -327,6 +327,10 @@ export default function ProfileScreen() {
           <div className="space-y-2 text-sm">
             <Row label="Prénom" value={profile?.first_name} />
             <Row label="Nom" value={profile?.last_name} />
+            <Row
+              label="Pseudo"
+              value={String((profile?.extra as Record<string, unknown> | undefined)?.nickname ?? "") || null}
+            />
             <Row label="E-mail" value={user?.email} />
             {!phoneHidden && (
               <Row
@@ -343,23 +347,7 @@ export default function ProfileScreen() {
             )}
             <div className="flex flex-wrap gap-2 pt-2">
               <Button size="sm" variant="outline" className="rounded-full" onClick={openIdentity}>Modifier</Button>
-              <Button size="sm" variant="ghost" className="rounded-full" onClick={() => setEmailForm({ open: true, value: "", busy: false })}>
-                <Mail className="h-3.5 w-3.5 mr-1" />Changer d'e-mail
-              </Button>
             </div>
-            {emailForm.open && (
-              <div className="mt-3 space-y-2 rounded-xl border border-border/60 p-3">
-                <Label htmlFor="new-email">Nouvelle adresse e-mail</Label>
-                <Input id="new-email" type="email" value={emailForm.value} onChange={(e) => setEmailForm((p) => ({ ...p, value: e.target.value }))} />
-                <p className="text-xs text-muted-foreground">
-                  Un lien de confirmation sera envoyé à cette adresse. Le compte ne sera mis à jour qu'après validation.
-                </p>
-                <div className="flex justify-end gap-2">
-                  <Button size="sm" variant="ghost" className="rounded-full" onClick={() => setEmailForm({ open: false, value: "", busy: false })}>Annuler</Button>
-                  <Button size="sm" className="rounded-full" disabled={emailForm.busy} onClick={changeEmail}>Envoyer</Button>
-                </div>
-              </div>
-            )}
           </div>
         )}
       </Section>
