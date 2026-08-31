@@ -290,6 +290,16 @@ export default function ProfileScreen() {
                 <Input id="last" required maxLength={80} value={form.last_name} onChange={(e) => setForm((p) => ({ ...p, last_name: e.target.value }))} />
               </div>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="nickname">Pseudo</Label>
+              <Input
+                id="nickname"
+                maxLength={40}
+                placeholder="Le nom affiché aux autres participants"
+                value={form.nickname}
+                onChange={(e) => setForm((p) => ({ ...p, nickname: e.target.value }))}
+              />
+            </div>
             {!phoneHidden && (
               <div className="space-y-2">
                 <Label htmlFor="phone">Téléphone</Label>
