@@ -269,6 +269,7 @@ export default function ProfileScreen() {
                 await saveIdentity.mutateAsync({
                   first_name: form.first_name,
                   last_name: form.last_name,
+                  nickname: form.nickname,
                   ...(phoneHidden ? {} : { phone: form.phone, countryCode: form.country }),
                 });
                 setEditIdentity(false);
