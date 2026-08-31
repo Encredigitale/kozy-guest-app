@@ -122,6 +122,7 @@ export default function ProfileScreen() {
     setForm({
       first_name: profile?.first_name ?? "",
       last_name: profile?.last_name ?? "",
+      nickname: String((profile?.extra as Record<string, unknown> | undefined)?.nickname ?? ""),
       phone: profile?.phone ?? "",
       country: DEFAULT_COUNTRY,
     });
