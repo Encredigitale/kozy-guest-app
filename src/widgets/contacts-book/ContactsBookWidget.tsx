@@ -8,15 +8,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { BookUser, Check, Pencil, Plus, Trash2, X } from "lucide-react";
+import { BookUser, Cake, Check, Pencil, Plus, Trash2, X } from "lucide-react";
+import { daysUntilBirthday, formatBirthday } from "./birthdays";
 
 export default function ContactsBookWidget({ config }: WidgetProps) {
   const scope = { scope_type: "global" as const, scope_id: null };
   const { items, isLoading, create, update, remove, upsertSingle } = useWidgetItems("contacts.book", scope);
 
-  const [draft, setDraft] = useState<Record<string, unknown>>({ name: "", email: "", phone: "" });
+  const [draft, setDraft] = useState<Record<string, unknown>>({ name: "", email: "", phone: "", birthday: "" });
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editDraft, setEditDraft] = useState({ name: "", email: "", phone: "" });
+  const [editDraft, setEditDraft] = useState({ name: "", email: "", phone: "", birthday: "" });
 
   const startEdit = (id: string, payload: Record<string, unknown>) => {
     setEditingId(id);
@@ -24,6 +25,7 @@ export default function ContactsBookWidget({ config }: WidgetProps) {
       name: String(payload.name ?? ""),
       email: String(payload.email ?? ""),
       phone: String(payload.phone ?? ""),
+      birthday: String(payload.birthday ?? ""),
     });
   };
 
@@ -46,7 +48,7 @@ export default function ContactsBookWidget({ config }: WidgetProps) {
     
     create.mutate(
       { payload: { ...draft } },
-      { onSuccess: () => setDraft({ name: "", email: "", phone: "" }) },
+      { onSuccess: () => setDraft({ name: "", email: "", phone: "", birthday: "" }) },
     );
   };
 
@@ -92,6 +94,15 @@ export default function ContactsBookWidget({ config }: WidgetProps) {
                         onChange={(e) => setEditDraft({ ...editDraft, phone: e.target.value })}
                         placeholder="+33 …"
                       />
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Date d'anniversaire</Label>
+                        <Input
+                          type="date"
+                          className="w-full min-w-0"
+                          value={editDraft.birthday}
+                          onChange={(e) => setEditDraft({ ...editDraft, birthday: e.target.value })}
+                        />
+                      </div>
                     </div>
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="sm" className="rounded-full" onClick={() => setEditingId(null)}>
@@ -113,6 +124,21 @@ export default function ContactsBookWidget({ config }: WidgetProps) {
                       <p className="text-sm font-medium truncate">{String(i.payload.name ?? "")}</p>
                       <p className="text-xs text-muted-foreground truncate">{String(i.payload.email ?? "")}</p>
                       <p className="text-xs text-muted-foreground truncate">{String(i.payload.phone ?? "")}</p>
+                      {i.payload.birthday ? (
+                        <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
+                          <Cake className="h-3 w-3 text-primary" />
+                          {formatBirthday(String(i.payload.birthday))}
+                          {(() => {
+                            const d = daysUntilBirthday(String(i.payload.birthday));
+                            if (d === null || d > 15) return null;
+                            return (
+                              <span className="text-primary font-medium">
+                                {d === 0 ? "· aujourd'hui 🎉" : `· dans ${d} j`}
+                              </span>
+                            );
+                          })()}
+                        </p>
+                      ) : null}
                     </div>
                     <button
                       onClick={() => startEdit(i.id, i.payload)}
@@ -154,6 +180,15 @@ export default function ContactsBookWidget({ config }: WidgetProps) {
             onChange={(e) => setDraft({ ...draft, phone: e.target.value })}
             placeholder="+33 …"
           />
+          <div className="space-y-1 col-span-3 sm:col-span-1">
+            <Label className="text-xs text-muted-foreground">Date d'anniversaire</Label>
+            <Input
+              type="date"
+              className="w-full min-w-0"
+              value={(draft.birthday as string) ?? ""}
+              onChange={(e) => setDraft({ ...draft, birthday: e.target.value })}
+            />
+          </div>
           </div>
           <Button onClick={add} disabled={create.isPending} size="sm" className="rounded-full self-end">
             <Plus className="h-3.5 w-3.5" /> Ajouter
