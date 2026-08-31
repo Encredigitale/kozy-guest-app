@@ -115,6 +115,7 @@ export function useUserProfile() {
     mutationFn: async (input: {
       first_name?: string;
       last_name?: string;
+      nickname?: string;
       phone?: string;
       countryCode?: string;
     }) => {
@@ -122,6 +123,12 @@ export function useUserProfile() {
       const patch: Record<string, unknown> = { user_id: user.id };
       if (input.first_name !== undefined) patch.first_name = input.first_name.trim() || null;
       if (input.last_name !== undefined) patch.last_name = input.last_name.trim() || null;
+      if (input.nickname !== undefined) {
+        patch.extra = {
+          ...(query.data?.profile?.extra ?? {}),
+          nickname: input.nickname.trim() || null,
+        };
+      }
       if (input.phone !== undefined) {
         const raw = input.phone.trim();
         const e164 = raw ? toE164(raw, input.countryCode) : null;

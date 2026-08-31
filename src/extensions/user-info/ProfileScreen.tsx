@@ -35,7 +35,7 @@ import {
   Download,
   Loader2,
   Lock,
-  Mail,
+  
   ShieldCheck,
   Trash2,
   UserCircle2,
@@ -108,8 +108,8 @@ export default function ProfileScreen() {
   const [editIdentity, setEditIdentity] = useState(false);
   const [editFood, setEditFood] = useState(false);
   const [editAllergies, setEditAllergies] = useState(false);
-  const [form, setForm] = useState({ first_name: "", last_name: "", phone: "", country: DEFAULT_COUNTRY });
-  const [emailForm, setEmailForm] = useState({ open: false, value: "", busy: false });
+  const [form, setForm] = useState({ first_name: "", last_name: "", nickname: "", phone: "", country: DEFAULT_COUNTRY });
+  
   const [pwdBusy, setPwdBusy] = useState(false);
   const [deleteState, setDeleteState] = useState({ open: false, password: "", busy: false });
 
@@ -122,6 +122,7 @@ export default function ProfileScreen() {
     setForm({
       first_name: profile?.first_name ?? "",
       last_name: profile?.last_name ?? "",
+      nickname: String((profile?.extra as Record<string, unknown> | undefined)?.nickname ?? ""),
       phone: profile?.phone ?? "",
       country: DEFAULT_COUNTRY,
     });
@@ -155,18 +156,6 @@ export default function ProfileScreen() {
     toast.success("Un lien de modification du mot de passe vous a été envoyé.");
   };
 
-  const changeEmail = async () => {
-    const next = emailForm.value.trim();
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(next)) return toast.error("Adresse e-mail invalide.");
-    setEmailForm((p) => ({ ...p, busy: true }));
-    const { error } = await supabase.auth.updateUser(
-      { email: next },
-      { emailRedirectTo: `${window.location.origin}/app/profile` },
-    );
-    setEmailForm({ open: false, value: "", busy: false });
-    if (error) return toast.error(error.message);
-    toast.success("Un e-mail de confirmation a été envoyé à la nouvelle adresse.");
-  };
 
   const onExport = async () => {
     try {
@@ -269,6 +258,7 @@ export default function ProfileScreen() {
                 await saveIdentity.mutateAsync({
                   first_name: form.first_name,
                   last_name: form.last_name,
+                  nickname: form.nickname,
                   ...(phoneHidden ? {} : { phone: form.phone, countryCode: form.country }),
                 });
                 setEditIdentity(false);
@@ -287,6 +277,16 @@ export default function ProfileScreen() {
                 <Label htmlFor="last">Nom *</Label>
                 <Input id="last" required maxLength={80} value={form.last_name} onChange={(e) => setForm((p) => ({ ...p, last_name: e.target.value }))} />
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="nickname">Pseudo</Label>
+              <Input
+                id="nickname"
+                maxLength={40}
+                placeholder="Le nom affiché aux autres participants"
+                value={form.nickname}
+                onChange={(e) => setForm((p) => ({ ...p, nickname: e.target.value }))}
+              />
             </div>
             {!phoneHidden && (
               <div className="space-y-2">
@@ -315,6 +315,10 @@ export default function ProfileScreen() {
           <div className="space-y-2 text-sm">
             <Row label="Prénom" value={profile?.first_name} />
             <Row label="Nom" value={profile?.last_name} />
+            <Row
+              label="Pseudo"
+              value={String((profile?.extra as Record<string, unknown> | undefined)?.nickname ?? "") || null}
+            />
             <Row label="E-mail" value={user?.email} />
             {!phoneHidden && (
               <Row
@@ -331,23 +335,7 @@ export default function ProfileScreen() {
             )}
             <div className="flex flex-wrap gap-2 pt-2">
               <Button size="sm" variant="outline" className="rounded-full" onClick={openIdentity}>Modifier</Button>
-              <Button size="sm" variant="ghost" className="rounded-full" onClick={() => setEmailForm({ open: true, value: "", busy: false })}>
-                <Mail className="h-3.5 w-3.5 mr-1" />Changer d'e-mail
-              </Button>
             </div>
-            {emailForm.open && (
-              <div className="mt-3 space-y-2 rounded-xl border border-border/60 p-3">
-                <Label htmlFor="new-email">Nouvelle adresse e-mail</Label>
-                <Input id="new-email" type="email" value={emailForm.value} onChange={(e) => setEmailForm((p) => ({ ...p, value: e.target.value }))} />
-                <p className="text-xs text-muted-foreground">
-                  Un lien de confirmation sera envoyé à cette adresse. Le compte ne sera mis à jour qu'après validation.
-                </p>
-                <div className="flex justify-end gap-2">
-                  <Button size="sm" variant="ghost" className="rounded-full" onClick={() => setEmailForm({ open: false, value: "", busy: false })}>Annuler</Button>
-                  <Button size="sm" className="rounded-full" disabled={emailForm.busy} onClick={changeEmail}>Envoyer</Button>
-                </div>
-              </div>
-            )}
           </div>
         )}
       </Section>
@@ -421,12 +409,18 @@ export default function ProfileScreen() {
       )}
 
       <Section title="Sécurité" icon={<Lock className="h-4 w-4" />}>
-        <div className="flex items-center justify-between gap-3">
-          <div className="text-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0 text-sm">
             <p className="font-medium">Mot de passe</p>
             <p className="text-muted-foreground text-xs">Géré par le système d'authentification.</p>
           </div>
-          <Button size="sm" variant="outline" className="rounded-full" disabled={pwdBusy} onClick={changePassword}>
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full rounded-full sm:w-auto sm:shrink-0"
+            disabled={pwdBusy}
+            onClick={changePassword}
+          >
             {pwdBusy && <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" />}Modifier mon mot de passe
           </Button>
         </div>
