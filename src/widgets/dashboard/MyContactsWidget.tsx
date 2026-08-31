@@ -44,7 +44,6 @@ export default function MyContactsWidget() {
                   <Link
                     key={c.id}
                     to="/app/contacts"
-                   search={{ c: undefined }}
                     search={{ c: c.id }}
                     className="flex flex-col items-center gap-2 p-3 rounded-xl border border-border/60 hover:bg-accent transition-colors text-center"
                   >
