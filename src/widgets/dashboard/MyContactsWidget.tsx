@@ -15,7 +15,7 @@ export default function MyContactsWidget() {
             <BookUser className="h-4 w-4 text-primary" />
             <h2 className="text-sm font-semibold">Carnet d'adresses</h2>
           </div>
-          <Link to="/app/contacts" className="text-xs text-primary hover:underline flex items-center gap-1">
+          <Link to="/app/contacts" search={{ c: undefined }} className="text-xs text-primary hover:underline flex items-center gap-1">
             Tout voir <ChevronRight className="h-3 w-3" />
           </Link>
         </div>
@@ -23,6 +23,7 @@ export default function MyContactsWidget() {
         {recent.length === 0 ? (
           <Link
             to="/app/contacts"
+            search={{ c: undefined }}
             className="flex items-center justify-center gap-2 py-6 text-sm text-muted-foreground border border-dashed rounded-lg hover:bg-accent transition-colors"
           >
             <Plus className="h-4 w-4" /> Ajouter un contact
@@ -43,6 +44,7 @@ export default function MyContactsWidget() {
                   <Link
                     key={c.id}
                     to="/app/contacts"
+                   search={{ c: undefined }}
                     search={{ c: c.id }}
                     className="flex flex-col items-center gap-2 p-3 rounded-xl border border-border/60 hover:bg-accent transition-colors text-center"
                   >
@@ -56,6 +58,7 @@ export default function MyContactsWidget() {
             </ul>
             <Link
               to="/app/contacts"
+              search={{ c: undefined }}
               className="mt-3 flex items-center justify-center gap-1 text-xs text-primary hover:underline"
             >
               <Plus className="h-3 w-3" /> Ajouter un contact
