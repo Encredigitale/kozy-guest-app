@@ -16,7 +16,7 @@ const ICONS: Record<string, LucideIcon> = {
 export const OTHER_TYPE = "other";
 
 export default function TypeStepWidget() {
-  const { type, setType, customType, setCustomType, next, setSelectedWidgets, setMenuComponents } = useWizard();
+  const { type, setType, customType, setCustomType, next, setSelectedWidgets, setMenuComponents, stepIndex, stepCount } = useWizard();
   const { data: types, isLoading } = useActiveEventTypes();
 
   const pickType = (key: string) => {
@@ -33,7 +33,7 @@ export default function TypeStepWidget() {
     <Card className="rounded-2xl border-border/60">
       <CardContent className="p-6 space-y-6">
         <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Étape 1 / 3</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Étape {stepIndex + 1} / {stepCount}</p>
           <h2 className="text-xl font-serif tracking-tight text-primary mt-1">Type d'événement</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Choisissez un type parmi ceux proposés, ou sélectionnez « Autre » pour le préciser.

@@ -6,12 +6,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { useWizard } from "./context";
 
 export default function InfoStepWidget() {
-  const { title, setTitle, description, setDescription, startsAt, setStartsAt, location, setLocation, next, back } = useWizard();
+  const { title, setTitle, description, setDescription, startsAt, setStartsAt, location, setLocation, next, back, isLastStep, submit, saving, stepIndex, stepCount } = useWizard();
   return (
     <Card className="rounded-2xl border-border/60">
       <CardContent className="p-6 space-y-6">
         <div>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">Étape 2 / 3</p>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">Étape {stepIndex + 1} / {stepCount}</p>
           <h2 className="text-xl font-serif tracking-tight text-primary mt-1">Informations</h2>
         </div>
         <div className="space-y-4">
@@ -24,7 +24,7 @@ export default function InfoStepWidget() {
         </div>
         <div className="flex justify-between">
           <Button variant="ghost" onClick={back} className="rounded-full">Retour</Button>
-          <Button disabled={!title.trim()} onClick={next} className="rounded-full">Continuer</Button>
+          <Button disabled={!title.trim() || saving} onClick={() => (isLastStep ? void submit() : next())} className="rounded-full">{isLastStep ? (saving ? "Création…" : "Créer l'événement") : "Continuer"}</Button>
         </div>
       </CardContent>
     </Card>
