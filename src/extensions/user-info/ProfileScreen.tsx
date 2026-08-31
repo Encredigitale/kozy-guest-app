@@ -108,7 +108,7 @@ export default function ProfileScreen() {
   const [editIdentity, setEditIdentity] = useState(false);
   const [editFood, setEditFood] = useState(false);
   const [editAllergies, setEditAllergies] = useState(false);
-  const [form, setForm] = useState({ first_name: "", last_name: "", phone: "", country: DEFAULT_COUNTRY });
+  const [form, setForm] = useState({ first_name: "", last_name: "", nickname: "", phone: "", country: DEFAULT_COUNTRY });
   const [emailForm, setEmailForm] = useState({ open: false, value: "", busy: false });
   const [pwdBusy, setPwdBusy] = useState(false);
   const [deleteState, setDeleteState] = useState({ open: false, password: "", busy: false });
