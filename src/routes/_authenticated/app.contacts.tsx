@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Suspense } from "react";
+import { BookUser } from "lucide-react";
 import { resolveWidgetComponent } from "@/core/registry/components";
 
 export const Route = createFileRoute("/_authenticated/app/contacts")({
