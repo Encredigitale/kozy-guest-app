@@ -515,9 +515,20 @@ export const approveInvitation = createServerFn({ method: "POST" })
     if (!invitation) throw new Error("Invitation introuvable");
     const inv = invitation as Record<string, any>;
 
+    // Valider la participation équivaut à la réponse « Je participe » de l'invité :
+    // le statut de l'invitation devient « accepted ».
     const patch = data.approved
-      ? { approved_at: new Date().toISOString(), approved_by: context.userId }
-      : { approved_at: null, approved_by: null };
+      ? {
+          approved_at: new Date().toISOString(),
+          approved_by: context.userId,
+          status: "accepted",
+          responded_at: inv.responded_at ?? new Date().toISOString(),
+        }
+      : {
+          approved_at: null,
+          approved_by: null,
+          ...(inv.status === "accepted" ? { status: inv.sent_at ? "sent" : "draft", responded_at: null } : {}),
+        };
     const { error: updateError } = await context.supabase
       .from("invitations")
       .update(patch as never)
