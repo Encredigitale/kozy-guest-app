@@ -12,6 +12,8 @@ import { FeatureCard } from "@/core/features/FeatureCard";
 import { FeaturePicker } from "@/core/features/FeaturePicker";
 import { FeatureIcon } from "@/core/features/FeatureIcon";
 import { useSession } from "@/core/auth/useSession";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/app/events/$eventId/")({
   head: () => ({
