@@ -172,6 +172,8 @@ export async function resolvePublicInvitation(input: {
       invitationId: inv.id,
       eventId: input.eventId,
       guestName: inv.name ?? null,
+      guestEmail: inv.email ?? null,
+      hasAccount: !!inv.guest_user_id,
       status: inv.status,
       event: {
         title: ev.title,
