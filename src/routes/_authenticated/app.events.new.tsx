@@ -1,136 +1,21 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, useMemo, Suspense } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { WizardContext, type WizardValue } from "@/widgets/event-new/context";
-import { useSurfaceWidgets } from "@/core/registry/useRegistry";
-import { resolveWidgetComponent } from "@/core/registry/components";
+import { createFileRoute } from "@tanstack/react-router";
+import { EventForm } from "@/core/eventForm/EventForm";
 
 export const Route = createFileRoute("/_authenticated/app/events/new")({
-  head: () => ({ meta: [{ title: "Nouvel événement — Kozy" }] }),
+  head: () => ({
+    meta: [
+      { title: "Créer un événement — Kozy" },
+      { name: "description", content: "Créez votre événement en quelques blocs : type, informations, date, lieu." },
+      { property: "og:title", content: "Créer un événement — Kozy" },
+      { property: "og:description", content: "Créez votre événement en quelques blocs : type, informations, date, lieu." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   component: NewEventPage,
 });
 
 function NewEventPage() {
   const { user } = Route.useRouteContext();
-  const navigate = useNavigate();
-
-  const [step, setStep] = useState(0);
-  const [type, setType] = useState("");
-  const [customType, setCustomType] = useState("");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
-  const [startsAt, setStartsAt] = useState("");
-  const [selectedWidgets, setSelectedWidgets] = useState<string[]>([]);
-  const [menuComponents, setMenuComponents] = useState<string[]>([]);
-  const [saving, setSaving] = useState(false);
-
-  const toggleMenuComponent = (key: string) =>
-    setMenuComponents((prev) => (prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]));
-
-  const toggleWidget = (id: string) =>
-    setSelectedWidgets((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
-
-  const submit = async (): Promise<void> => {
-    if (!title.trim()) { toast.error("Titre requis."); return; }
-    setSaving(true);
-    const { data, error } = await supabase
-      .from("events")
-      .insert({
-        organizer_id: user.id,
-        title: title.trim(),
-        description: description.trim() || null,
-        location: location.trim() || null,
-        starts_at: startsAt ? new Date(startsAt).toISOString() : null,
-        metadata: {
-          event_type: type || null,
-          event_type_label: type === "other" ? customType.trim() || "Autre" : null,
-          menu_components: menuComponents,
-        },
-      })
-      .select("id")
-      .single();
-    if (error || !data) {
-      setSaving(false);
-      toast.error(error?.message ?? "Erreur.");
-      return;
-    }
-    setSaving(false);
-    toast.success("Événement créé.");
-    navigate({ to: "/app/events/$eventId", params: { eventId: data.id } });
-  };
-
-  const { data: placements } = useSurfaceWidgets("event.new");
-  // Parcours volontairement réduit à 2 étapes : Type puis Informations.
-  // Les fonctionnalités ne sont plus choisies ici mais sur la page événement.
-  const STEP_KEYS = ["event.new.type", "event.new.info"];
-  const steps = useMemo(
-    () =>
-      placements
-        .filter((p) => STEP_KEYS.includes(p.widget.manifest.component))
-        .sort(
-          (a, b) =>
-            STEP_KEYS.indexOf(a.widget.manifest.component) -
-            STEP_KEYS.indexOf(b.widget.manifest.component),
-        ),
-    [placements],
-  );
-  const stepCount = steps.length;
-
-  const value: WizardValue = useMemo(
-    () => ({
-      type, setType,
-      customType, setCustomType,
-      title, setTitle,
-      description, setDescription,
-      startsAt, setStartsAt,
-      location, setLocation,
-      selectedWidgets, setSelectedWidgets, toggleWidget,
-      menuComponents, toggleMenuComponent, setMenuComponents,
-      step,
-      stepIndex: step,
-      stepCount,
-      isLastStep: step >= stepCount - 1,
-      next: () => setStep((s) => Math.min(s + 1, Math.max(stepCount - 1, 0))),
-      back: () => setStep((s) => Math.max(s - 1, 0)),
-      submit, saving,
-    }),
-    [type, customType, title, description, startsAt, location, selectedWidgets, menuComponents, step, stepCount, saving],
-  );
-
-  const current = steps[Math.min(step, Math.max(stepCount - 1, 0))];
-
-  return (
-    <WizardContext.Provider value={value}>
-      <div className="p-8 max-w-3xl lg:max-w-5xl xl:max-w-7xl mx-auto">
-        <h1 className="font-serif text-3xl tracking-tight text-primary">Nouvel événement</h1>
-        <div className="mt-2 flex items-center gap-1">
-          {steps.map((_, i) => (
-            <div
-              key={i}
-              className={`h-1 flex-1 rounded-full ${i <= step ? "bg-primary" : "bg-muted"}`}
-            />
-          ))}
-        </div>
-        <div className="mt-6">
-          {current ? (
-            <StepRenderer componentKey={current.widget.manifest.component} />
-          ) : (
-            <p className="text-sm text-muted-foreground">Aucune étape configurée. Utilisez le Studio pour publier les widgets de l'onboarding.</p>
-          )}
-        </div>
-      </div>
-    </WizardContext.Provider>
-  );
-}
-
-function StepRenderer({ componentKey }: { componentKey: string }) {
-  const Cmp = resolveWidgetComponent(componentKey);
-  if (!Cmp) return <p className="text-sm text-destructive">Composant introuvable : {componentKey}</p>;
-  return (
-    <Suspense fallback={<p className="text-sm text-muted-foreground">Chargement…</p>}>
-      <Cmp />
-    </Suspense>
-  );
+  return <EventForm mode="create" organizerId={user.id} />;
 }
