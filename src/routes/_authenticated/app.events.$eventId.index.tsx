@@ -13,7 +13,7 @@ import { FeaturePicker } from "@/core/features/FeaturePicker";
 import { FeatureIcon } from "@/core/features/FeatureIcon";
 import { useSession } from "@/core/auth/useSession";
 
-export const Route = createFileRoute("/_authenticated/app/events/$eventId")({
+export const Route = createFileRoute("/_authenticated/app/events/$eventId/")({
   head: () => ({
     meta: [
       { title: "Mon événement — Kozy" },
