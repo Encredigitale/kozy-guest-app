@@ -472,7 +472,7 @@ export const createGuestAccount = createServerFn({ method: "POST" })
     if (participant) {
       await supabaseAdmin
         .from("event_participants")
-        .update({ user_id: created.user.id, rsvp_status: "yes" } as never)
+        .update({ user_id: created.user.id, rsvp_status: "accepted" } as never)
         .eq("id", (participant as { id: string }).id);
     } else {
       await supabaseAdmin.from("event_participants").insert({
@@ -480,7 +480,7 @@ export const createGuestAccount = createServerFn({ method: "POST" })
         user_id: created.user.id,
         email,
         role: "guest",
-        rsvp_status: "yes",
+        rsvp_status: "accepted",
       } as never);
     }
 
