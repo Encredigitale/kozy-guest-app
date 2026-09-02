@@ -12,8 +12,10 @@ import { FeatureCard } from "@/core/features/FeatureCard";
 import { FeaturePicker } from "@/core/features/FeaturePicker";
 import { FeatureIcon } from "@/core/features/FeatureIcon";
 import { useSession } from "@/core/auth/useSession";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
-export const Route = createFileRoute("/_authenticated/app/events/$eventId")({
+export const Route = createFileRoute("/_authenticated/app/events/$eventId/")({
   head: () => ({
     meta: [
       { title: "Mon événement — Kozy" },
@@ -45,7 +47,19 @@ function EventDetailPage() {
   const { user } = useSession();
   const isOrganizer = !!ev && !!user && ev.organizer_id === user.id;
   const isDraft = ev?.status === "draft";
+  const isArchived = ev?.status === "archived";
   const { data: types } = useEventTypes();
+  const qc = useQueryClient();
+  const [statusBusy, setStatusBusy] = useState(false);
+
+  const changeStatus = async (status: "published" | "archived") => {
+    setStatusBusy(true);
+    const { error } = await supabase.from("events").update({ status }).eq("id", eventId);
+    setStatusBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(status === "published" ? "Événement publié." : "Événement archivé.");
+    qc.invalidateQueries({ queryKey: ["event", eventId] });
+  };
 
   const meta = (ev?.metadata ?? {}) as Record<string, unknown>;
   const typeKey = (meta["event_type"] as string | undefined) ?? null;
@@ -165,6 +179,36 @@ function EventDetailPage() {
                   <Badge variant="outline" className="rounded-full text-[11px]">
                     Brouillon — visible par vous seul
                   </Badge>
+                )}
+                {isArchived && (
+                  <Badge variant="outline" className="rounded-full text-[11px]">
+                    Archivé
+                  </Badge>
+                )}
+                {isOrganizer && (
+                  <>
+                    {ev?.status !== "published" && (
+                      <Button
+                        size="sm"
+                        className="h-7 rounded-full px-3 text-[11px]"
+                        disabled={statusBusy}
+                        onClick={() => changeStatus("published")}
+                      >
+                        Publier
+                      </Button>
+                    )}
+                    {ev?.status !== "archived" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 rounded-full px-3 text-[11px]"
+                        disabled={statusBusy}
+                        onClick={() => changeStatus("archived")}
+                      >
+                        Archiver
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
               <h1 className="mt-1 break-words font-serif text-2xl leading-tight tracking-tight text-primary">
