@@ -6,6 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Plus } from "lucide-react";
 
+const EVENT_STATUS_LABELS: Record<string, string> = {
+  draft: "Brouillon",
+  published: "Publié",
+  archived: "Archivé",
+};
+
 export const Route = createFileRoute("/_authenticated/app/events/")({
   head: () => ({ meta: [{ title: "Événements — Kozy" }] }),
   component: EventsListPage,
@@ -62,7 +68,7 @@ function EventsListPage() {
                       <CardTitle className="text-base">{e.title}</CardTitle>
                       {e.description && <CardDescription className="line-clamp-1">{e.description}</CardDescription>}
                     </div>
-                    <Badge variant={e.status === "published" ? "default" : "secondary"}>{e.status}</Badge>
+                    <Badge variant={e.status === "published" ? "default" : "secondary"}>{EVENT_STATUS_LABELS[e.status] ?? e.status}</Badge>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0 flex gap-4 text-xs text-muted-foreground">

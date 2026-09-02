@@ -179,10 +179,13 @@ export const sendInvitation = createServerFn({ method: "POST" })
 
     const { data: event } = await context.supabase
       .from("events")
-      .select("title, starts_at, location")
+      .select("title, starts_at, location, status")
       .eq("id", inv.event_id)
       .maybeSingle();
     const ev = (event ?? {}) as Record<string, any>;
+    if (ev.status === "draft") {
+      throw new Error("Cet événement est en brouillon : publiez-le pour envoyer les invitations.");
+    }
 
     const { data: profile } = await context.supabase
       .from("profiles")
@@ -375,9 +378,12 @@ export const sendInvitationSms = createServerFn({ method: "POST" })
 
     const { data: event } = await context.supabase
       .from("events")
-      .select("title")
+      .select("title, status")
       .eq("id", inv.event_id)
       .maybeSingle();
+    if ((event as { status?: string } | null)?.status === "draft") {
+      throw new Error("Cet événement est en brouillon : publiez-le pour envoyer les invitations.");
+    }
     const { data: profile } = await context.supabase
       .from("profiles")
       .select("display_name")
@@ -489,4 +495,62 @@ export const createGuestAccount = createServerFn({ method: "POST" })
       .insert({ invitation_id: data.invitationId, event_type: "account_created" } as never);
 
     return { ok: true as const, userId: created.user.id };
+  });
+
+
+/** L'organisateur valide (confirme) la participation d'un invité. */
+export const approveInvitation = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z.object({ invitationId: z.string().uuid(), approved: z.boolean() }).parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: invitation, error } = await context.supabase
+      .from("invitations")
+      .select("*")
+      .eq("id", data.invitationId)
+      .eq("organizer_id", context.userId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!invitation) throw new Error("Invitation introuvable");
+    const inv = invitation as Record<string, any>;
+
+    const patch = data.approved
+      ? { approved_at: new Date().toISOString(), approved_by: context.userId }
+      : { approved_at: null, approved_by: null };
+    const { error: updateError } = await context.supabase
+      .from("invitations")
+      .update(patch as never)
+      .eq("id", inv.id);
+    if (updateError) throw new Error(updateError.message);
+
+    if (data.approved) {
+      const { data: existing } = await context.supabase
+        .from("event_participants")
+        .select("id")
+        .eq("event_id", inv.event_id)
+        .eq(inv.guest_user_id ? "user_id" : "email", inv.guest_user_id ?? inv.email ?? "")
+        .maybeSingle();
+      if (existing?.id) {
+        await context.supabase
+          .from("event_participants")
+          .update({ rsvp_status: "accepted" } as never)
+          .eq("id", existing.id);
+      } else if (inv.guest_user_id || inv.email) {
+        await context.supabase.from("event_participants").insert({
+          event_id: inv.event_id,
+          user_id: inv.guest_user_id ?? null,
+          email: inv.email ?? null,
+          role: "guest",
+          rsvp_status: "accepted",
+        } as never);
+      }
+    }
+
+    await context.supabase.from("invitation_logs").insert({
+      invitation_id: inv.id,
+      event_type: data.approved ? "approved" : "approval_revoked",
+    } as never);
+
+    return { ok: true as const };
   });

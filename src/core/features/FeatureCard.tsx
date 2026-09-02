@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { resolveWidgetComponent } from "@/core/registry/components";
 import { FeatureIcon } from "./FeatureIcon";
-import { FeatureSummary } from "./FeatureSummary";
+import { FeatureSummary, FeatureProgress } from "./FeatureSummary";
 import type { EventFeature } from "./useEventFeatures";
 
 type Props = {
@@ -30,13 +30,15 @@ type Props = {
   canMoveDown: boolean;
   onMove: (dir: -1 | 1) => void;
   onDisable: () => void;
+  /** Faux pour un invité : lecture seule. */
+  canManage?: boolean;
 };
 
 /**
  * Carte générique d'une fonctionnalité active. Le contenu du plugin n'est
  * monté que lorsque l'utilisateur ouvre la carte (chargement paresseux).
  */
-export function FeatureCard({ feature, eventId, canMoveUp, canMoveDown, onMove, onDisable }: Props) {
+export function FeatureCard({ feature, eventId, canMoveUp, canMoveDown, onMove, onDisable, canManage = true }: Props) {
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const Component = open ? resolveWidgetComponent(feature.component) : null;
@@ -58,8 +60,10 @@ export function FeatureCard({ feature, eventId, canMoveUp, canMoveDown, onMove, 
               <p className="font-medium leading-tight">{feature.name}</p>
               <div className="mt-1">
                 <FeatureSummary featureId={feature.id} eventId={eventId} />
+                <FeatureProgress featureId={feature.id} eventId={eventId} />
               </div>
             </button>
+            {canManage && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -84,6 +88,7 @@ export function FeatureCard({ feature, eventId, canMoveUp, canMoveDown, onMove, 
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            )}
           </div>
 
           <button

@@ -101,6 +101,8 @@ export async function resolvePublicInvitation(input: {
   if (!event) return { ok: false, error: "deleted" };
   const ev = event as Record<string, any>;
   if (ev.status === "archived") return { ok: false, error: "cancelled_event" };
+  // Un événement en brouillon n'est visible que de son créateur.
+  if (ev.status === "draft") return { ok: false, error: "cancelled_event" };
 
   const { data: profile } = await supabaseAdmin
     .from("profiles")

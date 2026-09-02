@@ -16,13 +16,16 @@ export const sendEventInvitation = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: event, error: eventError } = await context.supabase
       .from("events")
-      .select("id, title, starts_at, location, organizer_id")
+      .select("id, title, starts_at, location, organizer_id, status")
       .eq("id", data.eventId)
       .eq("organizer_id", context.userId)
       .maybeSingle();
 
     if (eventError) throw new Error(eventError.message);
     if (!event) throw new Error("Événement introuvable ou accès refusé");
+    if ((event as { status?: string }).status === "draft") {
+      throw new Error("Cet événement est en brouillon : publiez-le pour envoyer les invitations.");
+    }
 
     const { data: participant, error: participantError } = await context.supabase
       .from("event_participants")

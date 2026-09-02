@@ -11,6 +11,7 @@ import { useEventFeatures, type EventFeature } from "@/core/features/useEventFea
 import { FeatureCard } from "@/core/features/FeatureCard";
 import { FeaturePicker } from "@/core/features/FeaturePicker";
 import { FeatureIcon } from "@/core/features/FeatureIcon";
+import { useSession } from "@/core/auth/useSession";
 
 export const Route = createFileRoute("/_authenticated/app/events/$eventId")({
   head: () => ({
@@ -40,7 +41,10 @@ function formatDate(iso: string | null): string | null {
 
 function EventDetailPage() {
   const { eventId } = Route.useParams();
-  const { data: ev } = useEvent(eventId);
+  const { data: ev, isLoading: eventLoading } = useEvent(eventId);
+  const { user } = useSession();
+  const isOrganizer = !!ev && !!user && ev.organizer_id === user.id;
+  const isDraft = ev?.status === "draft";
   const { data: types } = useEventTypes();
 
   const meta = (ev?.metadata ?? {}) as Record<string, unknown>;
@@ -112,6 +116,20 @@ function EventDetailPage() {
 
   const dateLabel = formatDate(ev?.starts_at ?? null);
 
+  if (!eventLoading && !ev) {
+    return (
+      <div className="mx-auto w-full max-w-3xl px-4 py-16 text-center">
+        <h1 className="font-serif text-2xl text-primary">Événement indisponible</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Cet événement n'existe plus ou n'est pas encore publié par son organisateur.
+        </p>
+        <Button asChild className="mt-6 h-11 rounded-full">
+          <Link to="/app/events">Mes événements</Link>
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto w-full max-w-5xl space-y-4 px-4 pb-28 pt-4 sm:px-6">
       <Link
@@ -137,11 +155,18 @@ function EventDetailPage() {
               </div>
             )}
             <div className="min-w-0 flex-1">
-              {typeLabel && (
-                <Badge variant="secondary" className="rounded-full text-[11px]">
-                  {typeLabel}
-                </Badge>
-              )}
+              <div className="flex flex-wrap items-center gap-1.5">
+                {typeLabel && (
+                  <Badge variant="secondary" className="rounded-full text-[11px]">
+                    {typeLabel}
+                  </Badge>
+                )}
+                {isDraft && (
+                  <Badge variant="outline" className="rounded-full text-[11px]">
+                    Brouillon — visible par vous seul
+                  </Badge>
+                )}
+              </div>
               <h1 className="mt-1 break-words font-serif text-2xl leading-tight tracking-tight text-primary">
                 {ev?.title ?? "Événement"}
               </h1>
@@ -159,16 +184,22 @@ function EventDetailPage() {
               </p>
             )}
           </div>
-          <Button asChild variant="outline" className="h-11 w-full rounded-full sm:w-auto">
-            <Link to="/app/events/$eventId/edit" params={{ eventId }}>
-              <Pencil className="h-4 w-4" />
-              Modifier les informations
-            </Link>
-          </Button>
+          {isOrganizer ? (
+            <Button asChild variant="outline" className="h-11 w-full rounded-full sm:w-auto">
+              <Link to="/app/events/$eventId/edit" params={{ eventId }}>
+                <Pencil className="h-4 w-4" />
+                Modifier les informations
+              </Link>
+            </Button>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Vous êtes invité(e) à cet événement : les informations sont consultables uniquement.
+            </p>
+          )}
         </CardContent>
       </Card>
 
-      {welcome && (
+      {welcome && isOrganizer && (
         <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
           <p className="font-medium">Votre événement est créé 🎉</p>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -188,11 +219,12 @@ function EventDetailPage() {
               canMoveUp={i > 0}
               canMoveDown={i < active.length - 1}
               onMove={(dir) => move(i, dir)}
+              canManage={isOrganizer}
               onDisable={() => disableFeature(f)}
             />
           ))}
         </div>
-      ) : (
+      ) : isOrganizer ? (
         <Card className="rounded-2xl border-dashed border-border">
           <CardContent className="space-y-4 p-6 text-center">
             <p className="font-serif text-xl text-primary">Votre événement est prêt</p>
@@ -215,19 +247,29 @@ function EventDetailPage() {
             </div>
           </CardContent>
         </Card>
+      ) : (
+        <Card className="rounded-2xl border-dashed border-border">
+          <CardContent className="p-6 text-center text-sm text-muted-foreground">
+            L'organisateur n'a pas encore ajouté de fonctionnalité à cet événement.
+          </CardContent>
+        </Card>
       )}
 
-      <Button className="h-12 w-full rounded-full" onClick={() => setPickerOpen(true)}>
-        <Plus className="h-5 w-5" /> Ajouter une fonctionnalité
-      </Button>
+      {isOrganizer && (
+        <>
+          <Button className="h-12 w-full rounded-full" onClick={() => setPickerOpen(true)}>
+            <Plus className="h-5 w-5" /> Ajouter une fonctionnalité
+          </Button>
 
-      <FeaturePicker
-        open={pickerOpen}
-        onOpenChange={setPickerOpen}
-        features={features}
-        onAdd={addFeature}
-        busyId={busyId}
-      />
+          <FeaturePicker
+            open={pickerOpen}
+            onOpenChange={setPickerOpen}
+            features={features}
+            onAdd={addFeature}
+            busyId={busyId}
+          />
+        </>
+      )}
     </div>
   );
 }

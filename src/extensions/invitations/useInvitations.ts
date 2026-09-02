@@ -21,6 +21,8 @@ export type InvitationRow = {
   responded_at: string | null;
   expires_at: string | null;
   revoked_at: string | null;
+  approved_at: string | null;
+  approved_by: string | null;
   created_at: string;
 };
 
