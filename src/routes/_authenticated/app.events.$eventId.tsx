@@ -162,21 +162,12 @@ function EventDetailPage() {
               </p>
             )}
           </div>
-          <Button
-            variant="outline"
-            className="h-11 w-full rounded-full sm:w-auto"
-            onClick={() => setEditInfo((v) => !v)}
-          >
-            <Pencil className="h-4 w-4" />
-            {editInfo ? "Fermer" : "Modifier les informations"}
+          <Button asChild variant="outline" className="h-11 w-full rounded-full sm:w-auto">
+            <Link to="/app/events/$eventId/edit" params={{ eventId }}>
+              <Pencil className="h-4 w-4" />
+              Modifier les informations
+            </Link>
           </Button>
-          {editInfo && InfoWidget && (
-            <div className="border-t border-border/60 pt-3 [&>*]:border-0 [&>*]:bg-transparent [&>*]:shadow-none">
-              <Suspense fallback={<p className="text-sm text-muted-foreground">Chargement…</p>}>
-                <InfoWidget config={{ eventId }} />
-              </Suspense>
-            </div>
-          )}
         </CardContent>
       </Card>
 
