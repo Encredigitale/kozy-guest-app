@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getBaseUrl, sendBrevoEmail } from "@/lib/email-delivery.server";
 import { renderInvitationEmail } from "@/lib/email-templates";
+import { loadEventMenu } from "@/lib/invitations.server";
 
 export const sendEventInvitation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -43,12 +44,14 @@ export const sendEventInvitation = createServerFn({ method: "POST" })
     const eventDate = event.starts_at
       ? new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short" }).format(new Date(event.starts_at))
       : undefined;
+    const menu = await loadEventMenu(event.id);
     const html = renderInvitationEmail({
       hostName: profile?.display_name ?? undefined,
       eventTitle: event.title,
       eventDate,
       eventLocation: event.location ?? undefined,
       inviteUrl,
+      menu,
     });
 
     await sendBrevoEmail(

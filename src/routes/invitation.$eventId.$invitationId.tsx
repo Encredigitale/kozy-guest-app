@@ -3,10 +3,13 @@ import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import {
+  createGuestAccount,
   getPublicInvitation,
   respondToInvitation,
   savePublicContribution,
 } from "@/lib/invitations.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "@tanstack/react-router";
 import type { PublicInvitationPayload } from "@/extensions/invitations/public-types";
 import GuestBringsBlock from "@/extensions/guest-brings/GuestBringsBlock";
 import ContributionsBlock from "@/extensions/contributions/ContributionsBlock";
@@ -53,12 +56,17 @@ function PublicInvitationPage() {
   const load = useServerFn(getPublicInvitation);
   const respond = useServerFn(respondToInvitation);
   const saveContribution = useServerFn(savePublicContribution);
+  const signUpGuest = useServerFn(createGuestAccount);
+  const navigate = useNavigate();
 
   const [state, setState] = useState<
     { kind: "loading" } | { kind: "error"; code: string } | { kind: "ok"; payload: PublicInvitationPayload }
   >({ kind: "loading" });
   const [busy, setBusy] = useState(false);
   const [contribution, setContribution] = useState("");
+  const [accountEmail, setAccountEmail] = useState("");
+  const [accountPassword, setAccountPassword] = useState("");
+  const [accountDone, setAccountDone] = useState(false);
 
   useEffect(() => {
     if (!token) {
@@ -72,6 +80,7 @@ function PublicInvitationPage() {
         if (result.ok) {
           setState({ kind: "ok", payload: result.payload });
           setContribution(result.payload.contribution ?? "");
+          setAccountEmail(result.payload.guestEmail ?? "");
         } else setState({ kind: "error", code: result.error });
       })
       .catch(() => !cancelled && setState({ kind: "error", code: "invalid_token" }));
@@ -107,6 +116,50 @@ function PublicInvitationPage() {
         setState({ kind: "ok", payload: result.payload });
         toast.success("Merci, c'est noté !");
       }
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const submitAccount = async () => {
+    if (!token || !accountEmail.trim() || accountPassword.length < 8) {
+      toast.error("Renseignez un e-mail valide et un mot de passe d'au moins 8 caractères.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const result = await signUpGuest({
+        data: {
+          eventId,
+          invitationId,
+          token,
+          email: accountEmail.trim(),
+          password: accountPassword,
+          displayName: state.kind === "ok" ? (state.payload.guestName ?? undefined) : undefined,
+        },
+      });
+      if (!result.ok) {
+        toast.error(
+          result.error === "account_exists"
+            ? "Un compte existe déjà avec cet e-mail : connectez-vous."
+            : "Création du compte impossible.",
+        );
+        return;
+      }
+      setAccountDone(true);
+      const { error } = await supabase.auth.signInWithPassword({
+        email: accountEmail.trim(),
+        password: accountPassword,
+      });
+      if (error) {
+        toast.success("Compte créé. Connectez-vous pour retrouver l'événement.");
+        navigate({ to: "/login" });
+        return;
+      }
+      toast.success("Bienvenue sur Kozy ! Votre compte est lié à cet événement.");
+      navigate({ to: "/app/events/$eventId", params: { eventId } });
+    } catch {
+      toast.error("Création du compte impossible.");
     } finally {
       setBusy(false);
     }
@@ -253,6 +306,36 @@ function PublicInvitationPage() {
               {p.contribution && (
                 <p className="text-xs text-muted-foreground">Actuellement noté : {p.contribution}</p>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {p.status === "accepted" && !p.hasAccount && !accountDone && (
+          <Card className="rounded-3xl border-border/60">
+            <CardContent className="p-6 space-y-3">
+              <h2 className="font-medium">Créer votre compte Kozy</h2>
+              <p className="text-sm text-muted-foreground">
+                Retrouvez cet événement, le menu et vos moments partagés dans votre espace Kozy.
+              </p>
+              <Input
+                type="email"
+                value={accountEmail}
+                onChange={(e) => setAccountEmail(e.target.value)}
+                placeholder="Votre e-mail"
+                className="rounded-2xl h-11"
+                autoComplete="email"
+              />
+              <Input
+                type="password"
+                value={accountPassword}
+                onChange={(e) => setAccountPassword(e.target.value)}
+                placeholder="Mot de passe (8 caractères min.)"
+                className="rounded-2xl h-11"
+                autoComplete="new-password"
+              />
+              <Button className="rounded-full h-11 w-full" disabled={busy} onClick={submitAccount}>
+                Créer mon compte
+              </Button>
             </CardContent>
           </Card>
         )}
