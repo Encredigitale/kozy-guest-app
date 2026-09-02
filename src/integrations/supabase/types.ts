@@ -1239,6 +1239,8 @@ export type Database = {
       }
       invitations: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           channel: string | null
           contact_id: string | null
           created_at: string
@@ -1261,6 +1263,8 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           channel?: string | null
           contact_id?: string | null
           created_at?: string
@@ -1283,6 +1287,8 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           channel?: string | null
           contact_id?: string | null
           created_at?: string
