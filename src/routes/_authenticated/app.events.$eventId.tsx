@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, MapPin, CalendarDays, Plus, Pencil, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import { useEventFeatures, type EventFeature } from "@/core/features/useEventFea
 import { FeatureCard } from "@/core/features/FeatureCard";
 import { FeaturePicker } from "@/core/features/FeaturePicker";
 import { FeatureIcon } from "@/core/features/FeatureIcon";
-import { resolveWidgetComponent } from "@/core/registry/components";
 
 export const Route = createFileRoute("/_authenticated/app/events/$eventId")({
   head: () => ({
@@ -53,7 +52,6 @@ function EventDetailPage() {
   const { features, active, setActive, reorder } = useEventFeatures(eventId, typeKey);
 
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [editInfo, setEditInfo] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [welcome, setWelcome] = useState(false);
   const [online, setOnline] = useState(true);
@@ -113,7 +111,6 @@ function EventDetailPage() {
   );
 
   const dateLabel = formatDate(ev?.starts_at ?? null);
-  const InfoWidget = editInfo ? resolveWidgetComponent("event.info") : null;
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-4 px-4 pb-28 pt-4 sm:px-6">
