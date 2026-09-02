@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, MapPin, CalendarDays, Plus, Pencil, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,6 @@ import { useEventFeatures, type EventFeature } from "@/core/features/useEventFea
 import { FeatureCard } from "@/core/features/FeatureCard";
 import { FeaturePicker } from "@/core/features/FeaturePicker";
 import { FeatureIcon } from "@/core/features/FeatureIcon";
-import { resolveWidgetComponent } from "@/core/registry/components";
 
 export const Route = createFileRoute("/_authenticated/app/events/$eventId")({
   head: () => ({
@@ -53,7 +52,6 @@ function EventDetailPage() {
   const { features, active, setActive, reorder } = useEventFeatures(eventId, typeKey);
 
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [editInfo, setEditInfo] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [welcome, setWelcome] = useState(false);
   const [online, setOnline] = useState(true);
@@ -113,7 +111,6 @@ function EventDetailPage() {
   );
 
   const dateLabel = formatDate(ev?.starts_at ?? null);
-  const InfoWidget = editInfo ? resolveWidgetComponent("event.info") : null;
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-4 px-4 pb-28 pt-4 sm:px-6">
@@ -162,21 +159,12 @@ function EventDetailPage() {
               </p>
             )}
           </div>
-          <Button
-            variant="outline"
-            className="h-11 w-full rounded-full sm:w-auto"
-            onClick={() => setEditInfo((v) => !v)}
-          >
-            <Pencil className="h-4 w-4" />
-            {editInfo ? "Fermer" : "Modifier les informations"}
+          <Button asChild variant="outline" className="h-11 w-full rounded-full sm:w-auto">
+            <Link to="/app/events/$eventId/edit" params={{ eventId }}>
+              <Pencil className="h-4 w-4" />
+              Modifier les informations
+            </Link>
           </Button>
-          {editInfo && InfoWidget && (
-            <div className="border-t border-border/60 pt-3 [&>*]:border-0 [&>*]:bg-transparent [&>*]:shadow-none">
-              <Suspense fallback={<p className="text-sm text-muted-foreground">Chargement…</p>}>
-                <InfoWidget config={{ eventId }} />
-              </Suspense>
-            </div>
-          )}
         </CardContent>
       </Card>
 
