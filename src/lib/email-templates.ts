@@ -25,6 +25,8 @@ export type KozyEmailOptions = {
   ctaUrl?: string;
   /** Petit bloc d'information (ex : détails d'un événement). */
   infoRows?: { label: string; value: string }[];
+  /** Menu de l'événement, groupé par composante (apéritif, entrée, plat…). */
+  menu?: { label: string; items: string[] }[];
   footerNote?: string;
 };
 
@@ -54,6 +56,7 @@ export function renderKozyEmail(options: KozyEmailOptions): string {
     ctaLabel,
     ctaUrl,
     infoRows = [],
+    menu = [],
     footerNote,
   } = options;
 
@@ -73,6 +76,28 @@ export function renderKozyEmail(options: KozyEmailOptions): string {
                 `<div style="margin:0 0 10px;font-size:14px;line-height:20px;">
                    <span style="color:${BRAND.muted};">${escapeHtml(row.label)}</span><br/>
                    <strong style="color:${BRAND.ink};font-size:15px;">${escapeHtml(row.value)}</strong>
+                 </div>`,
+            )
+            .join("")}
+        </td></tr>
+      </table>`
+    : "";
+
+  const menuHtml = menu.length
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;border:1px solid ${BRAND.border};border-radius:16px;">
+        <tr><td style="padding:18px 20px;">
+          <div style="margin:0 0 12px;font-size:15px;font-weight:700;color:${BRAND.ink};">Au menu</div>
+          ${menu
+            .map(
+              (group) =>
+                `<div style="margin:0 0 12px;">
+                   <div style="font-size:13px;color:${BRAND.muted};margin:0 0 4px;">${escapeHtml(group.label)}</div>
+                   ${group.items
+                     .map(
+                       (item) =>
+                         `<div style="font-size:15px;color:${BRAND.ink};line-height:22px;">• ${escapeHtml(item)}</div>`,
+                     )
+                     .join("")}
                  </div>`,
             )
             .join("")}
@@ -117,6 +142,7 @@ export function renderKozyEmail(options: KozyEmailOptions): string {
                 ${greeting ? `<p style="margin:0 0 16px;font-size:16px;line-height:26px;color:${BRAND.ink};">${escapeHtml(greeting)}</p>` : ""}
                 ${paragraphsHtml}
                 ${infoHtml}
+                ${menuHtml}
                 ${ctaHtml}
               </td>
             </tr>
@@ -161,6 +187,7 @@ export function renderInvitationEmail(params: {
   eventDate?: string;
   eventLocation?: string;
   message?: string;
+  menu?: { label: string; items: string[] }[];
   inviteUrl: string;
 }): string {
   const infoRows: { label: string; value: string }[] = [
@@ -179,6 +206,7 @@ export function renderInvitationEmail(params: {
       "Répondez en un clic, indiquez ce que vous apportez et retrouvez toutes les infos au même endroit.",
     ],
     infoRows,
+    menu: params.menu ?? [],
     ctaLabel: "Voir l'invitation",
     ctaUrl: params.inviteUrl,
     footerNote: "Aucun compte n'est nécessaire pour répondre à cette invitation.",
