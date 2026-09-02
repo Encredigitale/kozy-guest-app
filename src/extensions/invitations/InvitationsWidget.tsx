@@ -326,6 +326,13 @@ export default function InvitationsWidget({ config }: WidgetProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
+        {isDraftEvent && (
+          <p className="rounded-2xl bg-muted px-3 py-2 text-xs text-muted-foreground">
+            Cet événement est en brouillon : les invitations ne peuvent pas être envoyées et
+            personne d'autre que vous ne peut le consulter. Publiez-le pour lancer les invitations.
+          </p>
+        )}
+
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
           {[
             { label: "invités", value: counts.total },
