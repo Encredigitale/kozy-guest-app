@@ -462,6 +462,28 @@ export const createGuestAccount = createServerFn({ method: "POST" })
       .from("invitations")
       .update({ guest_user_id: created.user.id, email } as never)
       .eq("id", data.invitationId);
+    // Rattachement au participant de l'événement (accès à la page événement).
+    const { data: participant } = await supabaseAdmin
+      .from("event_participants")
+      .select("id, user_id")
+      .eq("event_id", data.eventId)
+      .eq("email", email)
+      .maybeSingle();
+    if (participant) {
+      await supabaseAdmin
+        .from("event_participants")
+        .update({ user_id: created.user.id, rsvp_status: "yes" } as never)
+        .eq("id", (participant as { id: string }).id);
+    } else {
+      await supabaseAdmin.from("event_participants").insert({
+        event_id: data.eventId,
+        user_id: created.user.id,
+        email,
+        role: "guest",
+        rsvp_status: "yes",
+      } as never);
+    }
+
     await supabaseAdmin
       .from("invitation_logs")
       .insert({ invitation_id: data.invitationId, event_type: "account_created" } as never);
