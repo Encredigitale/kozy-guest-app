@@ -97,7 +97,7 @@ export function AppShell() {
                 <Link
                   key={to}
                   to={to}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-accent ${
+                  className={`flex shrink-0 items-center gap-2 rounded-md px-2 py-1.5 hover:bg-accent sm:px-3 ${
                     active ? "bg-accent text-foreground" : "text-muted-foreground"
                   }`}
                 >
