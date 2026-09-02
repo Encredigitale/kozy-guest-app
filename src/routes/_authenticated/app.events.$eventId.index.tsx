@@ -45,7 +45,19 @@ function EventDetailPage() {
   const { user } = useSession();
   const isOrganizer = !!ev && !!user && ev.organizer_id === user.id;
   const isDraft = ev?.status === "draft";
+  const isArchived = ev?.status === "archived";
   const { data: types } = useEventTypes();
+  const qc = useQueryClient();
+  const [statusBusy, setStatusBusy] = useState(false);
+
+  const changeStatus = async (status: "published" | "archived") => {
+    setStatusBusy(true);
+    const { error } = await supabase.from("events").update({ status }).eq("id", eventId);
+    setStatusBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success(status === "published" ? "Événement publié." : "Événement archivé.");
+    qc.invalidateQueries({ queryKey: ["event", eventId] });
+  };
 
   const meta = (ev?.metadata ?? {}) as Record<string, unknown>;
   const typeKey = (meta["event_type"] as string | undefined) ?? null;
