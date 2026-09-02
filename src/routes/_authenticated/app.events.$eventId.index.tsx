@@ -166,6 +166,36 @@ function EventDetailPage() {
                     Brouillon — visible par vous seul
                   </Badge>
                 )}
+                {isArchived && (
+                  <Badge variant="outline" className="rounded-full text-[11px]">
+                    Archivé
+                  </Badge>
+                )}
+                {isOrganizer && (
+                  <>
+                    {ev?.status !== "published" && (
+                      <Button
+                        size="sm"
+                        className="h-7 rounded-full px-3 text-[11px]"
+                        disabled={statusBusy}
+                        onClick={() => changeStatus("published")}
+                      >
+                        Publier
+                      </Button>
+                    )}
+                    {ev?.status !== "archived" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-7 rounded-full px-3 text-[11px]"
+                        disabled={statusBusy}
+                        onClick={() => changeStatus("archived")}
+                      >
+                        Archiver
+                      </Button>
+                    )}
+                  </>
+                )}
               </div>
               <h1 className="mt-1 break-words font-serif text-2xl leading-tight tracking-tight text-primary">
                 {ev?.title ?? "Événement"}
