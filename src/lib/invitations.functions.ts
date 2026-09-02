@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { getBaseUrl, sendBrevoEmail } from "@/lib/email-delivery.server";
 import { renderInvitationEmail } from "@/lib/email-templates";
-import { generateToken, loadConfig, resolvePublicInvitation } from "@/lib/invitations.server";
+import { generateToken, loadConfig, loadEventMenu, resolvePublicInvitation } from "@/lib/invitations.server";
 import { invitationUrl } from "@/extensions/invitations/config";
 import { toE164 } from "@/lib/phone";
 
@@ -201,6 +201,8 @@ export const sendInvitation = createServerFn({ method: "POST" })
       .replace(/\{host\}/g, hostName)
       .replace(/\{event\}/g, ev.title ?? "un événement");
 
+    const menu = await loadEventMenu(inv.event_id);
+
     const html = renderInvitationEmail({
       hostName,
       eventTitle: ev.title ?? "Invitation",
@@ -208,6 +210,7 @@ export const sendInvitation = createServerFn({ method: "POST" })
       eventLocation: ev.location ?? undefined,
       inviteUrl: url,
       message: intro,
+      menu,
     });
 
     await sendBrevoEmail(
@@ -407,4 +410,61 @@ export const sendInvitationSms = createServerFn({ method: "POST" })
       .insert({ invitation_id: inv.id, event_type: "sms_sent", metadata: { channel: "sms" } } as never);
 
     return { ok: true as const, message: "SMS envoyé." };
+  });
+
+
+/** Page publique : l'invité crée son compte et est rattaché à l'événement. */
+export const createGuestAccount = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) =>
+    z
+      .object({
+        eventId: z.string().uuid(),
+        invitationId: z.string().uuid(),
+        token: z.string().min(10).max(200),
+        email: z.string().trim().email().max(255),
+        password: z.string().min(8).max(72),
+        displayName: z.string().trim().max(120).optional(),
+      })
+      .parse(data),
+  )
+  .handler(async ({ data }) => {
+    const resolved = await resolvePublicInvitation({
+      eventId: data.eventId,
+      invitationId: data.invitationId,
+      token: data.token,
+    });
+    if (!resolved.ok) return { ok: false as const, error: resolved.error };
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const email = data.email.toLowerCase();
+
+    const { data: users } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    const existing = users?.users.find((u) => u.email?.toLowerCase() === email);
+    if (existing) {
+      await supabaseAdmin
+        .from("invitations")
+        .update({ guest_user_id: existing.id } as never)
+        .eq("id", data.invitationId);
+      return { ok: false as const, error: "account_exists" };
+    }
+
+    const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password: data.password,
+      email_confirm: true,
+      user_metadata: { display_name: data.displayName ?? resolved.payload.guestName ?? null },
+    });
+    if (error || !created.user) {
+      return { ok: false as const, error: error?.message ?? "signup_failed" };
+    }
+
+    await supabaseAdmin
+      .from("invitations")
+      .update({ guest_user_id: created.user.id, email } as never)
+      .eq("id", data.invitationId);
+    await supabaseAdmin
+      .from("invitation_logs")
+      .insert({ invitation_id: data.invitationId, event_type: "account_created" } as never);
+
+    return { ok: true as const, userId: created.user.id };
   });
