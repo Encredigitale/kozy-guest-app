@@ -22,6 +22,44 @@ export async function loadConfig(): Promise<InvitationsConfig> {
   return normalizeConfig((data as { settings?: unknown } | null)?.settings);
 }
 
+/** Menu de l'événement (groupé par composante) pour l'e-mail et la page publique. */
+export async function loadEventMenu(
+  eventId: string,
+): Promise<{ label: string; items: string[] }[]> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: rows } = await supabaseAdmin
+    .from("widget_items")
+    .select("payload, position, created_at")
+    .eq("widget_key", "event.menu")
+    .eq("scope_type", "event")
+    .eq("scope_id", eventId)
+    .order("position", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  const items = (rows ?? []) as { payload: Record<string, unknown> | null }[];
+  if (items.length === 0) return [];
+
+  const { data: comps } = await supabaseAdmin
+    .from("menu_components" as never)
+    .select("key, label, sort_order")
+    .order("sort_order", { ascending: true });
+  const compList = (comps ?? []) as unknown as { key: string; label: string }[];
+  const labels = new Map(compList.map((c) => [c.key, c.label]));
+
+  const groups = new Map<string, string[]>();
+  for (const row of items) {
+    const payload = row.payload ?? {};
+    const key = String(payload["component_key"] ?? "autre");
+    const label = String(payload["label"] ?? payload["value"] ?? "").trim();
+    if (!label) continue;
+    const group = labels.get(key) ?? "Autre";
+    const list = groups.get(group) ?? [];
+    list.push(label);
+    groups.set(group, list);
+  }
+
+  return Array.from(groups.entries()).map(([label, values]) => ({ label, items: values }));
+}
 
 
 /** Vérifie le token côté serveur et renvoie une charge utile publique minimale. */
