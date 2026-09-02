@@ -84,11 +84,11 @@ export function AppShell() {
     ];
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <header className="h-14 border-b border-border/60 flex items-center justify-between px-4 gap-4 shrink-0">
-          <Link to="/app" className="font-serif text-xl tracking-tight text-primary">
+        <header className="h-14 border-b border-border/60 grid grid-cols-[auto_minmax(0,1fr)] items-center px-3 gap-2 shrink-0 sm:px-4 sm:gap-4">
+          <Link to="/app" className="shrink-0 font-serif text-lg sm:text-xl tracking-tight text-primary">
             Kozy
           </Link>
-          <nav className="flex items-center gap-1 text-sm">
+          <nav className="flex min-w-0 items-center justify-end gap-0.5 text-sm sm:gap-1">
             {USER_NAV.map(({ to, label, Icon }) => {
               const active = to === "/app"
                 ? pathname === "/app"
