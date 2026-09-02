@@ -8,6 +8,7 @@ import {
   markInvitationChannel,
   sendInvitation,
   sendInvitationSms,
+  approveInvitation,
 } from "@/lib/invitations.functions";
 import { COUNTRIES, DEFAULT_COUNTRY, looksLikePhone, maskPhone, toE164 } from "@/lib/phone";
 import {
@@ -48,6 +49,7 @@ import {
   UserPlus,
   Users,
   XCircle,
+  BadgeCheck,
 } from "lucide-react";
 
 const STATUS_STYLES: Record<InvitationStatus, string> = {
@@ -74,6 +76,8 @@ const LOG_LABELS: Record<string, string> = {
   opened: "Invitation ouverte",
   responded: "Réponse enregistrée",
   contribution: "Contribution choisie",
+  approved: "Participation validée par l'organisateur",
+  approval_revoked: "Validation retirée",
   cancelled: "Invitation annulée",
 };
 
@@ -101,8 +105,23 @@ export default function InvitationsWidget({ config }: WidgetProps) {
   const send = useServerFn(sendInvitation);
   const markChannel = useServerFn(markInvitationChannel);
   const sendSms = useServerFn(sendInvitationSms);
+  const approve = useServerFn(approveInvitation);
 
   const isOrganizer = !!ev && !!user && ev.organizer_id === user.id;
+  const isDraftEvent = ev?.status === "draft";
+
+  const toggleApproval = async (inv: InvitationRow, approved: boolean) => {
+    setBusyId(inv.id);
+    try {
+      await approve({ data: { invitationId: inv.id, approved } });
+      toast.success(approved ? "Participation validée." : "Validation retirée.");
+      invalidate();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Action impossible.");
+    } finally {
+      setBusyId(null);
+    }
+  };
   const origin = typeof window === "undefined" ? "" : window.location.origin;
 
   const searchIsPhone = looksLikePhone(search);
@@ -538,9 +557,16 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                       )}
                     </p>
                   </div>
-                  <Badge className={`rounded-full text-[10px] px-2 py-0.5 ${STATUS_STYLES[inv.status]}`}>
-                    {inv.status === "draft" ? "Invitation non envoyée" : STATUS_LABELS[inv.status]}
-                  </Badge>
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge className={`rounded-full text-[10px] px-2 py-0.5 ${STATUS_STYLES[inv.status]}`}>
+                      {inv.status === "draft" ? "Invitation non envoyée" : STATUS_LABELS[inv.status]}
+                    </Badge>
+                    {inv.approved_at && (
+                      <Badge variant="outline" className="rounded-full text-[10px] px-2 py-0 text-primary">
+                        Validée
+                      </Badge>
+                    )}
+                  </div>
 
                   {(isOrganizer || isAdmin) && (
                     <DropdownMenu>
@@ -590,6 +616,11 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                             <Share2 className="h-4 w-4 mr-2" /> Partager
                           </DropdownMenuItem>
                         )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => toggleApproval(inv, !inv.approved_at)}>
+                          <BadgeCheck className="h-4 w-4 mr-2" />
+                          {inv.approved_at ? "Retirer la validation" : "Valider la participation"}
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setLogsFor(inv)}>
                           <History className="h-4 w-4 mr-2" /> Historique &amp; réponse
                         </DropdownMenuItem>
