@@ -283,6 +283,40 @@ export const respondToInvitation = createServerFn({ method: "POST" })
         metadata: { response: data.response },
       } as never);
 
+    // Même résultat que la validation par l'organisateur : la réponse de l'invité
+    // met à jour (ou crée) sa participation à l'événement.
+    if (data.response === "accepted" || data.response === "declined") {
+      const { data: inv } = await supabaseAdmin
+        .from("invitations")
+        .select("event_id, guest_user_id, email")
+        .eq("id", data.invitationId)
+        .maybeSingle();
+      const row = (inv ?? {}) as Record<string, any>;
+      const rsvp = data.response === "accepted" ? "accepted" : "declined";
+      if (row.guest_user_id || row.email) {
+        const { data: existing } = await supabaseAdmin
+          .from("event_participants")
+          .select("id")
+          .eq("event_id", row.event_id)
+          .eq(row.guest_user_id ? "user_id" : "email", row.guest_user_id ?? row.email)
+          .maybeSingle();
+        if (existing?.id) {
+          await supabaseAdmin
+            .from("event_participants")
+            .update({ rsvp_status: rsvp } as never)
+            .eq("id", existing.id);
+        } else {
+          await supabaseAdmin.from("event_participants").insert({
+            event_id: row.event_id,
+            user_id: row.guest_user_id ?? null,
+            email: row.email ?? null,
+            role: "guest",
+            rsvp_status: rsvp,
+          } as never);
+        }
+      }
+    }
+
     return await resolvePublicInvitation(data);
   });
 
