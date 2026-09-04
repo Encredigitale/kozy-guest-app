@@ -25,4 +25,10 @@ export type PublicInvitationPayload = {
   };
   responseClosed: boolean;
   contribution: string | null;
+  /** Menu de l'événement, groupé par composante. */
+  menu: { label: string; items: string[] }[];
+  /** Autres invités et leur réponse. */
+  guests: { name: string; status: string; isSelf: boolean }[];
+  /** Ce que les invités apportent. */
+  brings: { guestName: string; label: string; quantity: number | null; unit: string | null }[];
 };
