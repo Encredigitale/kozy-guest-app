@@ -358,7 +358,7 @@ export default function InvitationsWidget({ config }: WidgetProps) {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
           {[
             { label: "invités", value: counts.total },
-            { label: "participent", value: counts.accepted },
+            { label: "participe", value: counts.accepted },
             { label: "refus", value: counts.declined },
             { label: "en attente", value: counts.pending },
             ...(cfg?.allowMaybe ? [{ label: "peut-être", value: counts.maybe }] : []),
