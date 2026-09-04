@@ -45,6 +45,16 @@ const ERROR_MESSAGES: Record<string, string> = {
   deleted: "Cette invitation n'est plus valide.",
 };
 
+const GUEST_STATUS_LABELS: Record<string, string> = {
+  accepted: "Participe",
+  declined: "Refus",
+  maybe: "Peut-être",
+  draft: "En attente",
+  sent: "En attente",
+  opened: "En attente",
+  expired: "En attente",
+};
+
 function formatDate(iso: string | null) {
   if (!iso) return null;
   return new Intl.DateTimeFormat("fr-FR", { dateStyle: "full", timeStyle: "short" }).format(new Date(iso));
@@ -286,6 +296,66 @@ function PublicInvitationPage() {
         )}
 
         {token && <PhotosBlock eventId={eventId} invitationId={invitationId} token={token} />}
+
+        {p.menu.length > 0 && (
+          <Card className="rounded-3xl border-border/60">
+            <CardContent className="p-6 space-y-4">
+              <h2 className="font-medium">Au menu</h2>
+              <div className="space-y-3">
+                {p.menu.map((group) => (
+                  <div key={group.label} className="space-y-1">
+                    <p className="text-xs uppercase tracking-wide text-muted-foreground">{group.label}</p>
+                    <ul className="text-sm space-y-0.5">
+                      {group.items.map((item, i) => (
+                        <li key={`${group.label}-${i}`}>{item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {p.guests.length > 0 && (
+          <Card className="rounded-3xl border-border/60">
+            <CardContent className="p-6 space-y-3">
+              <h2 className="font-medium">Les invités</h2>
+              <ul className="space-y-2">
+                {p.guests.map((g, i) => (
+                  <li key={`${g.name}-${i}`} className="flex items-center justify-between gap-3 text-sm">
+                    <span>
+                      {g.name}
+                      {g.isSelf && <span className="text-muted-foreground"> (vous)</span>}
+                    </span>
+                    <Badge variant="secondary" className="rounded-full text-xs">
+                      {GUEST_STATUS_LABELS[g.status] ?? "En attente"}
+                    </Badge>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
+
+        {p.brings.length > 0 && (
+          <Card className="rounded-3xl border-border/60">
+            <CardContent className="p-6 space-y-3">
+              <h2 className="font-medium">Ce que les invités apportent</h2>
+              <ul className="space-y-2 text-sm">
+                {p.brings.map((b, i) => (
+                  <li key={`${b.label}-${i}`} className="flex items-start justify-between gap-3">
+                    <span>
+                      {b.quantity ? `${b.quantity} ${b.unit ?? ""} ` : ""}
+                      {b.label}
+                    </span>
+                    <span className="text-muted-foreground">{b.guestName}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        )}
 
         {p.status === "accepted" && p.config.contributionsEnabled && (
 

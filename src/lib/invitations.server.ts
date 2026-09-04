@@ -168,9 +168,51 @@ export async function resolvePublicInvitation(input: {
     .limit(1)
     .maybeSingle();
 
+  // Menu de l'événement
+  const menu = await loadEventMenu(input.eventId);
+
+  // Liste des invités de l'événement (nom + statut)
+  const { data: allInvitations } = await supabaseAdmin
+    .from("invitations")
+    .select("id, name, email, status")
+    .eq("event_id", input.eventId)
+    .is("revoked_at", null)
+    .order("created_at", { ascending: true });
+  const invRows = (allInvitations ?? []) as { id: string; name: string | null; email: string | null; status: string }[];
+  const guests = invRows
+    .filter((g) => g.status !== "cancelled")
+    .map((g) => ({
+      name: g.name || (g.email ? g.email.split("@")[0]! : "Invité"),
+      status: g.status,
+      isSelf: g.id === inv.id,
+    }));
+  const nameById = new Map(invRows.map((g) => [g.id, g.name || "Invité"]));
+
+  // Ce que les invités apportent
+  const { data: bringRows } = await supabaseAdmin
+    .from("guest_contributions")
+    .select("invitation_id, label, quantity, unit, status, created_at")
+    .eq("event_id", input.eventId)
+    .neq("status", "removed")
+    .order("created_at", { ascending: true });
+  const brings = ((bringRows ?? []) as {
+    invitation_id: string;
+    label: string;
+    quantity: number | null;
+    unit: string | null;
+  }[]).map((b) => ({
+    guestName: nameById.get(b.invitation_id) ?? "Invité",
+    label: b.label,
+    quantity: b.quantity ?? null,
+    unit: b.unit ?? null,
+  }));
+
   return {
     ok: true,
     payload: {
+      menu,
+      guests,
+      brings,
       invitationId: inv.id,
       eventId: input.eventId,
       guestName: inv.name ?? null,
