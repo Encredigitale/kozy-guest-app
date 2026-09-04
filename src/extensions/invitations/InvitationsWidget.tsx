@@ -178,6 +178,7 @@ export default function InvitationsWidget({ config }: WidgetProps) {
       declined: by("declined"),
       maybe: by("maybe"),
       pending: invitations.filter((i) => !["accepted", "declined", "maybe"].includes(i.status)).length,
+    };
   }, [invitations]);
 
   const add = async (input: {
