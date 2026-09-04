@@ -45,6 +45,16 @@ const ERROR_MESSAGES: Record<string, string> = {
   deleted: "Cette invitation n'est plus valide.",
 };
 
+const GUEST_STATUS_LABELS: Record<string, string> = {
+  accepted: "Participe",
+  declined: "Refus",
+  maybe: "Peut-être",
+  draft: "En attente",
+  sent: "En attente",
+  opened: "En attente",
+  expired: "En attente",
+};
+
 function formatDate(iso: string | null) {
   if (!iso) return null;
   return new Intl.DateTimeFormat("fr-FR", { dateStyle: "full", timeStyle: "short" }).format(new Date(iso));
