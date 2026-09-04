@@ -27,7 +27,16 @@ export async function loadEventMenu(
   eventId: string,
 ): Promise<{ label: string; items: string[] }[]> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  // Le menu n'est diffusé que si l'organisateur a activé le module.
+  const { data: menuWidget } = await supabaseAdmin
+    .from("event_widgets")
+    .select("enabled")
+    .eq("event_id", eventId)
+    .eq("widget_id", "event.menu")
+    .maybeSingle();
+  if ((menuWidget as { enabled?: boolean } | null)?.enabled !== true) return [];
   const { data: rows } = await supabaseAdmin
+
     .from("widget_items")
     .select("payload, position, created_at")
     .eq("widget_key", "event.menu")
