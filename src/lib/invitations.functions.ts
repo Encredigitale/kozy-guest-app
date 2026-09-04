@@ -273,7 +273,12 @@ export const respondToInvitation = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin
       .from("invitations")
-      .update({ status: data.response, responded_at: new Date().toISOString() } as never)
+      .update({
+        status: data.response,
+        responded_at: new Date().toISOString(),
+        approved_at: data.response === "accepted" ? new Date().toISOString() : null,
+        approved_by: null,
+      } as never)
       .eq("id", data.invitationId);
     await supabaseAdmin
       .from("invitation_logs")
