@@ -168,8 +168,24 @@ export async function resolvePublicInvitation(input: {
     .limit(1)
     .maybeSingle();
 
+  // Modules activés par l'organisateur sur cet événement
+  const { data: enabledRows } = await supabaseAdmin
+    .from("event_widgets")
+    .select("widget_id, enabled")
+    .eq("event_id", input.eventId);
+  const enabledMap = new Map(
+    ((enabledRows ?? []) as { widget_id: string; enabled: boolean }[]).map((r) => [
+      r.widget_id,
+      r.enabled === true,
+    ]),
+  );
+  const isOn = (id: string) => enabledMap.get(id) === true;
+  const menuOn = isOn("event.menu");
+  const guestsOn = isOn("event.guests") || isOn("ext.invitations");
+  const bringsOn = isOn("ext.guest-brings");
+
   // Menu de l'événement
-  const menu = await loadEventMenu(input.eventId);
+  const menu = menuOn ? await loadEventMenu(input.eventId) : [];
 
   // Liste des invités de l'événement (nom + statut)
   const { data: allInvitations } = await supabaseAdmin
@@ -179,22 +195,26 @@ export async function resolvePublicInvitation(input: {
     .is("revoked_at", null)
     .order("created_at", { ascending: true });
   const invRows = (allInvitations ?? []) as { id: string; name: string | null; email: string | null; status: string }[];
-  const guests = invRows
-    .filter((g) => g.status !== "cancelled")
-    .map((g) => ({
-      name: g.name || (g.email ? g.email.split("@")[0]! : "Invité"),
-      status: g.status,
-      isSelf: g.id === inv.id,
-    }));
+  const guests = guestsOn
+    ? invRows
+        .filter((g) => g.status !== "cancelled")
+        .map((g) => ({
+          name: g.name || (g.email ? g.email.split("@")[0]! : "Invité"),
+          status: g.status,
+          isSelf: g.id === inv.id,
+        }))
+    : [];
   const nameById = new Map(invRows.map((g) => [g.id, g.name || "Invité"]));
 
   // Ce que les invités apportent
-  const { data: bringRows } = await supabaseAdmin
-    .from("guest_contributions")
-    .select("invitation_id, label, quantity, unit, status, created_at")
-    .eq("event_id", input.eventId)
-    .neq("status", "removed")
-    .order("created_at", { ascending: true });
+  const { data: bringRows } = bringsOn
+    ? await supabaseAdmin
+        .from("guest_contributions")
+        .select("invitation_id, label, quantity, unit, status, created_at")
+        .eq("event_id", input.eventId)
+        .neq("status", "removed")
+        .order("created_at", { ascending: true })
+    : { data: [] as unknown[] };
   const brings = ((bringRows ?? []) as {
     invitation_id: string;
     label: string;
@@ -206,6 +226,7 @@ export async function resolvePublicInvitation(input: {
     quantity: b.quantity ?? null,
     unit: b.unit ?? null,
   }));
+
 
   return {
     ok: true,
