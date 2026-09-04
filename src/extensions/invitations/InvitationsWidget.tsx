@@ -63,6 +63,28 @@ const STATUS_STYLES: Record<InvitationStatus, string> = {
   expired: "bg-muted text-muted-foreground border-transparent",
 };
 
+/** Statuts affichés côté invité : identiques aux compteurs du bloc. */
+type DisplayStatus = "accepted" | "declined" | "maybe" | "pending";
+
+const DISPLAY_STATUS_LABELS: Record<DisplayStatus, string> = {
+  accepted: "Participe",
+  declined: "Refus",
+  maybe: "Peut-être",
+  pending: "En attente",
+};
+
+const DISPLAY_STATUS_STYLES: Record<DisplayStatus, string> = {
+  accepted: "bg-secondary text-secondary-foreground border-transparent",
+  declined: "bg-destructive/10 text-destructive border-destructive/20",
+  maybe: "bg-primary/10 text-primary border-primary/20",
+  pending: "bg-background text-muted-foreground border-border",
+};
+
+function displayStatus(status: InvitationStatus): DisplayStatus {
+  if (status === "accepted" || status === "declined" || status === "maybe") return status;
+  return "pending";
+}
+
 function initials(label: string): string {
   const parts = label.split(/[\s._-]+/).filter(Boolean);
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
@@ -155,7 +177,7 @@ export default function InvitationsWidget({ config }: WidgetProps) {
       accepted: by("accepted"),
       declined: by("declined"),
       maybe: by("maybe"),
-      pending: invitations.filter((i) => ["draft", "sent", "opened"].includes(i.status)).length,
+      pending: invitations.filter((i) => !["accepted", "declined", "maybe"].includes(i.status)).length,
     };
   }, [invitations]);
 
@@ -336,7 +358,7 @@ export default function InvitationsWidget({ config }: WidgetProps) {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center">
           {[
             { label: "invités", value: counts.total },
-            { label: "participent", value: counts.accepted },
+            { label: "participe", value: counts.accepted },
             { label: "refus", value: counts.declined },
             { label: "en attente", value: counts.pending },
             ...(cfg?.allowMaybe ? [{ label: "peut-être", value: counts.maybe }] : []),
@@ -565,14 +587,11 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-1">
-                    <Badge className={`rounded-full text-[10px] px-2 py-0.5 ${STATUS_STYLES[inv.status]}`}>
-                      {inv.status === "draft" ? "Invitation non envoyée" : STATUS_LABELS[inv.status]}
+                    <Badge
+                      className={`rounded-full text-[10px] px-2 py-0.5 ${DISPLAY_STATUS_STYLES[displayStatus(inv.status)]}`}
+                    >
+                      {DISPLAY_STATUS_LABELS[displayStatus(inv.status)]}
                     </Badge>
-                    {inv.approved_at && (
-                      <Badge variant="outline" className="rounded-full text-[10px] px-2 py-0 text-primary">
-                        Validée
-                      </Badge>
-                    )}
                   </div>
 
                   {(isOrganizer || isAdmin) && (
