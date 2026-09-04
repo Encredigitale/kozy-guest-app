@@ -63,6 +63,28 @@ const STATUS_STYLES: Record<InvitationStatus, string> = {
   expired: "bg-muted text-muted-foreground border-transparent",
 };
 
+/** Statuts affichés côté invité : identiques aux compteurs du bloc. */
+type DisplayStatus = "accepted" | "declined" | "maybe" | "pending";
+
+const DISPLAY_STATUS_LABELS: Record<DisplayStatus, string> = {
+  accepted: "Participe",
+  declined: "Refus",
+  maybe: "Peut-être",
+  pending: "En attente",
+};
+
+const DISPLAY_STATUS_STYLES: Record<DisplayStatus, string> = {
+  accepted: "bg-secondary text-secondary-foreground border-transparent",
+  declined: "bg-destructive/10 text-destructive border-destructive/20",
+  maybe: "bg-primary/10 text-primary border-primary/20",
+  pending: "bg-background text-muted-foreground border-border",
+};
+
+function displayStatus(status: InvitationStatus): DisplayStatus {
+  if (status === "accepted" || status === "declined" || status === "maybe") return status;
+  return "pending";
+}
+
 function initials(label: string): string {
   const parts = label.split(/[\s._-]+/).filter(Boolean);
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
