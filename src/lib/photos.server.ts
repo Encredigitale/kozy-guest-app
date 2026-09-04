@@ -98,7 +98,7 @@ export async function loadEventContext(eventId: string): Promise<EventContext | 
 
   const { data: event } = await db
     .from("events")
-    .select("id, organizer_id, status, metadata")
+    .select("id, organizer_id, status, metadata, starts_at")
     .eq("id", eventId)
     .maybeSingle();
   if (!event) return null;

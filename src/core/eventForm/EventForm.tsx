@@ -57,11 +57,14 @@ export function EventForm({ mode, eventId, initial, organizerId }: EventFormProp
   }, [mode]);
 
   useEffect(() => {
-    if (mode !== "create") return;
+    if (mode !== "create" || !hydrated.current) return;
     try { localStorage.setItem(DRAFT_KEY, JSON.stringify(values)); } catch { /* ignore */ }
   }, [mode, values]);
 
-  useEffect(() => { setValues(initialValues); }, [initialValues]);
+  useEffect(() => {
+    if (mode === "create") return;
+    setValues(initialValues);
+  }, [mode, initialValues]);
 
   const criteria = requiredCriteria(values);
   const progress = progressOf(values);
