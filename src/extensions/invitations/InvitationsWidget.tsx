@@ -565,14 +565,11 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-1">
-                    <Badge className={`rounded-full text-[10px] px-2 py-0.5 ${STATUS_STYLES[inv.status]}`}>
-                      {inv.status === "draft" ? "Invitation non envoyée" : STATUS_LABELS[inv.status]}
+                    <Badge
+                      className={`rounded-full text-[10px] px-2 py-0.5 ${STATUS_STYLES[displayStatus(inv.status)]}`}
+                    >
+                      {DISPLAY_STATUS_LABELS[displayStatus(inv.status)]}
                     </Badge>
-                    {inv.approved_at && (
-                      <Badge variant="outline" className="rounded-full text-[10px] px-2 py-0 text-primary">
-                        Validée
-                      </Badge>
-                    )}
                   </div>
 
                   {(isOrganizer || isAdmin) && (
