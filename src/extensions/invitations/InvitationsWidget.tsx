@@ -588,7 +588,7 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <Badge
-                      className={`rounded-full text-[10px] px-2 py-0.5 ${STATUS_STYLES[displayStatus(inv.status)]}`}
+                      className={`rounded-full text-[10px] px-2 py-0.5 ${DISPLAY_STATUS_STYLES[displayStatus(inv.status)]}`}
                     >
                       {DISPLAY_STATUS_LABELS[displayStatus(inv.status)]}
                     </Badge>
