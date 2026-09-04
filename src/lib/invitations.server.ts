@@ -188,7 +188,8 @@ export async function resolvePublicInvitation(input: {
       r.enabled === true,
     ]),
   );
-  const isOn = (id: string) => enabledMap.get(id) === true;
+  // Un module est masqué uniquement s'il a été explicitement désactivé.
+  const isOn = (id: string) => enabledMap.get(id) !== false;
   const menuOn = isOn("event.menu");
   const guestsOn = isOn("event.guests") || isOn("ext.invitations");
   const bringsOn = isOn("ext.guest-brings");
