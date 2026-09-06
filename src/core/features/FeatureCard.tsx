@@ -143,6 +143,6 @@ export function FeatureCard({ feature, eventId, canMoveUp, canMoveDown, onMove, 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 }
