@@ -13,7 +13,8 @@ import {
   useSearchResults,
   useSearchSettings,
 } from "@/core/search/useSearch";
-import { useEvent } from "@/widgets/event-shared/queries";
+import { useQuery } from "@tanstack/react-query";
+import { eventQueryOptions } from "@/widgets/event-shared/queries";
 
 type SearchParams = { q?: string; source?: string; event?: string };
 
@@ -54,7 +55,7 @@ function SearchPage() {
   const [text, setText] = useState(params.q ?? "");
   const { data: settings } = useSearchSettings();
   const eventId = params.event ?? null;
-  const { data: ev } = useEvent(eventId ?? "");
+  const { data: ev } = useQuery({ ...eventQueryOptions(eventId ?? ""), enabled: !!eventId });
   const [online, setOnline] = useState(true);
 
   const { recent, remember, clear } = useRecentSearches(settings.recentRetentionDays);
