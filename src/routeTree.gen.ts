@@ -20,6 +20,7 @@ import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/ap
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
 import { Route as InvitationEventIdInvitationIdRouteImport } from './routes/invitation.$eventId.$invitationId'
 import { Route as AuthenticatedAppTokensRouteImport } from './routes/_authenticated/app.tokens'
+import { Route as AuthenticatedAppSearchRouteImport } from './routes/_authenticated/app.search'
 import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
 import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/app.notifications'
 import { Route as AuthenticatedAppEventsRouteImport } from './routes/_authenticated/app.events'
@@ -99,6 +100,11 @@ const InvitationEventIdInvitationIdRoute =
 const AuthenticatedAppTokensRoute = AuthenticatedAppTokensRouteImport.update({
   id: '/tokens',
   path: '/tokens',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppSearchRoute = AuthenticatedAppSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
 const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
@@ -259,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/app/events': typeof AuthenticatedAppEventsRouteWithChildren
   '/app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
+  '/app/search': typeof AuthenticatedAppSearchRoute
   '/app/tokens': typeof AuthenticatedAppTokensRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/app/': typeof AuthenticatedAppIndexRoute
@@ -293,6 +300,7 @@ export interface FileRoutesByTo {
   '/app/contacts': typeof AuthenticatedAppContactsRoute
   '/app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/app/profile': typeof AuthenticatedAppProfileRoute
+  '/app/search': typeof AuthenticatedAppSearchRoute
   '/app/tokens': typeof AuthenticatedAppTokensRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/app': typeof AuthenticatedAppIndexRoute
@@ -332,6 +340,7 @@ export interface FileRoutesById {
   '/_authenticated/app/events': typeof AuthenticatedAppEventsRouteWithChildren
   '/_authenticated/app/notifications': typeof AuthenticatedAppNotificationsRoute
   '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
+  '/_authenticated/app/search': typeof AuthenticatedAppSearchRoute
   '/_authenticated/app/tokens': typeof AuthenticatedAppTokensRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
@@ -371,6 +380,7 @@ export interface FileRouteTypes {
     | '/app/events'
     | '/app/notifications'
     | '/app/profile'
+    | '/app/search'
     | '/app/tokens'
     | '/invitation/$eventId/$invitationId'
     | '/app/'
@@ -405,6 +415,7 @@ export interface FileRouteTypes {
     | '/app/contacts'
     | '/app/notifications'
     | '/app/profile'
+    | '/app/search'
     | '/app/tokens'
     | '/invitation/$eventId/$invitationId'
     | '/app'
@@ -443,6 +454,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/events'
     | '/_authenticated/app/notifications'
     | '/_authenticated/app/profile'
+    | '/_authenticated/app/search'
     | '/_authenticated/app/tokens'
     | '/invitation/$eventId/$invitationId'
     | '/_authenticated/app/'
@@ -557,6 +569,13 @@ declare module '@tanstack/react-router' {
       path: '/tokens'
       fullPath: '/app/tokens'
       preLoaderRoute: typeof AuthenticatedAppTokensRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/search': {
+      id: '/_authenticated/app/search'
+      path: '/search'
+      fullPath: '/app/search'
+      preLoaderRoute: typeof AuthenticatedAppSearchRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/app/profile': {
@@ -817,6 +836,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppEventsRoute: typeof AuthenticatedAppEventsRouteWithChildren
   AuthenticatedAppNotificationsRoute: typeof AuthenticatedAppNotificationsRoute
   AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
+  AuthenticatedAppSearchRoute: typeof AuthenticatedAppSearchRoute
   AuthenticatedAppTokensRoute: typeof AuthenticatedAppTokensRoute
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppWSplatRoute: typeof AuthenticatedAppWSplatRoute
@@ -830,6 +850,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppEventsRoute: AuthenticatedAppEventsRouteWithChildren,
   AuthenticatedAppNotificationsRoute: AuthenticatedAppNotificationsRoute,
   AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
+  AuthenticatedAppSearchRoute: AuthenticatedAppSearchRoute,
   AuthenticatedAppTokensRoute: AuthenticatedAppTokensRoute,
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
   AuthenticatedAppWSplatRoute: AuthenticatedAppWSplatRoute,
