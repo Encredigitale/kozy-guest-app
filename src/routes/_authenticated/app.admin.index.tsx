@@ -106,6 +106,9 @@ function AdminHome() {
           <Button asChild size="sm" variant="ghost">
             <Link to="/app/admin/menu-components">Composantes de repas</Link>
           </Button>
+          <Button asChild size="sm" variant="ghost">
+            <Link to="/app/admin/search">Recherche</Link>
+          </Button>
         </CardContent>
       </Card>
     </div>

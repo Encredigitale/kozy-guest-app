@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, MapPin, CalendarDays, Plus, Pencil, WifiOff } from "lucide-react";
+import { ChevronLeft, MapPin, CalendarDays, Plus, Pencil, Search, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/app/events/$eventId/")({
+  validateSearch: (search: Record<string, unknown>): { bloc?: string; item?: string } => ({
+    bloc: typeof search.bloc === "string" && search.bloc ? search.bloc : undefined,
+    item: typeof search.item === "string" && search.item ? search.item : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Mon événement — Kozy" },
@@ -43,6 +47,7 @@ function formatDate(iso: string | null): string | null {
 
 function EventDetailPage() {
   const { eventId } = Route.useParams();
+  const { bloc } = Route.useSearch();
   const { data: ev, isLoading: eventLoading } = useEvent(eventId);
   const { user } = useSession();
   const isOrganizer = !!ev && !!user && ev.organizer_id === user.id;
@@ -151,6 +156,15 @@ function EventDetailPage() {
         className="inline-flex min-h-11 items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ChevronLeft className="h-4 w-4" /> Mes événements
+      </Link>
+
+      <Link
+        to="/app/search"
+        search={{ event: eventId }}
+        aria-label="Rechercher dans cet événement"
+        className="ml-2 inline-flex min-h-11 items-center gap-2 rounded-full border border-border/60 px-4 text-sm text-muted-foreground"
+      >
+        <Search className="h-4 w-4" /> Rechercher dans cet événement
       </Link>
 
       {!online && (
@@ -263,6 +277,7 @@ function EventDetailPage() {
               canMoveUp={i > 0}
               canMoveDown={i < active.length - 1}
               onMove={(dir) => move(i, dir)}
+              defaultOpen={bloc === f.id}
               canManage={isOrganizer}
               onDisable={() => disableFeature(f)}
             />

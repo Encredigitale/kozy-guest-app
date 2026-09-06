@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, MoreHorizontal, ArrowUp, ArrowDown, EyeOff } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,19 +32,29 @@ type Props = {
   onDisable: () => void;
   /** Faux pour un invité : lecture seule. */
   canManage?: boolean;
+  /** Ouvre la carte à l'arrivée (deep link depuis la recherche). */
+  defaultOpen?: boolean;
 };
 
 /**
  * Carte générique d'une fonctionnalité active. Le contenu du plugin n'est
  * monté que lorsque l'utilisateur ouvre la carte (chargement paresseux).
  */
-export function FeatureCard({ feature, eventId, canMoveUp, canMoveDown, onMove, onDisable, canManage = true }: Props) {
-  const [open, setOpen] = useState(false);
+export function FeatureCard({ feature, eventId, canMoveUp, canMoveDown, onMove, onDisable, canManage = true, defaultOpen = false }: Props) {
+  const [open, setOpen] = useState(defaultOpen);
   const [confirm, setConfirm] = useState(false);
   const Component = open ? resolveWidgetComponent(feature.component) : null;
 
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (defaultOpen) {
+      setOpen(true);
+      ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [defaultOpen]);
+
   return (
-    <>
+    <div ref={ref}>
       <Card className="rounded-2xl border-border/60 overflow-hidden">
         <CardContent className="p-0">
           <div className="flex items-start gap-3 p-4">
@@ -133,6 +143,6 @@ export function FeatureCard({ feature, eventId, canMoveUp, canMoveDown, onMove, 
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
 }

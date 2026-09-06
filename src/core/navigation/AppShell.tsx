@@ -89,6 +89,13 @@ export function AppShell() {
             Kozy
           </Link>
           <nav className="flex min-w-0 items-center justify-end gap-0.5 text-sm sm:gap-1">
+            <Link
+              to="/app/search"
+              aria-label="Rechercher"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-accent"
+            >
+              <Icons.Search className="h-5 w-5" />
+            </Link>
             {USER_NAV.map(({ to, label, Icon }) => {
               const active = to === "/app"
                 ? pathname === "/app"
@@ -132,6 +139,13 @@ export function AppShell() {
             <span className="hidden md:inline text-xs text-muted-foreground truncate max-w-[200px]">
               {user?.email}
             </span>
+            <Link
+              to="/app/search"
+              aria-label="Rechercher"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-accent"
+            >
+              <Icons.Search className="h-5 w-5" />
+            </Link>
             <NotificationBell />
 
           <Link
