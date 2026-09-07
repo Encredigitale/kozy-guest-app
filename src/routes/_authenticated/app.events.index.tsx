@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, MapPin, Plus } from "lucide-react";
+import { Calendar, MapPin, Plus, Eye } from "lucide-react";
+import { useSession } from "@/core/auth/useSession";
 
 const EVENT_STATUS_LABELS: Record<string, string> = {
   draft: "Brouillon",
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/_authenticated/app/events/")({
 
 type EventRow = {
   id: string;
+  organizer_id: string;
   title: string;
   description: string | null;
   status: "draft" | "published" | "archived";
@@ -27,12 +29,13 @@ type EventRow = {
 };
 
 function EventsListPage() {
+  const { user } = useSession();
   const { data, isLoading } = useQuery({
     queryKey: ["core", "events"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("events")
-        .select("id, title, description, status, starts_at, location")
+        .select("id, organizer_id, title, description, status, starts_at, location")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as EventRow[];
@@ -68,7 +71,14 @@ function EventsListPage() {
                       <CardTitle className="text-base">{e.title}</CardTitle>
                       {e.description && <CardDescription className="line-clamp-1">{e.description}</CardDescription>}
                     </div>
-                    <Badge variant={e.status === "published" ? "default" : "secondary"}>{EVENT_STATUS_LABELS[e.status] ?? e.status}</Badge>
+                    <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
+                      {user && e.organizer_id !== user.id && (
+                        <Badge variant="outline" className="gap-1 rounded-full text-[11px]">
+                          <Eye className="h-3 w-3" /> Invité · lecture seule
+                        </Badge>
+                      )}
+                      <Badge variant={e.status === "published" ? "default" : "secondary"}>{EVENT_STATUS_LABELS[e.status] ?? e.status}</Badge>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0 flex gap-4 text-xs text-muted-foreground">

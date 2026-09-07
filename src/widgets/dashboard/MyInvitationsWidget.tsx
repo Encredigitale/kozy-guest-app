@@ -15,6 +15,7 @@ export default function MyInvitationsWidget() {
         .from("event_participants")
         .select("id,role,event_id,events!inner(id,title,starts_at,location)")
         .eq("user_id", user!.id)
+        .eq("role", "guest")
         .order("created_at", { ascending: false })
         .limit(4);
       if (error) throw error;
