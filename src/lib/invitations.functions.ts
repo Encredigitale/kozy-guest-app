@@ -604,3 +604,70 @@ export const approveInvitation = createServerFn({ method: "POST" })
 
     return { ok: true as const };
   });
+
+/**
+ * Liste des personnes de l'événement visible par un invité connecté :
+ * l'organisateur + tous les invités, avec leur statut de réponse.
+ * Aucune donnée sensible (token, e-mail, téléphone) n'est renvoyée.
+ */
+export const listEventGuests = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ eventId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    // Vérifie que l'appelant a bien accès à cet événement.
+    const { data: participant } = await context.supabase
+      .from("event_participants")
+      .select("id")
+      .eq("event_id", data.eventId)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    const { data: ownInvitation } = await context.supabase
+      .from("invitations")
+      .select("id")
+      .eq("event_id", data.eventId)
+      .eq("guest_user_id", context.userId)
+      .maybeSingle();
+    if (!participant && !ownInvitation) throw new Error("Accès refusé");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { data: event } = await supabaseAdmin
+      .from("events")
+      .select("organizer_id")
+      .eq("id", data.eventId)
+      .maybeSingle();
+
+    const { data: rows } = await supabaseAdmin
+      .from("invitations")
+      .select("id, name, email, status, guest_user_id, created_at")
+      .eq("event_id", data.eventId)
+      .is("revoked_at", null)
+      .order("created_at", { ascending: true });
+
+    const organizerId = (event as { organizer_id?: string } | null)?.organizer_id ?? null;
+    let organizerName = "L'organisateur";
+    if (organizerId) {
+      const { data: profile } = await supabaseAdmin
+        .from("profiles")
+        .select("display_name")
+        .eq("user_id", organizerId)
+        .maybeSingle();
+      const name = (profile as { display_name?: string | null } | null)?.display_name;
+      if (name) organizerName = name;
+    }
+
+    const guests = ((rows ?? []) as Array<Record<string, any>>).map((r) => ({
+      id: String(r.id),
+      name: (r.name as string | null) || ((r.email as string | null) ? String(r.email).split("@")[0] : null) || "Invité",
+      status: String(r.status ?? "pending"),
+      isSelf: r.guest_user_id === context.userId,
+      isOrganizer: false,
+    }));
+
+    return {
+      people: [
+        { id: "organizer", name: organizerName, status: "accepted", isSelf: organizerId === context.userId, isOrganizer: true },
+        ...guests,
+      ],
+    };
+  });
