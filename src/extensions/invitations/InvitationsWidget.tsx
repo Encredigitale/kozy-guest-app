@@ -16,6 +16,7 @@ import {
   useEventInvitations,
   useInvitationLogs,
   useInvitationsConfig,
+  useEventPeople,
   type InvitationRow,
 } from "./useInvitations";
 import { CHANNEL_LABELS, STATUS_LABELS, invitationUrl, renderSmsText, type InvitationStatus } from "./config";
@@ -332,8 +333,53 @@ export default function InvitationsWidget({ config }: WidgetProps) {
 
   if (isLoading) return <div className="text-sm text-muted-foreground">Chargement…</div>;
 
-  const visible = isOrganizer || isAdmin || cfg?.guestVisibility === "guests";
-  if (!visible) return null;
+  if (!canManageGuests) {
+    const accepted = people.filter((p) => p.status === "accepted").length;
+    return (
+      <Card className="rounded-3xl border-border/60 bg-card/80 backdrop-blur-sm">
+        <CardHeader className="pb-2">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Users className="h-4 w-4 text-primary" />
+              Les invités
+            </CardTitle>
+            <Badge variant="secondary" className="rounded-full font-medium">
+              {accepted} / {people.length}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {peopleLoading ? (
+            <p className="text-sm text-muted-foreground">Chargement…</p>
+          ) : people.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Aucun invité pour le moment.</p>
+          ) : (
+            <ul className="space-y-2">
+              {people.map((p) => (
+                <li key={p.id} className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background p-3">
+                  <Avatar className="h-10 w-10 shrink-0">
+                    <AvatarFallback>{initials(p.name)}</AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">
+                      {p.name}
+                      {p.isSelf && <span className="text-muted-foreground"> (vous)</span>}
+                    </p>
+                    {p.isOrganizer && <p className="text-xs text-muted-foreground">Organisateur</p>}
+                  </div>
+                  <Badge
+                    className={`rounded-full text-[10px] px-2 py-0.5 ${DISPLAY_STATUS_STYLES[displayStatus(p.status as InvitationStatus)]}`}
+                  >
+                    {DISPLAY_STATUS_LABELS[displayStatus(p.status as InvitationStatus)]}
+                  </Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
 
   const channels = cfg?.channels ?? ["link", "share", "email"];
 
