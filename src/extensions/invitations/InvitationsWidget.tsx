@@ -130,6 +130,9 @@ export default function InvitationsWidget({ config }: WidgetProps) {
   const approve = useServerFn(approveInvitation);
 
   const isOrganizer = !!ev && !!user && ev.organizer_id === user.id;
+  const canManageGuests = isOrganizer || isAdmin;
+  // Un invité connecté voit la liste complète (organisateur inclus) en lecture seule.
+  const { data: people = [], isLoading: peopleLoading } = useEventPeople(eventId, !!user && !canManageGuests);
   const isDraftEvent = ev?.status === "draft";
 
   const toggleApproval = async (inv: InvitationRow, approved: boolean) => {
