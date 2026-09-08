@@ -106,7 +106,7 @@ export default function EventMenuWidget({ config }: WidgetProps) {
         <div className="space-y-3">
           {items.length === 0 ? (
             <p className="text-xs text-muted-foreground italic py-4 text-center">
-              Aucun choix pour l'instant. Ajoutez-en un ci-dessous.
+              {canEdit ? "Aucun choix pour l'instant. Ajoutez-en un ci-dessous." : "Le menu n'est pas encore renseigné."}
             </p>
           ) : (
             components
