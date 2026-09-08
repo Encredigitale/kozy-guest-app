@@ -11,6 +11,7 @@ import { UtensilsCrossed, Plus, Trash2, Pencil, Check, X } from "lucide-react";
 import { useWidgetItems, scopeFromEventId } from "@/widgets/_shared/useWidgetItems";
 import { useMenuComponentsForType } from "@/core/menu/useMenuComponents";
 import { useEvent } from "@/widgets/event-shared/queries";
+import { useSession } from "@/core/auth/useSession";
 
 // Widget: Menu & Thème
 // Haut : les choix déjà saisis, groupés par composante, avec modifier / supprimer.
@@ -27,6 +28,9 @@ function LucideIcon({ name, className }: { name: string; className?: string }) {
 export default function EventMenuWidget({ config }: WidgetProps) {
   const eventId = config?.eventId as string | undefined;
   const { data: event } = useEvent(eventId ?? "");
+  const { user } = useSession();
+  // Seul l'organisateur peut composer le menu ; les invités le consultent.
+  const canEdit = !!event && !!user && event.organizer_id === user.id;
   const eventType =
     (config?.eventType as string | undefined) ??
     ((event?.metadata as Record<string, unknown> | undefined)?.["event_type"] as string | undefined) ??
@@ -102,7 +106,7 @@ export default function EventMenuWidget({ config }: WidgetProps) {
         <div className="space-y-3">
           {items.length === 0 ? (
             <p className="text-xs text-muted-foreground italic py-4 text-center">
-              Aucun choix pour l'instant. Ajoutez-en un ci-dessous.
+              {canEdit ? "Aucun choix pour l'instant. Ajoutez-en un ci-dessous." : "Le menu n'est pas encore renseigné."}
             </p>
           ) : (
             components
@@ -117,7 +121,7 @@ export default function EventMenuWidget({ config }: WidgetProps) {
                   <ul className="space-y-1">
                     {(byComponent[c.key] ?? []).map((it) => {
                       const label = String(it.payload?.["label"] ?? "");
-                      const isEditing = editingId === it.id;
+                      const isEditing = canEdit && editingId === it.id;
                       return (
                         <li key={it.id} className="flex items-center gap-2 py-1">
                           {isEditing ? (
@@ -151,6 +155,8 @@ export default function EventMenuWidget({ config }: WidgetProps) {
                           ) : (
                             <>
                               <span className="flex-1 text-sm">{label}</span>
+                              {canEdit && (
+                              <>
                               <Button
                                 size="icon"
                                 variant="ghost"
@@ -167,6 +173,8 @@ export default function EventMenuWidget({ config }: WidgetProps) {
                               >
                                 <Trash2 className="h-3.5 w-3.5 text-destructive" />
                               </Button>
+                              </>
+                              )}
                             </>
                           )}
                         </li>
@@ -179,7 +187,7 @@ export default function EventMenuWidget({ config }: WidgetProps) {
         </div>
 
         {/* Partie basse : ajout d'un choix */}
-        {components.length === 0 ? (
+        {!canEdit ? null : components.length === 0 ? (
           <p className="text-xs text-muted-foreground italic py-4 text-center">
             Aucune composante de repas configurée pour ce type d'événement.
           </p>

@@ -145,3 +145,24 @@ export function useContactBook() {
     },
   });
 }
+
+export type EventPerson = {
+  id: string;
+  name: string;
+  status: string;
+  isSelf: boolean;
+  isOrganizer: boolean;
+};
+
+/** Liste des personnes de l'événement, visible par un invité (lecture seule). */
+export function useEventPeople(eventId: string, enabled: boolean) {
+  return useQuery<EventPerson[]>({
+    queryKey: ["invitations", "people", eventId],
+    enabled: !!eventId && enabled,
+    queryFn: async () => {
+      const { listEventGuests } = await import("@/lib/invitations.functions");
+      const res = await listEventGuests({ data: { eventId } });
+      return (res as { people: EventPerson[] }).people;
+    },
+  });
+}
