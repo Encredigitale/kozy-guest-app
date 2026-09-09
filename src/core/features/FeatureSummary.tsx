@@ -25,17 +25,22 @@ const SUMMARIES: Record<string, SummaryFn> = {
       .select("status")
       .eq("event_id", eventId);
     if (error) throw error;
-    const rows = data ?? [];
+    const all = data ?? [];
+    const rows = all.filter((r) => r.status !== "cancelled");
     if (rows.length === 0) return { text: "Aucun invité", progress: 0 };
     const accepted = rows.filter((r) => r.status === "accepted").length;
-    const answered = rows.filter((r) =>
-      ["accepted", "declined", "maybe"].includes(r.status),
-    ).length;
-    const pending = rows.filter((r) => ["draft", "sent", "opened"].includes(r.status)).length;
-    return {
-      text: `${plural(rows.length, "invité", "invités")} · ${accepted} participe${accepted > 1 ? "nt" : ""} · ${pending} en attente`,
-      progress: ratio(answered, rows.length),
-    };
+    const declined = rows.filter((r) => r.status === "declined").length;
+    const maybe = rows.filter((r) => r.status === "maybe").length;
+    const answered = accepted + declined + maybe;
+    const pending = rows.length - answered;
+    const parts = [
+      plural(rows.length, "invité", "invités"),
+      `${accepted} participe${accepted > 1 ? "nt" : ""}`,
+    ];
+    if (declined > 0) parts.push(`${declined} refus`);
+    if (maybe > 0) parts.push(`${maybe} peut-être`);
+    parts.push(`${pending} en attente`);
+    return { text: parts.join(" · "), progress: ratio(answered, rows.length) };
   },
   "ext.photos": async (eventId) => {
     const { count, error } = await supabase
