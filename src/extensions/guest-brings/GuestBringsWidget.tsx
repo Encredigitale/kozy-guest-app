@@ -91,7 +91,7 @@ export default function GuestBringsWidget({ config }: WidgetProps) {
                   const list = byInvitation.get(inv.id) ?? [];
                   return (
                     <li key={inv.id} className="space-y-1">
-                      <p className="text-sm font-medium">{inv.name || inv.email || "Invité"}</p>
+                      <p className="text-sm font-medium">{inv.name}</p>
                       {list.length === 0 ? (
                         <p className="text-sm text-muted-foreground">—</p>
                       ) : (
