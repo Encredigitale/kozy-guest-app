@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import type { WidgetProps } from "@/core/registry/components";
-import { useEventInvitations } from "@/extensions/invitations/useInvitations";
+import { useEventInvitations, useEventPeople } from "@/extensions/invitations/useInvitations";
+import { useSession } from "@/core/auth/useSession";
+import { useEvent } from "@/widgets/event-shared/queries";
 import { useContributionCatalog, useEventContributions } from "./useGuestBrings";
 import { ContributionIcon } from "./icons";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,9 +11,13 @@ import { Gift } from "lucide-react";
 
 export default function GuestBringsWidget({ config }: WidgetProps) {
   const eventId = (config?.eventId as string) ?? "";
+  const { user } = useSession();
+  const { data: ev } = useEvent(eventId);
+  const isOrganizer = !!ev && !!user && ev.organizer_id === user.id;
   const { data: contributions = [], isLoading } = useEventContributions(eventId);
   const { data: catalog } = useContributionCatalog();
   const { invitations } = useEventInvitations(eventId);
+  const { data: people = [] } = useEventPeople(eventId, !isOrganizer);
 
   const types = catalog?.types ?? [];
 
@@ -37,7 +43,14 @@ export default function GuestBringsWidget({ config }: WidgetProps) {
     return Array.from(counts.values()).sort((a, b) => b.count - a.count);
   }, [contributions, types]);
 
-  const accepted = invitations.filter((i) => i.status === "accepted");
+  const accepted = isOrganizer
+    ? invitations
+        .filter((i) => i.status === "accepted")
+        .map((i) => ({ id: i.id, name: i.name || i.email || "Invité" }))
+    : people
+        .filter((p) => p.status === "accepted" && !p.isOrganizer)
+        .map((p) => ({ id: p.id, name: p.name || "Invité" }));
+
 
   return (
     <Card className="rounded-2xl border-border/60">
