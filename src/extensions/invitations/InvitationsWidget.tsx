@@ -334,7 +334,14 @@ export default function InvitationsWidget({ config }: WidgetProps) {
   if (isLoading) return <div className="text-sm text-muted-foreground">Chargement…</div>;
 
   if (!canManageGuests) {
-    const accepted = people.filter((p) => p.status === "accepted").length;
+    const statusOf = (s: string) => displayStatus(s as InvitationStatus);
+    const guestCounts = {
+      total: people.length,
+      accepted: people.filter((p) => statusOf(p.status) === "accepted").length,
+      declined: people.filter((p) => statusOf(p.status) === "declined").length,
+      maybe: people.filter((p) => statusOf(p.status) === "maybe").length,
+      pending: people.filter((p) => statusOf(p.status) === "pending").length,
+    };
     return (
       <Card className="rounded-3xl border-border/60 bg-card/80 backdrop-blur-sm">
         <CardHeader className="pb-2">
@@ -344,7 +351,7 @@ export default function InvitationsWidget({ config }: WidgetProps) {
               Les invités
             </CardTitle>
             <Badge variant="secondary" className="rounded-full font-medium">
-              {accepted} / {people.length}
+              {guestCounts.accepted} / {guestCounts.total}
             </Badge>
           </div>
         </CardHeader>
