@@ -396,7 +396,8 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                   </Badge>
                 </li>
               ))}
-            </ul>
+              </ul>
+            </>
           )}
         </CardContent>
       </Card>
