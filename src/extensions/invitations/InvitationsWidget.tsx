@@ -334,7 +334,14 @@ export default function InvitationsWidget({ config }: WidgetProps) {
   if (isLoading) return <div className="text-sm text-muted-foreground">Chargement…</div>;
 
   if (!canManageGuests) {
-    const accepted = people.filter((p) => p.status === "accepted").length;
+    const statusOf = (s: string) => displayStatus(s as InvitationStatus);
+    const guestCounts = {
+      total: people.length,
+      accepted: people.filter((p) => statusOf(p.status) === "accepted").length,
+      declined: people.filter((p) => statusOf(p.status) === "declined").length,
+      maybe: people.filter((p) => statusOf(p.status) === "maybe").length,
+      pending: people.filter((p) => statusOf(p.status) === "pending").length,
+    };
     return (
       <Card className="rounded-3xl border-border/60 bg-card/80 backdrop-blur-sm">
         <CardHeader className="pb-2">
@@ -344,7 +351,7 @@ export default function InvitationsWidget({ config }: WidgetProps) {
               Les invités
             </CardTitle>
             <Badge variant="secondary" className="rounded-full font-medium">
-              {accepted} / {people.length}
+              {guestCounts.accepted} / {guestCounts.total}
             </Badge>
           </div>
         </CardHeader>
@@ -354,7 +361,22 @@ export default function InvitationsWidget({ config }: WidgetProps) {
           ) : people.length === 0 ? (
             <p className="text-sm text-muted-foreground">Aucun invité pour le moment.</p>
           ) : (
-            <ul className="space-y-2">
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center mb-4">
+                {[
+                  { label: "invités", value: guestCounts.total },
+                  { label: "participe", value: guestCounts.accepted },
+                  { label: "refus", value: guestCounts.declined },
+                  { label: "en attente", value: guestCounts.pending },
+                  { label: "peut-être", value: guestCounts.maybe },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-2xl border border-border/60 bg-background p-3">
+                    <p className="text-lg font-medium leading-none">{s.value}</p>
+                    <p className="text-[11px] text-muted-foreground mt-1">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+              <ul className="space-y-2">
               {people.map((p) => (
                 <li key={p.id} className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background p-3">
                   <Avatar className="h-10 w-10 shrink-0">
@@ -374,7 +396,8 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                   </Badge>
                 </li>
               ))}
-            </ul>
+              </ul>
+            </>
           )}
         </CardContent>
       </Card>
