@@ -81,7 +81,10 @@ export function useEventInvitations(eventId: string) {
     },
   });
 
-  const invalidate = () => qc.invalidateQueries({ queryKey: key });
+  const invalidate = () => {
+    qc.invalidateQueries({ queryKey: key });
+    qc.invalidateQueries({ queryKey: ["feature-summary", "ext.invitations", eventId] });
+  };
 
   const update = useMutation({
     mutationFn: async (input: { id: string; patch: Partial<InvitationRow> }) => {
