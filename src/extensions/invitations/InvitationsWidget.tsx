@@ -361,7 +361,22 @@ export default function InvitationsWidget({ config }: WidgetProps) {
           ) : people.length === 0 ? (
             <p className="text-sm text-muted-foreground">Aucun invité pour le moment.</p>
           ) : (
-            <ul className="space-y-2">
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center mb-4">
+                {[
+                  { label: "invités", value: guestCounts.total },
+                  { label: "participe", value: guestCounts.accepted },
+                  { label: "refus", value: guestCounts.declined },
+                  { label: "en attente", value: guestCounts.pending },
+                  { label: "peut-être", value: guestCounts.maybe },
+                ].map((s) => (
+                  <div key={s.label} className="rounded-2xl border border-border/60 bg-background p-3">
+                    <p className="text-lg font-medium leading-none">{s.value}</p>
+                    <p className="text-[11px] text-muted-foreground mt-1">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+              <ul className="space-y-2">
               {people.map((p) => (
                 <li key={p.id} className="flex items-center gap-3 rounded-2xl border border-border/60 bg-background p-3">
                   <Avatar className="h-10 w-10 shrink-0">
