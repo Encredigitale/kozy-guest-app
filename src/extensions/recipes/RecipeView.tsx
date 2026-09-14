@@ -69,7 +69,7 @@ export function RecipeView({
   return (
     <>
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="max-h-[92dvh] overflow-y-auto rounded-t-3xl">
+        <SheetContent side="bottom" className="max-h-[92dvh] overflow-y-auto rounded-t-3xl bg-background sm:max-w-2xl sm:mx-auto">
           <SheetHeader className="text-left">
             <SheetTitle>{recipe.title}</SheetTitle>
             <SheetDescription>Recette liée à cet élément du menu.</SheetDescription>
