@@ -2,6 +2,7 @@
 
 export type RecipePhoto = {
   id: string;
+  path: string;
   url: string | null;
   sortOrder: number;
 };

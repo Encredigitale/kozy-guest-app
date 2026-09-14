@@ -110,6 +110,7 @@ export const getRecipe = createServerFn({ method: "POST" })
     const photoList = await Promise.all(
       ((photos ?? []) as { id: string; storage_path: string; sort_order: number }[]).map(async (p) => ({
         id: p.id,
+        path: p.storage_path,
         url: await signRecipePath(p.storage_path, config.signedUrlMinutes),
         sortOrder: p.sort_order,
       })),

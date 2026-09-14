@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   Sheet,
@@ -76,7 +76,7 @@ export function RecipeEditor({
     setPhotos(
       (recipe?.photos ?? [])
         .filter((p) => p.url)
-        .map((p) => ({ path: "", width: 0, height: 0, preview: p.url! })),
+        .map((p) => ({ path: p.path, width: 0, height: 0, preview: p.url! })),
     );
     const initial: Format[] = [];
     if (recipe?.textContent) initial.push("text");
@@ -84,9 +84,6 @@ export function RecipeEditor({
     if (recipe?.externalUrl) initial.push("link");
     setActive(initial);
   }, [open, recipe, menuItemLabel]);
-
-  // Les photos déjà enregistrées conservent leur chemin de stockage.
-  const existingPaths = useMemo(() => recipe?.photos.map((p) => p.id) ?? [], [recipe]);
 
   const allFormats: Array<{ key: Format; label: string; hint: string; icon: typeof AlignLeft }> = [
     { key: "text", label: "Écrire", hint: "Texte libre", icon: AlignLeft },
@@ -156,8 +153,8 @@ export function RecipeEditor({
         textContent: text,
         externalUrl: url,
         externalUrlNote: note,
-        photos: photos.map((p, i) => ({
-          path: p.path || existingPaths[i] || "",
+        photos: photos.map((p) => ({
+          path: p.path,
           width: p.width,
           height: p.height,
         })),
