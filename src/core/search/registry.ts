@@ -100,6 +100,15 @@ export const SEARCH_SOURCES: SearchSource[] = [
     searchFields: ["title", "content"],
     order: 9,
   },
+  {
+    id: "recipes",
+    entityType: "recipe",
+    label: "Recettes",
+    icon: "BookOpen",
+    widgetId: "event.menu",
+    searchFields: ["title", "text_content", "external_url_note"],
+    order: 10,
+  },
 ];
 
 export function findSearchSource(id: string): SearchSource | undefined {

@@ -206,6 +206,17 @@ export const EXTENSIONS: ExtensionDefinition[] = [
       { key: "ext.gifts", component: lazy(() => import("@/extensions/gifts/GiftsWidget")) },
     ],
   },
+  {
+    key: "recipes",
+    name: "Recette",
+    description:
+      "Ajoute très simplement une recette (texte, photos, lien) à un élément du Menu & Thème, avec partage ciblé aux invités.",
+    category: "catering",
+    icon: "BookOpen",
+    version: "1.0.0",
+    scope: "event",
+    settingsComponent: lazy(() => import("@/extensions/recipes/AdminSettings")),
+  },
 ];
 
 
