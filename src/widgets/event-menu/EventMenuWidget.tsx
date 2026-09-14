@@ -12,6 +12,8 @@ import { useWidgetItems, scopeFromEventId } from "@/widgets/_shared/useWidgetIte
 import { useMenuComponentsForType } from "@/core/menu/useMenuComponents";
 import { useEvent } from "@/widgets/event-shared/queries";
 import { useSession } from "@/core/auth/useSession";
+import { RecipeMenuAction } from "@/extensions/recipes/RecipeMenuAction";
+import { useMenuRecipes } from "@/extensions/recipes/useRecipes";
 
 // Widget: Menu & Thème
 // Haut : les choix déjà saisis, groupés par composante, avec modifier / supprimer.
@@ -47,6 +49,7 @@ export default function EventMenuWidget({ config }: WidgetProps) {
     [allComponents, selectedKeys],
   );
   const { items, create, update, remove } = useWidgetItems(WIDGET_KEY, scopeFromEventId(eventId));
+  const { data: recipes } = useMenuRecipes(eventId);
 
   const [componentKey, setComponentKey] = useState<string>("");
   const [draft, setDraft] = useState("");
@@ -155,6 +158,15 @@ export default function EventMenuWidget({ config }: WidgetProps) {
                           ) : (
                             <>
                               <span className="flex-1 text-sm">{label}</span>
+                              {eventId && recipes?.enabled && (
+                                <RecipeMenuAction
+                                  eventId={eventId}
+                                  menuItemId={it.id}
+                                  menuItemLabel={label}
+                                  summary={recipes.byMenuItem[it.id]}
+                                  canEdit={canEdit}
+                                />
+                              )}
                               {canEdit && (
                               <>
                               <Button
