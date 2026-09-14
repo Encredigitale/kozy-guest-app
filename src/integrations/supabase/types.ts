@@ -1399,6 +1399,143 @@ export type Database = {
         }
         Relationships: []
       }
+      menu_recipe: {
+        Row: {
+          created_at: string
+          created_by_user_id: string | null
+          deleted_at: string | null
+          event_id: string
+          external_url: string | null
+          external_url_note: string | null
+          id: string
+          menu_item_id: string
+          text_content: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by_user_id?: string | null
+          deleted_at?: string | null
+          event_id: string
+          external_url?: string | null
+          external_url_note?: string | null
+          id?: string
+          menu_item_id: string
+          text_content?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by_user_id?: string | null
+          deleted_at?: string | null
+          event_id?: string
+          external_url?: string | null
+          external_url_note?: string | null
+          id?: string
+          menu_item_id?: string
+          text_content?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_recipe_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_recipe_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "widget_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_recipe_photo: {
+        Row: {
+          created_at: string
+          height: number
+          id: string
+          recipe_id: string
+          sort_order: number
+          storage_path: string
+          width: number
+        }
+        Insert: {
+          created_at?: string
+          height?: number
+          id?: string
+          recipe_id: string
+          sort_order?: number
+          storage_path: string
+          width?: number
+        }
+        Update: {
+          created_at?: string
+          height?: number
+          id?: string
+          recipe_id?: string
+          sort_order?: number
+          storage_path?: string
+          width?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_recipe_photo_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "menu_recipe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      menu_recipe_share: {
+        Row: {
+          created_at: string
+          id: string
+          invitation_id: string
+          recipe_id: string
+          revoked_at: string | null
+          shared_by_user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invitation_id: string
+          recipe_id: string
+          revoked_at?: string | null
+          shared_by_user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invitation_id?: string
+          recipe_id?: string
+          revoked_at?: string | null
+          shared_by_user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_recipe_share_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "invitations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_recipe_share_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "menu_recipe"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           body: string | null

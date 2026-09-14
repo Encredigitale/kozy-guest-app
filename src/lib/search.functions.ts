@@ -548,6 +548,49 @@ export const globalSearch = createServerFn({ method: "POST" })
       }
     }
 
+    // 11. Recettes -------------------------------------------------------------
+    // Le contenu des photos et la page externe ne sont jamais indexés.
+    if (enabled("recipes")) {
+      const { data: recipes } = await db
+        .from("menu_recipe")
+        .select("id, event_id, menu_item_id, title, text_content, external_url_note, updated_at")
+        .in("event_id", eventIds)
+        .is("deleted_at", null)
+        .limit(1000);
+      for (const r of (recipes ?? []) as unknown as {
+        id: string;
+        event_id: string;
+        menu_item_id: string;
+        title: string;
+        text_content: string | null;
+        external_url_note: string | null;
+        updated_at: string | null;
+      }[]) {
+        if (!blockOn(r.event_id, "event.menu")) continue;
+        const ev = eventById.get(r.event_id);
+        const score = scoreFields(
+          query,
+          [
+            { value: r.title, weight: 3 },
+            { value: r.text_content, weight: 1 },
+            { value: r.external_url_note, weight: 1 },
+          ],
+          { fuzzy },
+        );
+        push({
+          id: r.id,
+          source: "recipes",
+          entityType: "recipe",
+          title: r.title || "Recette",
+          subtitle: (r.text_content ?? r.external_url_note ?? "").slice(0, 90) || null,
+          context: eventContext(ev),
+          eventId: r.event_id,
+          blockId: "event.menu",
+          score: score > 0 ? score + recencyBoost(r.updated_at ?? ev?.starts_at) : 0,
+        });
+      }
+    }
+
     return finish(results, settings, activeSources.map((s) => s.id), query);
   });
 
