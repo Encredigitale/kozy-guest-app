@@ -4,9 +4,9 @@ import { Plus, Users, Bell, Calendar } from "lucide-react";
 
 const ACTIONS = [
   { to: "/app/events/new", label: "Nouvel événement", icon: Plus, color: "text-primary bg-primary/10" },
-  { to: "/app/events", label: "Mes événements", icon: Calendar, color: "text-blue-600 bg-blue-500/10" },
-  { to: "/app/notifications", label: "Notifications", icon: Bell, color: "text-orange-600 bg-orange-500/10" },
-  { to: "/app/profile", label: "Mon profil", icon: Users, color: "text-emerald-600 bg-emerald-500/10" },
+  { to: "/app/events", label: "Mes événements", icon: Calendar, color: "text-secondary bg-secondary/10" },
+  { to: "/app/notifications", label: "Notifications", icon: Bell, color: "text-accent-foreground bg-accent/35" },
+  { to: "/app/profile", label: "Mon profil", icon: Users, color: "text-secondary bg-secondary/10" },
 ] as const;
 
 export default function MyActionsWidget() {
