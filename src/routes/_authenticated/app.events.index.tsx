@@ -43,7 +43,7 @@ function EventsListPage() {
   });
 
   return (
-    <div className="p-8 max-w-5xl">
+    <div className="min-h-screen bg-background p-8 max-w-5xl mx-auto">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="font-serif text-3xl tracking-tight text-primary">Événements</h1>
