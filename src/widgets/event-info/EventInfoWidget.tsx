@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useActiveEventTypes } from "@/core/eventTypes/useEventTypes";
 import {
-  Trash2, Pencil, Calendar, MapPin, Utensils, Briefcase, PartyPopper, Gift, Coffee, Heart, Cake, Music, Baby,
+  Trash2, Pencil, Calendar, MapPin, Navigation, Utensils, Briefcase, PartyPopper, Gift, Coffee, Heart, Cake, Music, Baby,
   Users, CalendarDays, Sparkles, type LucideIcon,
 } from "lucide-react";
 
@@ -162,6 +162,16 @@ export default function EventInfoWidget({ config }: WidgetProps) {
                 <div className="flex items-center gap-2 min-w-0">
                   <MapPin className="h-4 w-4 shrink-0 text-primary" />
                   <span className="truncate">{ev.location}</span>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(ev.location)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20"
+                    aria-label="S'y rendre"
+                    title="S'y rendre"
+                  >
+                    <Navigation className="h-4 w-4" />
+                  </a>
                 </div>
               )}
             </div>

@@ -15,7 +15,7 @@ import { useActiveEventTypes } from "@/core/eventTypes/useEventTypes";
 import { FeatureIcon } from "@/core/features/FeatureIcon";
 import { AccordionSection, type SectionStatus } from "./AccordionSection";
 import {
-  emptyEventForm, formatDateSummary, fromStartsAt, isValidDate, missingOf,
+  emptyEventForm, formatDateSummary, formatLocation, fromStartsAt, isValidDate, missingOf,
   progressOf, requiredCriteria, toStartsAt, type EventFormValues,
 } from "./state";
 
@@ -109,7 +109,7 @@ export function EventForm({ mode, eventId, initial, organizerId }: EventFormProp
     const payload = {
       title: values.title.trim(),
       description: values.description.trim() || null,
-      location: values.location.trim() || null,
+      location: formatLocation(values) || null,
       starts_at: toStartsAt(values),
     };
     if (mode === "create") {
@@ -122,6 +122,9 @@ export function EventForm({ mode, eventId, initial, organizerId }: EventFormProp
             event_type: values.type || null,
             event_type_label: values.type === "other" ? values.customType.trim() || "Autre" : null,
             organizer_note: values.organizerNote.trim() || null,
+            address: values.address.trim() || null,
+            postal_code: values.postalCode.trim() || null,
+            city: values.city.trim() || null,
           },
         })
         .select("id")
@@ -144,6 +147,9 @@ export function EventForm({ mode, eventId, initial, organizerId }: EventFormProp
           event_type: values.type || null,
           event_type_label: values.type === "other" ? values.customType.trim() || "Autre" : null,
           organizer_note: values.organizerNote.trim() || null,
+          address: values.address.trim() || null,
+          postal_code: values.postalCode.trim() || null,
+          city: values.city.trim() || null,
         },
       })
       .eq("id", eventId!);
@@ -331,25 +337,56 @@ export function EventForm({ mode, eventId, initial, organizerId }: EventFormProp
           index={3}
           title="Lieu"
           status={sectionStatus(3)}
-          summary={values.location.trim() ? `📍 ${values.location.trim()}` : null}
+          summary={formatLocation(values) ? `📍 ${formatLocation(values)}` : null}
           isOpen={open === 3}
           onToggle={() => toggle(3)}
         >
-          <div className="space-y-2">
-            <Label htmlFor="ev-loc">Lieu *</Label>
-            <div className="relative">
-              <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="ev-loc"
-                className="h-11 pl-9"
-                value={values.location}
-                onChange={(e) => set("location", e.target.value)}
-                placeholder="12 rue des Jardins, Metz"
-              />
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="ev-address">Adresse *</Label>
+              <div className="relative">
+                <MapPin className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="ev-address"
+                  className="h-11 pl-9"
+                  value={values.address}
+                  onChange={(e) => set("address", e.target.value)}
+                  placeholder="12 rue des Jardins"
+                />
+              </div>
+              {touched[3] && !values.address.trim() && (
+                <p className="text-sm text-destructive">Indiquez l'adresse de l'événement.</p>
+              )}
             </div>
-            {touched[3] && !values.location.trim() && (
-              <p className="text-sm text-destructive">Indiquez le lieu de l'événement.</p>
-            )}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="space-y-2 min-w-0">
+                <Label htmlFor="ev-postal">Code postal *</Label>
+                <Input
+                  id="ev-postal"
+                  className="h-11 w-full min-w-0"
+                  value={values.postalCode}
+                  onChange={(e) => set("postalCode", e.target.value)}
+                  placeholder="57000"
+                  inputMode="numeric"
+                />
+                {touched[3] && !values.postalCode.trim() && (
+                  <p className="text-sm text-destructive">Indiquez le code postal.</p>
+                )}
+              </div>
+              <div className="space-y-2 min-w-0">
+                <Label htmlFor="ev-city">Ville *</Label>
+                <Input
+                  id="ev-city"
+                  className="h-11 w-full min-w-0"
+                  value={values.city}
+                  onChange={(e) => set("city", e.target.value)}
+                  placeholder="Metz"
+                />
+                {touched[3] && !values.city.trim() && (
+                  <p className="text-sm text-destructive">Indiquez la ville.</p>
+                )}
+              </div>
+            </div>
           </div>
           <Button className="mt-4 h-11 w-full rounded-full sm:w-auto" onClick={() => validateAndAdvance(3, 4)}>
             Continuer
