@@ -38,7 +38,9 @@ export function requiredCriteria(v: EventFormValues) {
     { key: "title", section: 1, label: "Nom de l'événement", valid: v.title.trim().length > 0 },
     { key: "date", section: 2, label: "Date de l'événement", valid: isValidDate(v.date) },
     { key: "time", section: 2, label: "Heure de l'événement", valid: /^\d{2}:\d{2}$/.test(v.time) },
-    { key: "location", section: 3, label: "Lieu", valid: v.location.trim().length > 0 },
+    { key: "address", section: 3, label: "Adresse", valid: v.address.trim().length > 0 },
+    { key: "postalCode", section: 3, label: "Code postal", valid: v.postalCode.trim().length > 0 },
+    { key: "city", section: 3, label: "Ville", valid: v.city.trim().length > 0 },
   ];
 }
 
