@@ -109,7 +109,7 @@ export function EventForm({ mode, eventId, initial, organizerId }: EventFormProp
     const payload = {
       title: values.title.trim(),
       description: values.description.trim() || null,
-      location: values.location.trim() || null,
+      location: formatLocation(values) || null,
       starts_at: toStartsAt(values),
     };
     if (mode === "create") {
