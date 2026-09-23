@@ -34,7 +34,9 @@ function EditEventPage() {
       description: ev.description ?? "",
       date,
       time,
-      location: ev.location ?? "",
+      address: (meta["address"] as string) ?? ev.location ?? "",
+      postalCode: (meta["postal_code"] as string) ?? "",
+      city: (meta["city"] as string) ?? "",
       organizerNote: (meta["organizer_note"] as string) ?? "",
     };
   }, [ev]);

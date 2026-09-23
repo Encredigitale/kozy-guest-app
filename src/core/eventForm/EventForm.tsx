@@ -122,6 +122,9 @@ export function EventForm({ mode, eventId, initial, organizerId }: EventFormProp
             event_type: values.type || null,
             event_type_label: values.type === "other" ? values.customType.trim() || "Autre" : null,
             organizer_note: values.organizerNote.trim() || null,
+            address: values.address.trim() || null,
+            postal_code: values.postalCode.trim() || null,
+            city: values.city.trim() || null,
           },
         })
         .select("id")
@@ -144,6 +147,9 @@ export function EventForm({ mode, eventId, initial, organizerId }: EventFormProp
           event_type: values.type || null,
           event_type_label: values.type === "other" ? values.customType.trim() || "Autre" : null,
           organizer_note: values.organizerNote.trim() || null,
+          address: values.address.trim() || null,
+          postal_code: values.postalCode.trim() || null,
+          city: values.city.trim() || null,
         },
       })
       .eq("id", eventId!);
