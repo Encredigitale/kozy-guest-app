@@ -5,7 +5,9 @@ export type EventFormValues = {
   description: string;
   date: string; // yyyy-mm-dd
   time: string; // HH:mm
-  location: string;
+  address: string;
+  postalCode: string;
+  city: string;
   organizerNote: string;
 };
 
@@ -16,9 +18,18 @@ export const emptyEventForm: EventFormValues = {
   description: "",
   date: "",
   time: "",
-  location: "",
+  address: "",
+  postalCode: "",
+  city: "",
   organizerNote: "",
 };
+
+/** Adresse complète en une ligne, stockée dans events.location. */
+export function formatLocation(v: Pick<EventFormValues, "address" | "postalCode" | "city">): string {
+  const street = v.address.trim();
+  const town = `${v.postalCode.trim()} ${v.city.trim()}`.trim();
+  return [street, town].filter(Boolean).join(", ");
+}
 
 /** Dynamic list of required criteria — add one here and the gauge adapts. */
 export function requiredCriteria(v: EventFormValues) {
