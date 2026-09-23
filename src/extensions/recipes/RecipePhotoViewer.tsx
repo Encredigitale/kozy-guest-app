@@ -31,7 +31,7 @@ export function RecipePhotoViewer({
       }}
     >
       <DialogContent
-        className="max-w-none w-screen h-[100dvh] p-0 border-0 bg-background/95 rounded-none [&>button]:hidden"
+        className="max-w-none w-screen h-[100dvh] p-0 border-0 bg-popup/95 rounded-none [&>button]:hidden"
         aria-describedby={undefined}
       >
         <div className="relative h-full w-full overflow-hidden touch-none">
