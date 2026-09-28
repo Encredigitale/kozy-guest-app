@@ -24,7 +24,7 @@ export const Route = createFileRoute("/api/public/invitations/reminders")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const secret = process.env["INVITATIONS_CRON_SECRET"];
+        const secret = process.env["KOZY_REMINDERS_CRON_SECRET"];
         const provided = request.headers.get("x-cron-secret") ?? "";
         if (!secret) return new Response("Not configured", { status: 503 });
         const a = Buffer.from(provided);
