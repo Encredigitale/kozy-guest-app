@@ -17,11 +17,13 @@
  * 1. Add the variable to :root (light value) and .dark (dark value)
  * 2. Register it in @theme inline as --color-<name>: var(--<name>)
  *
- * Palette Kozy « Golden Harvest » : crème, terre cuite, brun et olive.
+ * Palette Kozy « Nuit festive » : violet profond, jaune solaire, corail et ivoire.
  */
 
 @theme inline {
-  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -83,33 +85,33 @@
 }
 
 :root {
-  --radius: 1rem;
-  --background: oklch(0.981 0.007 67.745);
-  --foreground: oklch(0.330 0.045 23.936);
+  --radius: 0.875rem;
+  --background: oklch(0.98027 0.02232 87.149);
+  --foreground: oklch(0.26506 0.12827 285.187);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.330 0.045 23.936);
+  --card-foreground: oklch(0.26506 0.12827 285.187);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.330 0.045 23.936);
+  --popover-foreground: oklch(0.26506 0.12827 285.187);
   --popup: oklch(1 0 0);
-  --popup-foreground: oklch(0.330 0.045 23.936);
-  --primary: oklch(0.542 0.138 42.001);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.508 0.080 122.826);
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.936 0.016 64.665);
-  --muted-foreground: oklch(0.572 0.046 66.680);
-  --accent: oklch(0.759 0.141 74.425);
-  --accent-foreground: oklch(0.330 0.045 23.936);
-  --destructive: oklch(0.495 0.142 30.814);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.893 0.028 70.919);
-  --input: oklch(0.936 0.016 64.665);
-  --ring: oklch(0.542 0.138 42.001);
-  --chart-1: oklch(0.542 0.138 42.001);
-  --chart-2: oklch(0.508 0.080 122.826);
-  --chart-3: oklch(0.666 0.157 58.318);
-  --chart-4: oklch(0.572 0.046 66.680);
-  --chart-5: oklch(0.495 0.142 30.814);
+  --popup-foreground: oklch(0.26506 0.12827 285.187);
+  --primary: oklch(0.26506 0.12827 285.187);
+  --primary-foreground: oklch(0.98027 0.02232 87.149);
+  --secondary: oklch(0.71093 0.18255 30.756);
+  --secondary-foreground: oklch(0.26506 0.12827 285.187);
+  --muted: oklch(0.948 0.025 87.149);
+  --muted-foreground: oklch(0.486 0.067 285.187);
+  --accent: oklch(0.87164 0.17276 91.101);
+  --accent-foreground: oklch(0.26506 0.12827 285.187);
+  --destructive: oklch(0.71093 0.18255 30.756);
+  --destructive-foreground: oklch(0.26506 0.12827 285.187);
+  --border: oklch(0.26506 0.12827 285.187 / 18%);
+  --input: oklch(1 0 0);
+  --ring: oklch(0.71093 0.18255 30.756);
+  --chart-1: oklch(0.26506 0.12827 285.187);
+  --chart-2: oklch(0.71093 0.18255 30.756);
+  --chart-3: oklch(0.87164 0.17276 91.101);
+  --chart-4: oklch(0.57 0.12 155);
+  --chart-5: oklch(0.64 0.13 230);
   --avatar-1: oklch(0.85 0.05 25);
   --avatar-1-fg: oklch(0.50 0.10 25);
   --avatar-2: oklch(0.86 0.04 55);
@@ -127,13 +129,13 @@
   --avatar-8: oklch(0.85 0.05 280);
   --avatar-8-fg: oklch(0.50 0.11 280);
   --sidebar: oklch(1 0 0);
-  --sidebar-foreground: oklch(0.330 0.045 23.936);
-  --sidebar-primary: oklch(0.542 0.138 42.001);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.936 0.016 64.665);
-  --sidebar-accent-foreground: oklch(0.542 0.138 42.001);
-  --sidebar-border: oklch(0.893 0.028 70.919);
-  --sidebar-ring: oklch(0.542 0.138 42.001);
+  --sidebar-foreground: oklch(0.26506 0.12827 285.187);
+  --sidebar-primary: oklch(0.26506 0.12827 285.187);
+  --sidebar-primary-foreground: oklch(0.98027 0.02232 87.149);
+  --sidebar-accent: oklch(0.87164 0.17276 91.101);
+  --sidebar-accent-foreground: oklch(0.26506 0.12827 285.187);
+  --sidebar-border: oklch(0.26506 0.12827 285.187 / 18%);
+  --sidebar-ring: oklch(0.71093 0.18255 30.756);
 }
 
 .dark {
