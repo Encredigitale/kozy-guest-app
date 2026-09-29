@@ -18,6 +18,25 @@ export const Route = createFileRoute("/_authenticated/app/events/$eventId/edit")
   component: EditEventPage,
 });
 
+/** Adresse structurée ; pour les anciens événements, découpe « rue, 57000 Ville ». */
+function legacyAddress(meta: Record<string, unknown>, location: string | null) {
+  if (typeof meta["address"] === "string") {
+    return {
+      address: meta["address"] as string,
+      postalCode: (meta["postal_code"] as string) ?? "",
+      city: (meta["city"] as string) ?? "",
+    };
+  }
+  const raw = (location ?? "").trim();
+  const m = raw.match(/^(.*?)[,\s]+(\d{4,5})\s+(.+)$/);
+  if (m) return { address: m[1]!.trim(), postalCode: m[2]!, city: m[3]!.trim() };
+  const parts = raw.split(",").map((s) => s.trim()).filter(Boolean);
+  if (parts.length >= 2) {
+    return { address: parts.slice(0, -1).join(", "), postalCode: "", city: parts[parts.length - 1]! };
+  }
+  return { address: raw, postalCode: "", city: "" };
+}
+
 function EditEventPage() {
   const { eventId } = Route.useParams();
   const { user } = Route.useRouteContext();
@@ -34,9 +53,7 @@ function EditEventPage() {
       description: ev.description ?? "",
       date,
       time,
-      address: (meta["address"] as string) ?? ev.location ?? "",
-      postalCode: (meta["postal_code"] as string) ?? "",
-      city: (meta["city"] as string) ?? "",
+      ...legacyAddress(meta, ev.location),
       organizerNote: (meta["organizer_note"] as string) ?? "",
     };
   }, [ev]);

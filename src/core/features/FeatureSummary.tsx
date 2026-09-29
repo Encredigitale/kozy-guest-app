@@ -20,13 +20,12 @@ const ratio = (done: number, total: number) => (total > 0 ? Math.min(1, done / t
 
 const SUMMARIES: Record<string, SummaryFn> = {
   "ext.invitations": async (eventId) => {
-    const { data, error } = await supabase
-      .from("invitations")
-      .select("status")
-      .eq("event_id", eventId);
-    if (error) throw error;
-    const all = data ?? [];
-    const rows = all.filter((r) => r.status !== "cancelled");
+    // Même source pour organisateur et invités (les invités ne lisent que leur ligne via RLS).
+    const { listEventGuests } = await import("@/lib/invitations.functions");
+    const res = (await listEventGuests({ data: { eventId } })) as {
+      people?: Array<{ status: string; isOrganizer?: boolean }>;
+    };
+    const rows = (res.people ?? []).filter((r) => !r.isOrganizer && r.status !== "cancelled");
     if (rows.length === 0) return { text: "Aucun invité", progress: 0 };
     const accepted = rows.filter((r) => r.status === "accepted").length;
     const declined = rows.filter((r) => r.status === "declined").length;
