@@ -169,27 +169,27 @@ export function EventForm({ mode, eventId, initial, organizerId }: EventFormProp
   const backTo = mode === "edit" && eventId ? `/app/events/${eventId}` : "/app/events";
 
   return (
-    <div className="mx-auto w-full max-w-[800px] px-4 pb-28 sm:px-6">
-      <div className="sticky top-0 z-20 -mx-4 bg-background/95 px-4 pb-3 pt-3 backdrop-blur sm:-mx-6 sm:px-6">
+    <div className="mx-auto w-full max-w-[800px] px-4 pb-28 pt-4 sm:px-6">
+      <div className="kozy-title-band sticky top-2 z-20 px-4 pb-4 pt-3">
         <Link
           to={backTo}
-          className="inline-flex min-h-11 items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+          className="inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-primary hover:text-secondary"
         >
           <ChevronLeft className="h-4 w-4" /> Retour
         </Link>
-        <h1 className="font-serif text-2xl tracking-tight text-primary sm:text-3xl">
+        <h1 className="font-serif text-2xl text-primary sm:text-3xl">
           {mode === "create" ? "Créer un événement" : "Modifier l'événement"}
         </h1>
         <div className="mt-2 flex items-center gap-3">
           <div
-            className="h-2 flex-1 overflow-hidden rounded-full bg-muted"
+            className="h-3 flex-1 overflow-hidden rounded-full border-2 border-primary bg-card"
             role="progressbar"
             aria-valuenow={progress}
             aria-valuemin={0}
             aria-valuemax={100}
           >
             <div
-              className="h-full rounded-full bg-primary transition-all duration-300"
+              className="h-full bg-secondary transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -200,7 +200,7 @@ export function EventForm({ mode, eventId, initial, organizerId }: EventFormProp
         )}
       </div>
 
-      <div className="space-y-3 pt-2">
+      <div className="space-y-4 pt-6">
         {/* ① Type */}
         <AccordionSection
           index={0}
@@ -217,7 +217,7 @@ export function EventForm({ mode, eventId, initial, organizerId }: EventFormProp
                 key={t.id}
                 type="button"
                 onClick={() => set("type", t.key)}
-                className={`min-h-[72px] rounded-xl border-2 p-3 text-left transition-colors ${values.type === t.key ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
+                className={`min-h-[72px] rounded-lg border-2 p-3 text-left transition-colors ${values.type === t.key ? "border-primary bg-accent/35" : "border-border bg-card hover:border-primary"}`}
               >
                 <FeatureIcon id={t.key} name={t.icon} className="mb-1 h-5 w-5 text-primary" />
                 <span className="block text-sm font-medium">{t.label}</span>
@@ -226,7 +226,7 @@ export function EventForm({ mode, eventId, initial, organizerId }: EventFormProp
             <button
               type="button"
               onClick={() => set("type", "other")}
-              className={`min-h-[72px] rounded-xl border-2 p-3 text-left transition-colors ${values.type === "other" ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
+              className={`min-h-[72px] rounded-lg border-2 p-3 text-left transition-colors ${values.type === "other" ? "border-primary bg-accent/35" : "border-border bg-card hover:border-primary"}`}
             >
               <Sparkles className="mb-1 h-5 w-5 text-primary" />
               <span className="block text-sm font-medium">Autre</span>

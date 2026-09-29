@@ -11,6 +11,10 @@ export const Route = createFileRoute("/_authenticated/app/contacts")({
     meta: [
       { title: "Contacts — Kozy" },
       { name: "description", content: "Votre carnet d'adresses personnel." },
+      { property: "og:title", content: "Contacts — Kozy" },
+      { property: "og:description", content: "Votre carnet d'adresses personnel." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ContactsPage,
@@ -19,12 +23,12 @@ export const Route = createFileRoute("/_authenticated/app/contacts")({
 function ContactsPage() {
   const Widget = resolveWidgetComponent("contacts.book");
   return (
-    <div className="p-6 md:p-8 max-w-3xl mx-auto">
-      <header className="mb-6">
-        <h1 className="font-serif text-3xl md:text-4xl tracking-tight text-primary flex items-center gap-2">
+    <div className="kozy-page max-w-3xl">
+      <header className="kozy-title-band mb-8 p-5 md:p-6">
+        <h1 className="font-serif text-3xl md:text-4xl text-primary flex items-center gap-2">
           <BookUser className="h-7 w-7" /> Contacts
         </h1>
-        <p className="text-sm text-muted-foreground mt-2">
+        <p className="text-sm text-foreground/70 mt-2">
           Vos contacts favoris et réutilisables pour vos prochains événements.
         </p>
       </header>

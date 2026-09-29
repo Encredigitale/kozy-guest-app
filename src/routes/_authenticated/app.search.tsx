@@ -127,8 +127,8 @@ function SearchPage() {
     navigate({ to: "/app/search", search: (prev) => ({ ...prev, source }), replace: true });
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 pb-24 pt-4 sm:px-6">
-      <div className="mb-3 flex items-center gap-2">
+    <div className="mx-auto w-full max-w-3xl px-4 pb-24 pt-6 sm:px-6">
+      <div className="kozy-title-band mb-6 flex items-center gap-2 p-3 pr-5">
         <Button
           variant="ghost"
           size="icon"

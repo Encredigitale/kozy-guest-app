@@ -150,7 +150,7 @@ function EventDetailPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-4 px-4 pb-28 pt-4 sm:px-6">
+    <div className="mx-auto w-full max-w-5xl space-y-5 px-4 pb-28 pt-5 sm:px-6">
       <Link
         to="/app/events"
         className="inline-flex min-h-11 items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -162,7 +162,7 @@ function EventDetailPage() {
         to="/app/search"
         search={{ event: eventId }}
         aria-label="Rechercher dans cet événement"
-        className="ml-2 inline-flex min-h-11 items-center gap-2 rounded-full border border-border/60 px-4 text-sm text-muted-foreground"
+        className="ml-2 inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-primary bg-card px-4 text-sm font-semibold text-primary"
       >
         <Search className="h-4 w-4" /> Rechercher dans cet événement
       </Link>
@@ -174,11 +174,11 @@ function EventDetailPage() {
       )}
 
       {/* CORE : informations toujours présentes, jamais désactivables */}
-      <Card className="rounded-2xl border-border/60">
+      <Card className="kozy-title-band">
         <CardContent className="space-y-3 p-4">
           <div className="flex items-start gap-3">
             {typeRow && (
-              <div className="h-10 w-10 shrink-0 rounded-full bg-primary/10 grid place-items-center">
+              <div className="h-10 w-10 shrink-0 rounded-full border-2 border-primary bg-card grid place-items-center">
                 <FeatureIcon id="event.type" name={typeRow.icon} className="h-5 w-5 text-primary" />
               </div>
             )}
@@ -225,12 +225,12 @@ function EventDetailPage() {
                   </>
                 )}
               </div>
-              <h1 className="mt-1 break-words font-serif text-2xl leading-tight tracking-tight text-primary">
+              <h1 className="mt-2 break-words font-serif text-2xl leading-tight text-primary">
                 {ev?.title ?? "Événement"}
               </h1>
             </div>
           </div>
-          <div className="space-y-1 text-sm text-muted-foreground">
+          <div className="space-y-1 text-sm text-foreground/70">
             {dateLabel && (
               <p className="flex items-center gap-2">
                 <CalendarDays className="h-4 w-4 shrink-0" /> {dateLabel}
@@ -258,7 +258,7 @@ function EventDetailPage() {
       </Card>
 
       {welcome && isOrganizer && (
-        <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4">
+        <div className="rounded-lg border-2 border-primary bg-accent/35 p-4 shadow-[4px_4px_0_var(--color-primary)]">
           <p className="font-medium">Votre événement est créé 🎉</p>
           <p className="mt-1 text-sm text-muted-foreground">
             Ajoutez maintenant uniquement les fonctionnalités dont vous avez besoin.

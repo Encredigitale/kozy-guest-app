@@ -6,7 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Bell, Mail, Smartphone, MessageSquare } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app/notifications")({
-  head: () => ({ meta: [{ title: "Notifications — Kozy" }] }),
+  head: () => ({ meta: [
+    { title: "Notifications — Kozy" },
+    { name: "description", content: "Consultez vos notifications Kozy." },
+    { property: "og:title", content: "Notifications — Kozy" },
+    { property: "og:description", content: "Consultez vos notifications Kozy." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: NotificationsPage,
 });
 
@@ -33,11 +40,11 @@ function NotificationsPage() {
   };
 
   return (
-    <div className="p-8 max-w-3xl">
-      <div className="flex items-start justify-between">
+    <div className="kozy-page max-w-3xl">
+      <div className="kozy-title-band flex items-start justify-between gap-4 p-5 md:p-6">
         <div>
-          <h1 className="font-serif text-3xl tracking-tight text-primary">Notifications</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h1 className="font-serif text-3xl text-primary">Notifications</h1>
+          <p className="text-sm text-foreground/70 mt-1">
             {unread.length > 0 ? `${unread.length} non lue${unread.length > 1 ? "s" : ""}` : "Tout est lu."}
           </p>
         </div>

@@ -45,16 +45,15 @@ function DashboardPage() {
   });
 
   return (
-    <div className="p-4 md:p-8 max-w-5xl mx-auto">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-accent via-background to-background border border-border/60 p-6 md:p-8 mb-8">
-        <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full bg-primary/10 blur-2xl" />
+    <div className="kozy-page max-w-5xl">
+      <section className="kozy-title-band mb-8 p-6 md:p-8">
         <div className="relative flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="min-w-0">
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary mb-3">
+            <div className="inline-flex items-center gap-2 rounded-full border-2 border-primary bg-card px-3 py-1 text-xs font-semibold text-primary mb-3">
               <Sparkles className="h-3 w-3" />
               {today}
             </div>
-            <h1 className="font-serif text-3xl md:text-4xl tracking-tight text-primary">
+            <h1 className="font-serif text-3xl md:text-4xl text-primary">
               Bonjour{name ? ` ${name}` : ""} <span className="inline-block">👋</span>
             </h1>
             <p className="text-sm text-muted-foreground mt-2 max-w-md">

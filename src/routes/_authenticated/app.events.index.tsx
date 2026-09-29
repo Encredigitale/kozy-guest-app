@@ -14,7 +14,14 @@ const EVENT_STATUS_LABELS: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/_authenticated/app/events/")({
-  head: () => ({ meta: [{ title: "Événements — Kozy" }] }),
+  head: () => ({ meta: [
+    { title: "Événements — Kozy" },
+    { name: "description", content: "Retrouvez les événements que vous organisez et ceux auxquels vous participez." },
+    { property: "og:title", content: "Événements — Kozy" },
+    { property: "og:description", content: "Retrouvez les événements que vous organisez et ceux auxquels vous participez." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: EventsListPage,
 });
 
@@ -43,11 +50,11 @@ function EventsListPage() {
   });
 
   return (
-    <div className="min-h-screen bg-background p-8 max-w-5xl mx-auto">
-      <div className="flex items-start justify-between gap-4">
+    <div className="kozy-page min-h-screen max-w-5xl">
+      <div className="kozy-title-band flex items-start justify-between gap-4 p-5 md:p-6">
         <div>
-          <h1 className="font-serif text-3xl tracking-tight text-primary">Événements</h1>
-          <p className="text-sm text-muted-foreground mt-1">Vos événements et ceux auxquels vous participez.</p>
+          <h1 className="font-serif text-3xl text-primary">Événements</h1>
+          <p className="text-sm text-foreground/70 mt-1">Vos événements et ceux auxquels vous participez.</p>
         </div>
         <Button asChild className="rounded-full"><Link to="/app/events/new"><Plus className="h-4 w-4" /> Nouveau</Link></Button>
       </div>
@@ -64,7 +71,7 @@ function EventsListPage() {
         ) : (
           (data ?? []).map((e) => (
             <Link key={e.id} to="/app/events/$eventId" params={{ eventId: e.id }}>
-              <Card className="rounded-2xl border-border/60 hover:border-primary/40 transition-colors">
+              <Card className="hover:-translate-y-0.5 hover:border-primary transition-[transform,border-color]">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between gap-3">
                     <div>
