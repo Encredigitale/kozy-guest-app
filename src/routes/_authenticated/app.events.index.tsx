@@ -14,7 +14,14 @@ const EVENT_STATUS_LABELS: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/_authenticated/app/events/")({
-  head: () => ({ meta: [{ title: "Événements — Kozy" }] }),
+  head: () => ({ meta: [
+    { title: "Événements — Kozy" },
+    { name: "description", content: "Retrouvez les événements que vous organisez et ceux auxquels vous participez." },
+    { property: "og:title", content: "Événements — Kozy" },
+    { property: "og:description", content: "Retrouvez les événements que vous organisez et ceux auxquels vous participez." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: EventsListPage,
 });
 

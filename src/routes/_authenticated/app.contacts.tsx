@@ -11,6 +11,10 @@ export const Route = createFileRoute("/_authenticated/app/contacts")({
     meta: [
       { title: "Contacts — Kozy" },
       { name: "description", content: "Votre carnet d'adresses personnel." },
+      { property: "og:title", content: "Contacts — Kozy" },
+      { property: "og:description", content: "Votre carnet d'adresses personnel." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ContactsPage,

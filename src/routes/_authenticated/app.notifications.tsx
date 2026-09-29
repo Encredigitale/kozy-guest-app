@@ -6,7 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Bell, Mail, Smartphone, MessageSquare } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app/notifications")({
-  head: () => ({ meta: [{ title: "Notifications — Kozy" }] }),
+  head: () => ({ meta: [
+    { title: "Notifications — Kozy" },
+    { name: "description", content: "Consultez vos notifications Kozy." },
+    { property: "og:title", content: "Notifications — Kozy" },
+    { property: "og:description", content: "Consultez vos notifications Kozy." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: NotificationsPage,
 });
 
