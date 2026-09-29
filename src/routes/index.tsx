@@ -1,7 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Calendar, Users, Wine, Heart, Bell } from "lucide-react";
+import {
+  ArrowRight,
+  Bell,
+  CalendarDays,
+  Camera,
+  Heart,
+  Sparkles,
+  Users,
+  UtensilsCrossed,
+  Wine,
+} from "lucide-react";
 import heroAsset from "@/assets/hero-gathering.jpg.asset.json";
 import organizeImg from "@/assets/onboard-organize.jpg";
 import shareImg from "@/assets/onboard-share.jpg";
@@ -33,7 +42,7 @@ export const Route = createFileRoute("/")({
 
 const benefits = [
   {
-    icon: Calendar,
+    icon: CalendarDays,
     title: "Créez en quelques secondes",
     text: "Un événement, une date, un lieu — c'est tout.",
   },
@@ -61,129 +70,158 @@ const benefits = [
 
 function Landing() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="max-w-6xl mx-auto flex items-center justify-between px-6 py-5">
-        <div className="font-serif text-2xl tracking-tight text-primary">Kozy</div>
-        <Button asChild variant="ghost" size="sm">
-          <Link to="/login">Se connecter</Link>
-        </Button>
-      </header>
+    <div className="min-h-screen overflow-hidden bg-background text-foreground">
+      <section className="relative bg-primary text-primary-foreground">
+        <div className="pointer-events-none absolute left-[5%] top-36 hidden text-secondary lg:block">
+          <Sparkles className="h-12 w-12 rotate-12" strokeWidth={2.5} />
+        </div>
+        <div className="pointer-events-none absolute right-[7%] top-24 text-accent">
+          <Heart className="h-10 w-10 rotate-12" strokeWidth={2.5} />
+        </div>
 
-      <main>
-        <section className="max-w-6xl mx-auto px-6 pt-8 pb-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="animate-fade-in">
-              <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl leading-[1.05] tracking-tight text-foreground">
-                Les plus beaux souvenirs commencent autour d'une&nbsp;table.
-              </h1>
-              <p className="mt-6 text-lg text-muted-foreground max-w-xl leading-relaxed">
-                Organisez facilement vos repas, anniversaires et moments entre proches.
-                Invitez vos proches, répartissez les contributions et retrouvez l'historique
-                de tous vos événements.
-              </p>
-              <div className="mt-8 flex flex-col sm:flex-row gap-3">
-                <Button asChild size="lg" className="rounded-full px-8">
-                  <Link to="/signup">Créer un compte</Link>
-                </Button>
-                <Button asChild size="lg" variant="outline" className="rounded-full px-8">
-                  <Link to="/login">Se connecter</Link>
-                </Button>
-              </div>
+        <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-8 lg:px-12">
+          <Link to="/" className="font-display text-3xl font-extrabold text-accent">
+            Kozy.
+          </Link>
+          <Button asChild variant="outline" className="rounded-full border-primary-foreground/50 bg-transparent text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            <Link to="/login">Se connecter</Link>
+          </Button>
+        </header>
+
+        <div className="relative z-10 mx-auto grid min-h-[720px] max-w-7xl items-center gap-12 px-5 pb-20 pt-8 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-12 lg:pb-28 lg:pt-12">
+          <div className="relative max-w-2xl">
+            <div className="mb-6 inline-flex rotate-[-2deg] items-center gap-2 rounded-full border-2 border-primary bg-secondary px-4 py-2 text-xs font-bold uppercase text-secondary-foreground">
+              <Sparkles className="h-4 w-4" /> Les moments qui comptent
             </div>
+            <h1 className="font-display text-5xl font-extrabold leading-[0.94] sm:text-7xl lg:text-8xl">
+              L'art de
+              <span className="block rotate-[-2deg] text-accent">se retrouver.</span>
+            </h1>
+            <p className="mt-7 max-w-xl text-lg leading-relaxed text-primary-foreground/80 sm:text-xl">
+              Organisez vos repas, anniversaires et moments entre proches. Invitez, partagez
+              et gardez-en le souvenir.
+            </p>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Button asChild size="lg" className="rounded-full border-2 border-accent bg-accent px-8 text-accent-foreground shadow-[0_6px_0_var(--secondary)] hover:bg-accent/90 active:translate-y-1 active:shadow-none">
+                <Link to="/signup">Créer un compte <ArrowRight className="ml-2 h-5 w-5" /></Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="rounded-full border-primary-foreground/50 bg-transparent px-8 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+                <Link to="/login">Se connecter</Link>
+              </Button>
+            </div>
+          </div>
 
-            <div className="relative">
-              <div className="absolute -inset-8 bg-accent/40 rounded-[3rem] blur-3xl -z-10" />
+          <div className="relative mx-auto w-full max-w-2xl pb-12 pt-6">
+            <div className="absolute -right-2 top-0 z-20 rotate-6 rounded-lg border-2 border-primary bg-secondary px-4 py-2 font-display text-sm font-bold text-secondary-foreground sm:right-8">
+              À partager sans modération !
+            </div>
+            <div className="relative rotate-2 overflow-hidden rounded-[2rem] border-4 border-accent bg-card shadow-[12px_14px_0_var(--secondary)]">
               <img
                 src={heroImg}
                 alt="Famille et amis partageant un repas convivial autour d'une table."
                 width={1600}
                 height={1200}
-                className="w-full h-auto rounded-[2rem] shadow-sm"
+                className="aspect-[4/3] w-full object-cover"
               />
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-2xl bg-background/95 p-4 text-foreground">
+                <div>
+                  <p className="font-display text-xl font-bold">Une table. Vos proches.</p>
+                  <p className="text-sm text-muted-foreground">Et des souvenirs qui restent.</p>
+                </div>
+                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary text-accent">
+                  <Heart className="h-5 w-5" fill="currentColor" />
+                </div>
+              </div>
+            </div>
+            <div className="absolute -bottom-2 left-2 -rotate-3 rounded-xl border-2 border-primary bg-accent px-5 py-3 font-display font-bold text-accent-foreground sm:left-10">
+              Tout le monde est invité.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <main>
+        <section className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
+          <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr]">
+            <div>
+              <p className="mb-3 font-bold uppercase text-secondary">Simple, vraiment.</p>
+              <h2 className="font-display text-4xl font-extrabold leading-tight sm:text-5xl">
+                Tout ce qu'il faut,
+                <span className="block text-primary/60">rien de plus.</span>
+              </h2>
+              <p className="mt-5 max-w-sm text-muted-foreground">
+                Pensé pour se concentrer sur l'essentiel : les gens.
+              </p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {benefits.map((benefit, index) => (
+                <article
+                  key={benefit.title}
+                  className={`group border-2 border-primary p-5 shadow-[5px_5px_0_var(--primary)] transition-transform hover:-translate-y-1 ${index === 0 ? "rotate-[-1deg] bg-accent" : index === 1 ? "rotate-1 bg-secondary text-secondary-foreground" : "bg-card"}`}
+                >
+                  <div className="mb-5 grid h-11 w-11 place-items-center rounded-full bg-primary text-accent">
+                    <benefit.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-display text-xl font-bold">{benefit.title}</h3>
+                  <p className={`mt-2 text-sm leading-relaxed ${index === 1 ? "text-secondary-foreground/75" : "text-muted-foreground"}`}>
+                    {benefit.text}
+                  </p>
+                </article>
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="max-w-6xl mx-auto px-6 pb-24">
-          <div className="text-center mb-12">
-            <h2 className="font-serif text-3xl sm:text-4xl tracking-tight">
-              Tout ce qu'il faut, rien de plus.
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              Pensé pour se concentrer sur l'essentiel : les gens.
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {benefits.map((b, i) => (
-              <Card
-                key={b.title}
-                className="p-6 rounded-3xl border-border/60 shadow-none hover:shadow-sm transition-shadow animate-fade-in"
-                style={{ animationDelay: `${i * 60}ms` }}
-              >
-                <div className="h-11 w-11 rounded-2xl bg-accent grid place-items-center mb-4">
-                  <b.icon className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="font-serif text-lg mb-1">{b.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{b.text}</p>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        <section className="max-w-6xl mx-auto px-6 pb-24">
-          <div className="text-center mb-12">
-            <h2 className="font-serif text-3xl sm:text-4xl tracking-tight">
-              De l'idée au souvenir.
-            </h2>
-            <p className="mt-3 text-muted-foreground">
-              Un parcours simple, du premier invité au dernier souvenir.
-            </p>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { img: organizeImg, title: "Organisez", text: "Créez un événement en moins d'une minute." },
-              { img: shareImg, title: "Partagez", text: "Invitez vos proches, répartissez les rôles." },
-              { img: rememberImg, title: "Souvenez-vous", text: "Photos, menus et invités, tout est gardé." },
-              { img: readyImg, title: "Recommencez", text: "Chaque événement inspire le prochain." },
-            ].map((s, i) => (
-              <div
-                key={s.title}
-                className="animate-fade-in"
-                style={{ animationDelay: `${i * 80}ms` }}
-              >
-                <img
-                  src={s.img}
-                  alt={s.title}
-                  width={800}
-                  height={800}
-                  className="w-full h-auto rounded-[2rem] shadow-sm"
-                />
-                <h3 className="mt-4 font-serif text-lg">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mt-1">{s.text}</p>
+        <section className="bg-primary py-20 text-primary-foreground lg:py-28">
+          <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
+            <div className="mb-12 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+              <div>
+                <p className="mb-3 font-bold uppercase text-accent">De l'idée au souvenir</p>
+                <h2 className="max-w-2xl font-display text-4xl font-extrabold leading-tight sm:text-5xl">
+                  Chaque moment mérite sa petite histoire.
+                </h2>
               </div>
-            ))}
+              <Camera className="hidden h-16 w-16 rotate-6 text-secondary sm:block" strokeWidth={1.7} />
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { img: organizeImg, title: "Organisez", text: "Créez un événement en moins d'une minute." },
+                { img: shareImg, title: "Partagez", text: "Invitez vos proches, répartissez les rôles." },
+                { img: rememberImg, title: "Souvenez-vous", text: "Photos, menus et invités, tout est gardé." },
+                { img: readyImg, title: "Recommencez", text: "Chaque événement inspire le prochain." },
+              ].map((step, index) => (
+                <article key={step.title} className={`relative ${index % 2 === 0 ? "lg:-rotate-1" : "lg:rotate-1"}`}>
+                  <div className="absolute left-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full border-2 border-primary bg-accent font-display font-bold text-accent-foreground">
+                    {index + 1}
+                  </div>
+                  <img src={step.img} alt={step.title} width={800} height={800} className="aspect-square w-full rounded-2xl border-4 border-primary-foreground object-cover" />
+                  <h3 className="mt-5 font-display text-2xl font-bold text-accent">{step.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-primary-foreground/70">{step.text}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
-
-        <section className="max-w-3xl mx-auto px-6 pb-24 text-center">
-          <h2 className="font-serif text-3xl sm:text-4xl tracking-tight mb-4">
-            Prêt à créer votre prochain moment ?
-          </h2>
-          <p className="text-muted-foreground mb-8">
+        <section className="relative mx-auto max-w-5xl px-5 py-20 text-center sm:px-8 lg:py-28">
+          <Wine className="absolute left-6 top-16 hidden h-14 w-14 -rotate-12 text-secondary sm:block" />
+          <UtensilsCrossed className="absolute right-8 top-20 hidden h-14 w-14 rotate-12 text-primary sm:block" />
+          <h2 className="font-display text-4xl font-extrabold sm:text-6xl">Prêt à créer votre prochain moment ?</h2>
+          <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">
             Rejoignez Kozy et rassemblez ceux qui comptent.
           </p>
-          <Button asChild size="lg" className="rounded-full px-10">
-            <Link to="/signup">Commencer</Link>
+          <Button asChild size="lg" className="mt-8 rounded-full border-2 border-primary bg-primary px-10 text-primary-foreground shadow-[0_6px_0_var(--secondary)] hover:bg-primary/90 active:translate-y-1 active:shadow-none">
+            <Link to="/signup">Commencer <ArrowRight className="ml-2 h-5 w-5" /></Link>
           </Button>
         </section>
       </main>
 
-      <footer className="border-t border-border/60">
-        <div className="max-w-6xl mx-auto px-6 py-8 text-sm text-muted-foreground flex flex-wrap gap-4 justify-between">
+      <footer className="border-t-2 border-primary bg-accent text-accent-foreground">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-8 text-sm sm:px-8 lg:px-12">
           <div>© {new Date().getFullYear()} Kozy</div>
-          <div className="font-serif text-primary">Kozy</div>
+          <div className="font-display text-2xl font-extrabold">Kozy.</div>
         </div>
       </footer>
     </div>
