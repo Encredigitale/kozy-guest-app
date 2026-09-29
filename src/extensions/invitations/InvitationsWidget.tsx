@@ -335,12 +335,13 @@ export default function InvitationsWidget({ config }: WidgetProps) {
 
   if (!canManageGuests) {
     const statusOf = (s: string) => displayStatus(s as InvitationStatus);
+    const invitees = people.filter((p) => !p.isOrganizer);
     const guestCounts = {
-      total: people.length,
-      accepted: people.filter((p) => statusOf(p.status) === "accepted").length,
-      declined: people.filter((p) => statusOf(p.status) === "declined").length,
-      maybe: people.filter((p) => statusOf(p.status) === "maybe").length,
-      pending: people.filter((p) => statusOf(p.status) === "pending").length,
+      total: invitees.length,
+      accepted: invitees.filter((p) => statusOf(p.status) === "accepted").length,
+      declined: invitees.filter((p) => statusOf(p.status) === "declined").length,
+      maybe: invitees.filter((p) => statusOf(p.status) === "maybe").length,
+      pending: invitees.filter((p) => statusOf(p.status) === "pending").length,
     };
     return (
       <Card className="rounded-3xl border-border/60 bg-card/80 backdrop-blur-sm">

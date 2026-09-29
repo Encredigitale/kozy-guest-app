@@ -66,8 +66,17 @@ export function RecipeEditor({
   const [uploading, setUploading] = useState(false);
   const [active, setActive] = useState<Format[]>([]);
 
+  // Réinitialise uniquement à l'ouverture ou au changement de recette,
+  // jamais lors d'un simple rafraîchissement des données (retour d'onglet).
+  const initKey = useRef<string | null>(null);
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      initKey.current = null;
+      return;
+    }
+    const key = recipe?.id ?? "new";
+    if (initKey.current === key) return;
+    initKey.current = key;
     setTitle(recipe?.title ?? menuItemLabel);
     setEditTitle(false);
     setText(recipe?.textContent ?? "");

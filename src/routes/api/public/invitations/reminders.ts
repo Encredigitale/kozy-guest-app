@@ -15,7 +15,7 @@ function dayKey(d: Date) {
 
 /**
  * Rappels quotidiens (planificateur, chaque matin).
- * En-tête requis : x-cron-secret = INVITATIONS_CRON_SECRET.
+ * En-tête requis : x-cron-secret = KOZY_REMINDERS_CRON_SECRET.
  *   - sans réponse depuis 3 jours → relance (limite maxReminders)
  *   - J-1 → e-mail de relance à tous les invités (hors refus/annulés)
  *   - J   → notification sur le tableau de bord des invités ayant un compte
