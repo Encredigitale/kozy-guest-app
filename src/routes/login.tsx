@@ -85,12 +85,12 @@ function LoginPage() {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
+    <div className="kozy-auth-shell flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="font-serif text-3xl tracking-tight text-primary">Kozy</Link>
+          <Link to="/" className="font-serif text-4xl text-accent">Kozy</Link>
         </div>
-        <Card className="rounded-3xl border-border/60 shadow-none">
+        <Card className="border-primary bg-popup text-popup-foreground shadow-[10px_10px_0_var(--color-accent)]">
           <CardHeader>
             <CardTitle>{forgot ? "Mot de passe oublié" : "Se connecter"}</CardTitle>
             <CardDescription>

@@ -84,15 +84,15 @@ export function AppShell() {
     ];
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <header className="h-14 border-b border-border/60 grid grid-cols-[auto_minmax(0,1fr)] items-center px-3 gap-2 shrink-0 sm:px-4 sm:gap-4">
-          <Link to="/app" className="shrink-0 font-serif text-lg sm:text-xl tracking-tight text-primary">
+        <header className="min-h-16 border-b-2 border-primary bg-primary text-primary-foreground grid grid-cols-[auto_minmax(0,1fr)] items-center px-3 gap-2 shrink-0 sm:px-5 sm:gap-4">
+          <Link to="/app" className="shrink-0 font-serif text-xl text-accent">
             Kozy
           </Link>
           <nav className="flex min-w-0 items-center justify-end gap-0.5 text-sm sm:gap-1">
             <Link
               to="/app/search"
               aria-label="Rechercher"
-              className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-accent"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-primary-foreground hover:bg-accent hover:text-accent-foreground"
             >
               <Icons.Search className="h-5 w-5" />
             </Link>
@@ -104,8 +104,8 @@ export function AppShell() {
                 <Link
                   key={to}
                   to={to}
-                  className={`flex shrink-0 items-center gap-2 rounded-md px-2 py-1.5 hover:bg-accent sm:px-3 ${
-                    active ? "bg-accent text-foreground" : "text-muted-foreground"
+                  className={`flex min-h-10 shrink-0 items-center gap-2 rounded-md px-2 py-1.5 hover:bg-accent hover:text-accent-foreground sm:px-3 ${
+                    active ? "bg-accent text-accent-foreground" : "text-primary-foreground"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -114,7 +114,7 @@ export function AppShell() {
               );
             })}
             <NotificationBell />
-            <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground">
+            <Button variant="ghost" size="sm" onClick={signOut} className="text-primary-foreground hover:text-accent-foreground">
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline ml-2">Déconnexion</span>
             </Button>
@@ -131,18 +131,18 @@ export function AppShell() {
   return (
     <div className="min-h-screen bg-background flex">
       <main className="flex-1 overflow-x-hidden flex flex-col">
-        <header className="h-14 border-b border-border/60 flex items-center justify-between px-4 gap-2 shrink-0">
-          <Link to="/app" className="font-serif text-xl tracking-tight text-primary">
+        <header className="min-h-16 border-b-2 border-primary bg-primary text-primary-foreground flex items-center justify-between px-5 gap-2 shrink-0">
+          <Link to="/app" className="font-serif text-xl text-accent">
             Kozy
           </Link>
           <div className="flex items-center gap-2">
-            <span className="hidden md:inline text-xs text-muted-foreground truncate max-w-[200px]">
+            <span className="hidden md:inline text-xs text-primary-foreground/75 truncate max-w-[200px]">
               {user?.email}
             </span>
             <Link
               to="/app/search"
               aria-label="Rechercher"
-              className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-accent"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-primary-foreground hover:bg-accent hover:text-accent-foreground"
             >
               <Icons.Search className="h-5 w-5" />
             </Link>
@@ -150,12 +150,12 @@ export function AppShell() {
 
           <Link
             to="/app/profile"
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:bg-accent"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-primary-foreground hover:bg-accent hover:text-accent-foreground"
           >
             <ProfileIcon className="h-4 w-4" />
             <span className="hidden sm:inline">Profil</span>
           </Link>
-          <Button variant="ghost" size="sm" onClick={signOut} className="text-muted-foreground">
+          <Button variant="ghost" size="sm" onClick={signOut} className="text-primary-foreground hover:text-accent-foreground">
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline ml-2">Déconnexion</span>
           </Button>

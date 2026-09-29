@@ -42,21 +42,21 @@ export function AccordionSection({
     <div
       ref={ref}
       className={cn(
-        "scroll-mt-32 overflow-hidden rounded-2xl border bg-card transition-colors",
-        status === "error" ? "border-destructive/50" : "border-border/60",
+        "scroll-mt-32 overflow-hidden rounded-lg border-2 bg-card shadow-[4px_4px_0_var(--color-border)] transition-colors",
+        status === "error" ? "border-destructive" : "border-primary/30",
       )}
     >
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={isOpen}
-        className="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/50"
+        className="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-accent/25"
       >
         <span aria-hidden className="text-lg leading-none text-primary">
           {NUMERALS[index] ?? index + 1}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium">{title}</span>
+          <span className="block truncate font-serif text-sm">{title}</span>
           <span
             className={cn(
               "block truncate text-xs",

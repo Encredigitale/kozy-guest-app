@@ -56,8 +56,8 @@ function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-      <Card className="w-full max-w-md">
+    <div className="kozy-auth-shell flex items-center justify-center px-4 py-12">
+      <Card className="w-full max-w-md border-primary bg-popup text-popup-foreground shadow-[10px_10px_0_var(--color-accent)]">
         <CardHeader>
           <CardTitle>Nouveau mot de passe</CardTitle>
           <CardDescription>

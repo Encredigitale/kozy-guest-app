@@ -75,15 +75,17 @@ function LegalPage() {
             Retour
           </Link>
         </Button>
-        <h1 className="font-serif text-4xl tracking-tight text-primary">{label}</h1>
-        {data && (
+        <header className="kozy-title-band p-6">
+          <h1 className="font-serif text-4xl text-primary">{label}</h1>
+          {data && (
           <p className="text-xs text-muted-foreground mt-2">
             Version {data.version}
             {data.published_at
               ? ` · publiée le ${new Date(data.published_at).toLocaleDateString("fr-FR")}`
               : ""}
           </p>
-        )}
+          )}
+        </header>
         <div className="mt-8">
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Chargement…</p>
