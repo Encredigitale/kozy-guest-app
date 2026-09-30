@@ -178,12 +178,12 @@ function Landing() {
             <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
               <div>
                 <p className="mb-4 font-bold uppercase text-accent">De l'idée au souvenir</p>
-                <h2 className="max-w-4xl font-display text-4xl leading-tight sm:text-6xl lg:text-7xl">
+                <h2 className="max-w-4xl font-display text-4xl leading-tight sm:text-6xl">
                   Chaque moment mérite <span className="text-accent">sa petite histoire.</span>
                 </h2>
               </div>
               <div className="hidden shrink-0 items-end gap-4 text-accent lg:flex">
-                <p className="max-w-40 -rotate-6 text-right font-serif text-2xl italic leading-snug text-primary-foreground">Des gens, des échanges, des souvenirs.</p>
+                <p className="w-48 -rotate-6 text-right font-sans text-2xl italic leading-snug text-primary-foreground">Des gens, des échanges, des souvenirs.</p>
                 <Camera className="h-16 w-16 rotate-6 text-secondary" strokeWidth={1.7} />
               </div>
             </div>
