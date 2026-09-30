@@ -321,13 +321,13 @@ export default function ContributionsWidget({ config }: WidgetProps) {
       </CardContent>
 
       <Dialog open={!!draft} onOpenChange={(open) => !open && setDraft(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
+        <DialogContent className="max-h-[calc(100dvh-1rem)] max-w-md grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 sm:max-h-[calc(100dvh-3rem)] sm:gap-4 sm:p-6">
+          <DialogHeader className="shrink-0 px-5 pb-3 pt-5 pr-12 sm:p-0">
             <DialogTitle>{draft?.id ? "Modifier le besoin" : "Ajouter un besoin"}</DialogTitle>
             <DialogDescription>Dites simplement ce qu'il vous manque.</DialogDescription>
           </DialogHeader>
           {draft && (
-            <div className="space-y-4">
+            <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain px-5 py-1 sm:px-0">
               <div className="space-y-1">
                 <Label className="text-xs">Catégorie</Label>
                 <Select
@@ -454,6 +454,10 @@ export default function ContributionsWidget({ config }: WidgetProps) {
                 />
               </div>
 
+            </div>
+          )}
+          {draft && (
+            <div className="shrink-0 border-t border-border bg-popup px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3 sm:border-0 sm:p-0">
               <Button className="w-full rounded-full" onClick={submit}>
                 {draft.id ? "Enregistrer" : "Ajouter le besoin"}
               </Button>
