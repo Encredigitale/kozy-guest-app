@@ -12,15 +12,41 @@ export default function CalendarWidget() {
     queryKey: ["dashboard", "calendar", user?.id],
     enabled: !!user?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Événements que j'organise
+      const { data: own, error: ownError } = await supabase
         .from("events")
         .select("id,title,starts_at")
         .eq("organizer_id", user!.id)
         .gte("starts_at", new Date().toISOString())
         .order("starts_at", { ascending: true })
         .limit(30);
-      if (error) throw error;
-      return data ?? [];
+      if (ownError) throw ownError;
+
+      // Événements auxquels je participe (invité)
+      const { data: participations, error: partError } = await supabase
+        .from("event_participants")
+        .select("event_id")
+        .eq("user_id", user!.id);
+      if (partError) throw partError;
+
+      const invitedIds = (participations ?? [])
+        .map((p) => p.event_id)
+        .filter((id) => !(own ?? []).some((e) => e.id === id));
+
+      let invited: { id: string; title: string; starts_at: string | null }[] = [];
+      if (invitedIds.length > 0) {
+        const { data: invitedEvents, error: invitedError } = await supabase
+          .from("events")
+          .select("id,title,starts_at")
+          .in("id", invitedIds)
+          .gte("starts_at", new Date().toISOString());
+        if (invitedError) throw invitedError;
+        invited = invitedEvents ?? [];
+      }
+
+      return [...(own ?? []), ...invited].sort((a, b) =>
+        (a.starts_at ?? "").localeCompare(b.starts_at ?? ""),
+      );
     },
   });
 
