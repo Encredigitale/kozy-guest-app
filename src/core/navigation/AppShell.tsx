@@ -1,5 +1,6 @@
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import * as Icons from "lucide-react";
 import { LogOut, User as UserIcon, LayoutGrid, Settings, Home, Calendar, BookUser, User as ProfileIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,7 +37,8 @@ function DynIcon({ name, className }: { name?: string; className?: string }) {
 
 export function AppShell() {
   const navigate = useNavigate();
-  const { user, isAdmin } = useSession();
+  const queryClient = useQueryClient();
+  const { user, isAdmin, isSuperAdmin } = useSession();
   const { data: widgets } = useActiveWidgets();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
@@ -70,10 +72,15 @@ export function AppShell() {
   }, [extensions]);
 
   const signOut = async () => {
+    await queryClient.cancelQueries();
+    queryClient.clear();
     await supabase.auth.signOut();
     toast.success("Déconnecté.");
-    navigate({ to: "/" });
+    navigate({ to: "/login", replace: true });
   };
+
+  // The Studio d'administration has its own shell.
+  if (pathname.startsWith("/admin")) return <Outlet />;
 
   // Non-admin users: no sidebar, top header nav only.
   if (!isAdmin) {
@@ -160,8 +167,11 @@ export function AppShell() {
           </Button>
           </div>
         </header>
-
-
+        {isSuperAdmin && (
+          <Link to="/admin/dashboard" className="block border-b border-border bg-accent/35 px-5 py-1.5 text-xs font-semibold text-foreground hover:underline">
+            ← Retour au Studio d'administration
+          </Link>
+        )}
         <div className="flex-1 overflow-y-auto">
           <Outlet />
         </div>

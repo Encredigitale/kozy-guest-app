@@ -6,6 +6,7 @@ export function useSession() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -13,18 +14,21 @@ export function useSession() {
       if (cancelled) return;
       setUser(data.user ?? null);
       if (data.user) {
-        const { data: role } = await supabase
+        const { data: roles } = await supabase
           .from("user_roles")
           .select("role")
-          .eq("user_id", data.user.id)
-          .eq("role", "admin")
-          .maybeSingle();
-        if (!cancelled) setIsAdmin(!!role);
+          .eq("user_id", data.user.id);
+        const list = (roles ?? []).map((r) => String(r.role));
+        if (!cancelled) {
+          setIsAdmin(list.includes("admin") || list.includes("superadmin"));
+          setIsSuperAdmin(list.includes("superadmin") || list.includes("admin"));
+        }
       }
       setLoading(false);
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (!session) { setIsAdmin(false); setIsSuperAdmin(false); }
     });
     return () => {
       cancelled = true;
@@ -32,5 +36,5 @@ export function useSession() {
     };
   }, []);
 
-  return { user, loading, isAdmin };
+  return { user, loading, isAdmin, isSuperAdmin };
 }
