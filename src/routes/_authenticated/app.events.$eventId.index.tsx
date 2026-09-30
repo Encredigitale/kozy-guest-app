@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, MapPin, CalendarDays, Plus, Pencil, Search, WifiOff } from "lucide-react";
+import { ChevronLeft, MapPin, CalendarDays, ArrowRight, Pencil, Search, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -76,16 +76,8 @@ function EventDetailPage() {
 
   const [pickerOpen, setPickerOpen] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [welcome, setWelcome] = useState(false);
   const [online, setOnline] = useState(true);
 
-  useEffect(() => {
-    const key = `kozy.event.welcome.${eventId}`;
-    if (typeof window !== "undefined" && !localStorage.getItem(key)) {
-      setWelcome(true);
-      localStorage.setItem(key, "1");
-    }
-  }, [eventId]);
 
   useEffect(() => {
     const sync = () => setOnline(navigator.onLine);
@@ -257,14 +249,6 @@ function EventDetailPage() {
         </CardContent>
       </Card>
 
-      {welcome && isOrganizer && (
-        <div className="rounded-lg border-2 border-primary bg-accent/35 p-4 shadow-[4px_4px_0_var(--color-primary)]">
-          <p className="font-medium">Votre événement est créé 🎉</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Ajoutez maintenant uniquement les fonctionnalités dont vous avez besoin.
-          </p>
-        </div>
-      )}
 
       {/* FONCTIONNALITÉS : générées dynamiquement depuis le registry */}
       {active.length > 0 ? (
@@ -316,9 +300,16 @@ function EventDetailPage() {
 
       {isOrganizer && (
         <>
-          <Button className="h-12 w-full rounded-full" onClick={() => setPickerOpen(true)}>
-            <Plus className="h-5 w-5" /> Ajouter une fonctionnalité
-          </Button>
+          <div className="rounded-lg border-2 border-primary bg-card p-5 shadow-[6px_6px_0_var(--color-accent)]">
+            <p className="font-serif text-xl text-primary">🎉 C'est parti !</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Votre événement est créé. Lancez les invitations, préparez le menu et choisissez les
+              fonctionnalités qui feront de ce moment une réussite.
+            </p>
+            <Button className="mt-4 h-11 rounded-full" onClick={() => setPickerOpen(true)}>
+              Organiser mon événement <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
 
           <FeaturePicker
             open={pickerOpen}
