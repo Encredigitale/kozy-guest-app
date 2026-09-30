@@ -218,7 +218,7 @@ export const sendInvitation = createServerFn({ method: "POST" })
 
     await sendBrevoEmail(
       inv.email,
-      data.reminder ? `Rappel : ${ev.title} — Kozy` : `Invitation : ${ev.title} — Kozy`,
+      data.reminder ? `Rappel : ${ev.title} — Ma Belle Table` : `Invitation : ${ev.title} — Ma Belle Table`,
       html,
       `${intro} Voir l'invitation : ${url}`,
     );

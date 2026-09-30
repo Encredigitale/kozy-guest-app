@@ -22,12 +22,12 @@ import { Plus, Trash2 } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/app/admin/contribution-types")({
   head: () => ({
     meta: [
-      { title: "Types d'apports — Administration Kozy" },
+      { title: "Types d'apports — Administration Ma Belle Table" },
       {
         name: "description",
         content: "Gérez les catégories d'apports (vin, dessert, fleurs, cadeau…), leurs suggestions et leurs types d'événements.",
       },
-      { property: "og:title", content: "Types d'apports — Administration Kozy" },
+      { property: "og:title", content: "Types d'apports — Administration Ma Belle Table" },
       { property: "og:description", content: "Référentiel des apports du plugin « Invité apporte »." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

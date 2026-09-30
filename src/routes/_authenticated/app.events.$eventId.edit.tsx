@@ -7,9 +7,9 @@ import { useMemo } from "react";
 export const Route = createFileRoute("/_authenticated/app/events/$eventId/edit")({
   head: () => ({
     meta: [
-      { title: "Modifier l'événement — Kozy" },
+      { title: "Modifier l'événement — Ma Belle Table" },
       { name: "description", content: "Modifiez les informations principales de votre événement." },
-      { property: "og:title", content: "Modifier l'événement — Kozy" },
+      { property: "og:title", content: "Modifier l'événement — Ma Belle Table" },
       { property: "og:description", content: "Modifiez les informations principales de votre événement." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -26,9 +26,9 @@ export const Route = createFileRoute("/invitation/$eventId/$invitationId")({
   validateSearch: z.object({ token: z.string().optional() }),
   head: () => ({
     meta: [
-      { title: "Votre invitation — Kozy" },
+      { title: "Votre invitation — Ma Belle Table" },
       { name: "description", content: "Consultez votre invitation et répondez en un clic, sans créer de compte." },
-      { property: "og:title", content: "Votre invitation — Kozy" },
+      { property: "og:title", content: "Votre invitation — Ma Belle Table" },
       { property: "og:description", content: "Consultez votre invitation et répondez en un clic." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -166,7 +166,7 @@ function PublicInvitationPage() {
         navigate({ to: "/login" });
         return;
       }
-      toast.success("Bienvenue sur Kozy ! Votre compte est lié à cet événement.");
+      toast.success("Bienvenue sur Ma Belle Table ! Votre compte est lié à cet événement.");
       navigate({ to: "/app/events/$eventId", params: { eventId } });
     } catch {
       toast.error("Création du compte impossible.");
@@ -383,9 +383,9 @@ function PublicInvitationPage() {
         {p.status === "accepted" && !p.hasAccount && !accountDone && (
           <Card className="rounded-3xl border-border/60">
             <CardContent className="p-6 space-y-3">
-              <h2 className="font-medium">Créer votre compte Kozy</h2>
+              <h2 className="font-medium">Créer votre compte Ma Belle Table</h2>
               <p className="text-sm text-muted-foreground">
-                Retrouvez cet événement, le menu et vos moments partagés dans votre espace Kozy.
+                Retrouvez cet événement, le menu et vos moments partagés dans votre espace Ma Belle Table.
               </p>
               <Input
                 type="email"

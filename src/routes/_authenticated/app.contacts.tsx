@@ -9,9 +9,9 @@ export const Route = createFileRoute("/_authenticated/app/contacts")({
   }),
   head: () => ({
     meta: [
-      { title: "Contacts — Kozy" },
+      { title: "Contacts — Ma Belle Table" },
       { name: "description", content: "Votre carnet d'adresses personnel." },
-      { property: "og:title", content: "Contacts — Kozy" },
+      { property: "og:title", content: "Contacts — Ma Belle Table" },
       { property: "og:description", content: "Votre carnet d'adresses personnel." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

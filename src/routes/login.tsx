@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { BrandLogo } from "@/core/branding/BrandLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +17,7 @@ export const Route = createFileRoute("/login")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Connexion — Kozy" },
+      { title: "Connexion — Ma Belle Table" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -88,7 +89,7 @@ function LoginPage() {
     <div className="kozy-auth-shell flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="font-serif text-4xl text-accent">Kozy</Link>
+          <BrandLogo size="lg" />
         </div>
         <Card className="border-primary bg-popup text-popup-foreground shadow-[10px_10px_0_var(--color-accent)]">
           <CardHeader>

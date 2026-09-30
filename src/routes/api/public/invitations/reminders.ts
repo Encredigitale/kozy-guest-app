@@ -123,7 +123,7 @@ export const Route = createFileRoute("/api/public/invitations/reminders")({
           try {
             await sendBrevoEmail(
               raw.email,
-              kind === "day_before_sent" ? `Demain : ${ev.title} — Kozy` : `Rappel : ${ev.title} — Kozy`,
+              kind === "day_before_sent" ? `Demain : ${ev.title} — Ma Belle Table` : `Rappel : ${ev.title} — Ma Belle Table`,
               renderInvitationEmail({
                 guestName: raw.name ?? undefined,
                 eventTitle: ev.title,

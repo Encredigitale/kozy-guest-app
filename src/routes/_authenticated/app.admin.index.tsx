@@ -11,7 +11,7 @@ import { LayoutGrid, MonitorSmartphone, Puzzle, Wand2 } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/app/admin/")({
   head: () => ({
     meta: [
-      { title: "Tableau de bord admin — Kozy" },
+      { title: "Tableau de bord admin — Ma Belle Table" },
       { name: "description", content: "Vue d'ensemble du core, des écrans, des widgets et des plugins." },
     ],
   }),

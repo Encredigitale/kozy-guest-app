@@ -59,7 +59,7 @@ export const DEFAULT_INVITATIONS_CONFIG: InvitationsConfig = {
   allowedCountries: [],
   defaultCountry: "FR",
   templateSms: "{guest}, {host} vous invite à {event}. Consultez votre invitation et répondez ici : {link}",
-  smsSender: "Kozy",
+  smsSender: "Ma Belle Table",
 };
 
 export function normalizeConfig(raw: unknown): InvitationsConfig {

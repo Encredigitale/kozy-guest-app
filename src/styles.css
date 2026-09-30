@@ -17,7 +17,7 @@
  * 1. Add the variable to :root (light value) and .dark (dark value)
  * 2. Register it in @theme inline as --color-<name>: var(--<name>)
  *
- * Palette Kozy « Asymmetric solar purple » : violet nuit, jaune solaire, corail et ivoire.
+ * Palette Ma Belle Table « Asymmetric solar purple » : violet nuit, jaune solaire, corail et ivoire.
  */
 
 @theme inline {

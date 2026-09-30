@@ -22,9 +22,9 @@ export const Route = createFileRoute("/_authenticated/app/events/$eventId/")({
   }),
   head: () => ({
     meta: [
-      { title: "Mon événement — Kozy" },
+      { title: "Mon événement — Ma Belle Table" },
       { name: "description", content: "Gérez votre événement et ajoutez les fonctionnalités utiles." },
-      { property: "og:title", content: "Mon événement — Kozy" },
+      { property: "og:title", content: "Mon événement — Ma Belle Table" },
       { property: "og:description", content: "Gérez votre événement et ajoutez les fonctionnalités utiles." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -26,12 +26,12 @@ export const Route = createFileRoute("/_authenticated/app/search")({
   }),
   head: () => ({
     meta: [
-      { title: "Rechercher — Kozy" },
+      { title: "Rechercher — Ma Belle Table" },
       {
         name: "description",
         content: "Retrouvez un événement, une personne, un cadeau ou un plat en une recherche.",
       },
-      { property: "og:title", content: "Rechercher — Kozy" },
+      { property: "og:title", content: "Rechercher — Ma Belle Table" },
       {
         property: "og:description",
         content: "Retrouvez un événement, une personne, un cadeau ou un plat en une recherche.",

@@ -6,7 +6,7 @@ export type PublicInvitationPayload = {
   eventId: string;
   guestName: string | null;
   guestEmail: string | null;
-  /** L'invité est déjà rattaché à un compte Kozy. */
+  /** L'invité est déjà rattaché à un compte Ma Belle Table. */
   hasAccount: boolean;
   status: string;
   event: {

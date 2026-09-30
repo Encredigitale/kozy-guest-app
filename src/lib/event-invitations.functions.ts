@@ -59,7 +59,7 @@ export const sendEventInvitation = createServerFn({ method: "POST" })
 
     await sendBrevoEmail(
       participant.email,
-      `Invitation : ${event.title} — Kozy`,
+      `Invitation : ${event.title} — Ma Belle Table`,
       html,
       `${profile?.display_name ?? "Un proche"} vous invite à ${event.title}. Voir l'invitation : ${inviteUrl}`,
     );

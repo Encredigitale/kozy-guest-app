@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app/w/$")({
-  head: () => ({ meta: [{ title: "Widget — Kozy" }] }),
+  head: () => ({ meta: [{ title: "Widget — Ma Belle Table" }] }),
   component: WidgetHost,
 });
 

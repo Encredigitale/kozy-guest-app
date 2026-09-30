@@ -16,7 +16,7 @@ type AuditRow = {
 };
 
 export const Route = createFileRoute("/_authenticated/app/audit")({
-  head: () => ({ meta: [{ title: "Journal d'audit — Kozy" }] }),
+  head: () => ({ meta: [{ title: "Journal d'audit — Ma Belle Table" }] }),
   component: AuditPage,
 });
 

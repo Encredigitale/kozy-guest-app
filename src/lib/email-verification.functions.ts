@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getBaseUrl, sendBrevoEmail } from "@/lib/email-delivery.server";
 import { EMAIL_VERIFICATION_TOKEN_TTL_HOURS, hashEmailVerificationToken } from "@/lib/email-verification.server";
-import { renderKozyEmail } from "@/lib/email-templates";
+import { renderBrandEmail } from "@/lib/email-templates";
 
 /**
  * Envoie (ou renvoie) l'e-mail de validation d'adresse.
@@ -49,12 +49,12 @@ export const sendVerificationEmail = createServerFn({ method: "POST" })
     if (insertError) throw new Error(insertError.message);
 
     const link = `${getBaseUrl()}/verify-email?token=${token}`;
-    const html = renderKozyEmail({
+    const html = renderBrandEmail({
       title: "Confirmez votre adresse e-mail",
-      preheader: "Une dernière étape pour activer votre compte Kozy.",
+      preheader: "Une dernière étape pour activer votre compte Ma Belle Table.",
       greeting: profile?.display_name ? `Bonjour ${profile.display_name},` : "Bonjour,",
       paragraphs: [
-        "Bienvenue sur Kozy ! Pour sécuriser votre compte, confirmez votre adresse e-mail en cliquant sur le bouton ci-dessous.",
+        "Bienvenue sur Ma Belle Table ! Pour sécuriser votre compte, confirmez votre adresse e-mail en cliquant sur le bouton ci-dessous.",
         `Ce lien est valable ${EMAIL_VERIFICATION_TOKEN_TTL_HOURS} heures.`,
       ],
       ctaLabel: "Valider mon adresse e-mail",
@@ -65,7 +65,7 @@ export const sendVerificationEmail = createServerFn({ method: "POST" })
 
     await sendBrevoEmail(
       email,
-      "Confirmez votre adresse e-mail — Kozy",
+      "Confirmez votre adresse e-mail — Ma Belle Table",
       html,
       `Confirmez votre adresse e-mail : ${link}`,
     );

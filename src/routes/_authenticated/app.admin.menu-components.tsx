@@ -21,13 +21,13 @@ import { Plus, Trash2 } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/app/admin/menu-components")({
   head: () => ({
     meta: [
-      { title: "Composantes de repas — Administration Kozy" },
+      { title: "Composantes de repas — Administration Ma Belle Table" },
       {
         name: "description",
         content: "Gérez les composantes de repas (apéritif, entrée, plat, dessert, boissons) par type d'événement.",
       },
-      { property: "og:title", content: "Composantes de repas — Administration Kozy" },
-      { property: "og:description", content: "Catalogue des composantes de repas de la plateforme Kozy." },
+      { property: "og:title", content: "Composantes de repas — Administration Ma Belle Table" },
+      { property: "og:description", content: "Catalogue des composantes de repas de la plateforme Ma Belle Table." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

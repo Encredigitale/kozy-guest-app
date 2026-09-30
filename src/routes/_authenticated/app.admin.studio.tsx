@@ -25,7 +25,7 @@ import type { WidgetManifest, WidgetRow, WidgetSize, WidgetStatus } from "@/core
 import { WidgetRenderer } from "@/core/registry/WidgetRenderer";
 
 export const Route = createFileRoute("/_authenticated/app/admin/studio")({
-  head: () => ({ meta: [{ title: "Studio — Kozy" }] }),
+  head: () => ({ meta: [{ title: "Studio — Ma Belle Table" }] }),
   component: StudioPage,
 });
 
