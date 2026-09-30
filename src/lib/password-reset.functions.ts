@@ -23,7 +23,13 @@ export const sendPasswordResetEmail = createServerFn({ method: "POST" })
     });
 
     // Compte inexistant : on reste neutre.
-    if (error || !link?.properties?.action_link) return { ok: true as const };
+    if (error || !link?.properties?.hashed_token) {
+      if (error) console.error("Password reset generateLink failed:", error.message);
+      return { ok: true as const };
+    }
+
+    // Lien direct vers notre page (pas de redirection Supabase, résistant aux scanners d'e-mails).
+    const resetUrl = `${redirectTo}?token_hash=${encodeURIComponent(link.properties.hashed_token)}&type=recovery`;
 
     const html = renderBrandEmail({
       title: "Réinitialisation de votre mot de passe",
@@ -34,7 +40,7 @@ export const sendPasswordResetEmail = createServerFn({ method: "POST" })
         "Ce lien est valable 1 heure et ne peut être utilisé qu'une seule fois.",
       ],
       ctaLabel: "Choisir un nouveau mot de passe",
-      ctaUrl: link.properties.action_link,
+      ctaUrl: resetUrl,
       footerNote:
         "Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet e-mail.",
     });
@@ -43,7 +49,7 @@ export const sendPasswordResetEmail = createServerFn({ method: "POST" })
       email,
       "Réinitialisation de votre mot de passe — Ma Belle Table",
       html,
-      `Réinitialisez votre mot de passe : ${link.properties.action_link}`,
+      `Réinitialisez votre mot de passe : ${resetUrl}`,
     );
 
     return { ok: true as const };
