@@ -13,7 +13,6 @@ import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as DevCalendarPreviewRouteImport } from './routes/dev-calendar-preview'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LegalDocTypeRouteImport } from './routes/legal.$docType'
@@ -67,11 +66,6 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DevCalendarPreviewRoute = DevCalendarPreviewRouteImport.update({
-  id: '/dev-calendar-preview',
-  path: '/dev-calendar-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -266,7 +260,6 @@ const AuthenticatedAppAdminExtensionsKeyRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/dev-calendar-preview': typeof DevCalendarPreviewRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
@@ -306,7 +299,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/dev-calendar-preview': typeof DevCalendarPreviewRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
@@ -345,7 +337,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/dev-calendar-preview': typeof DevCalendarPreviewRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
@@ -387,7 +378,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/dev-calendar-preview'
     | '/login'
     | '/reset-password'
     | '/signup'
@@ -427,7 +417,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/dev-calendar-preview'
     | '/login'
     | '/reset-password'
     | '/signup'
@@ -465,7 +454,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/dev-calendar-preview'
     | '/login'
     | '/reset-password'
     | '/signup'
@@ -507,7 +495,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  DevCalendarPreviewRoute: typeof DevCalendarPreviewRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
@@ -546,13 +533,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev-calendar-preview': {
-      id: '/dev-calendar-preview'
-      path: '/dev-calendar-preview'
-      fullPath: '/dev-calendar-preview'
-      preLoaderRoute: typeof DevCalendarPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -916,7 +896,6 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  DevCalendarPreviewRoute: DevCalendarPreviewRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
