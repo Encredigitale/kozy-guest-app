@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getBaseUrl, sendBrevoEmail } from "@/lib/email-delivery.server";
 import { EMAIL_VERIFICATION_TOKEN_TTL_HOURS, hashEmailVerificationToken } from "@/lib/email-verification.server";
-import { renderMa Belle TableEmail } from "@/lib/email-templates";
+import { renderBrandEmail } from "@/lib/email-templates";
 
 /**
  * Envoie (ou renvoie) l'e-mail de validation d'adresse.
@@ -49,7 +49,7 @@ export const sendVerificationEmail = createServerFn({ method: "POST" })
     if (insertError) throw new Error(insertError.message);
 
     const link = `${getBaseUrl()}/verify-email?token=${token}`;
-    const html = renderMa Belle TableEmail({
+    const html = renderBrandEmail({
       title: "Confirmez votre adresse e-mail",
       preheader: "Une dernière étape pour activer votre compte Ma Belle Table.",
       greeting: profile?.display_name ? `Bonjour ${profile.display_name},` : "Bonjour,",

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { getBaseUrl, sendBrevoEmail } from "@/lib/email-delivery.server";
-import { renderMa Belle TableEmail } from "@/lib/email-templates";
+import { renderBrandEmail } from "@/lib/email-templates";
 
 /**
  * Envoie l'e-mail de réinitialisation via Brevo (le SMTP Supabase n'est pas utilisé).
@@ -25,7 +25,7 @@ export const sendPasswordResetEmail = createServerFn({ method: "POST" })
     // Compte inexistant : on reste neutre.
     if (error || !link?.properties?.action_link) return { ok: true as const };
 
-    const html = renderMa Belle TableEmail({
+    const html = renderBrandEmail({
       title: "Réinitialisation de votre mot de passe",
       preheader: "Choisissez un nouveau mot de passe Ma Belle Table.",
       greeting: "Bonjour,",

@@ -15,7 +15,7 @@ const BRAND = {
   pageBg: "#C1DFF4",
 };
 
-export type Ma Belle TableEmailOptions = {
+export type BrandEmailOptions = {
   title: string;
   preheader?: string;
   greeting?: string;
@@ -47,7 +47,7 @@ export function textToParagraphs(text: string): string[] {
     .filter(Boolean);
 }
 
-export function renderMa Belle TableEmail(options: Ma Belle TableEmailOptions): string {
+export function renderBrandEmail(options: BrandEmailOptions): string {
   const {
     title,
     preheader = "",
@@ -170,7 +170,7 @@ export function renderNotificationEmail(params: {
   ctaLabel?: string;
   ctaUrl?: string;
 }): string {
-  return renderMa Belle TableEmail({
+  return renderBrandEmail({
     title: params.title,
     preheader: params.body?.slice(0, 120) ?? params.title,
     paragraphs: params.body ? textToParagraphs(params.body) : [],
@@ -196,7 +196,7 @@ export function renderInvitationEmail(params: {
   if (params.eventDate) infoRows.push({ label: "Quand", value: params.eventDate });
   if (params.eventLocation) infoRows.push({ label: "Où", value: params.eventLocation });
 
-  return renderMa Belle TableEmail({
+  return renderBrandEmail({
     title: `Vous êtes invité·e : ${params.eventTitle}`,
     preheader: `${params.hostName ?? "Un proche"} vous invite à ${params.eventTitle}`,
     greeting: params.guestName ? `Bonjour ${params.guestName},` : "Bonjour,",
