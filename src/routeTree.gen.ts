@@ -16,8 +16,11 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LegalDocTypeRouteImport } from './routes/legal.$docType'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as InvitationEventIdInvitationIdRouteImport } from './routes/invitation.$eventId.$invitationId'
 import { Route as AuthenticatedAppTokensRouteImport } from './routes/_authenticated/app.tokens'
 import { Route as AuthenticatedAppSearchRouteImport } from './routes/_authenticated/app.search'
@@ -27,6 +30,11 @@ import { Route as AuthenticatedAppEventsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAppContactsRouteImport } from './routes/_authenticated/app.contacts'
 import { Route as AuthenticatedAppAuditRouteImport } from './routes/_authenticated/app.audit'
 import { Route as AuthenticatedAppAdminRouteImport } from './routes/_authenticated/app.admin'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminInvitationsRouteImport } from './routes/_authenticated/admin.invitations'
+import { Route as AuthenticatedAdminEventsRouteImport } from './routes/_authenticated/admin.events'
+import { Route as AuthenticatedAdminContactsRouteImport } from './routes/_authenticated/admin.contacts'
+import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
 import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/app.events.index'
 import { Route as AuthenticatedAppAdminIndexRouteImport } from './routes/_authenticated/app.admin.index'
 import { Route as ApiPublicV1MeRouteImport } from './routes/api/public/v1/me'
@@ -82,15 +90,30 @@ const LegalDocTypeRoute = LegalDocTypeRouteImport.update({
   path: '/legal/$docType',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   id: '/app',
   path: '/app',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const InvitationEventIdInvitationIdRoute =
   InvitationEventIdInvitationIdRouteImport.update({
@@ -139,6 +162,34 @@ const AuthenticatedAppAdminRoute = AuthenticatedAppAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminInvitationsRoute =
+  AuthenticatedAdminInvitationsRouteImport.update({
+    id: '/invitations',
+    path: '/invitations',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminEventsRoute =
+  AuthenticatedAdminEventsRouteImport.update({
+    id: '/events',
+    path: '/events',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminContactsRoute =
+  AuthenticatedAdminContactsRouteImport.update({
+    id: '/contacts',
+    path: '/contacts',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const AuthenticatedAppEventsIndexRoute =
   AuthenticatedAppEventsIndexRouteImport.update({
@@ -264,8 +315,15 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/app': typeof AuthenticatedAppRouteWithChildren
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/legal/$docType': typeof LegalDocTypeRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/contacts': typeof AuthenticatedAdminContactsRoute
+  '/admin/events': typeof AuthenticatedAdminEventsRoute
+  '/admin/invitations': typeof AuthenticatedAdminInvitationsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/admin': typeof AuthenticatedAppAdminRouteWithChildren
   '/app/audit': typeof AuthenticatedAppAuditRoute
   '/app/contacts': typeof AuthenticatedAppContactsRoute
@@ -275,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/app/search': typeof AuthenticatedAppSearchRoute
   '/app/tokens': typeof AuthenticatedAppTokensRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
   '/app/admin/contribution-types': typeof AuthenticatedAppAdminContributionTypesRoute
   '/app/admin/contributions': typeof AuthenticatedAppAdminContributionsRoute
@@ -303,7 +362,13 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/legal/$docType': typeof LegalDocTypeRoute
+  '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/contacts': typeof AuthenticatedAdminContactsRoute
+  '/admin/events': typeof AuthenticatedAdminEventsRoute
+  '/admin/invitations': typeof AuthenticatedAdminInvitationsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/audit': typeof AuthenticatedAppAuditRoute
   '/app/contacts': typeof AuthenticatedAppContactsRoute
   '/app/notifications': typeof AuthenticatedAppNotificationsRoute
@@ -311,6 +376,7 @@ export interface FileRoutesByTo {
   '/app/search': typeof AuthenticatedAppSearchRoute
   '/app/tokens': typeof AuthenticatedAppTokensRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
   '/app/admin/contribution-types': typeof AuthenticatedAppAdminContributionTypesRoute
   '/app/admin/contributions': typeof AuthenticatedAppAdminContributionsRoute
@@ -341,8 +407,15 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/legal/$docType': typeof LegalDocTypeRoute
+  '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/contacts': typeof AuthenticatedAdminContactsRoute
+  '/_authenticated/admin/events': typeof AuthenticatedAdminEventsRoute
+  '/_authenticated/admin/invitations': typeof AuthenticatedAdminInvitationsRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/app/admin': typeof AuthenticatedAppAdminRouteWithChildren
   '/_authenticated/app/audit': typeof AuthenticatedAppAuditRoute
   '/_authenticated/app/contacts': typeof AuthenticatedAppContactsRoute
@@ -352,6 +425,7 @@ export interface FileRoutesById {
   '/_authenticated/app/search': typeof AuthenticatedAppSearchRoute
   '/_authenticated/app/tokens': typeof AuthenticatedAppTokensRoute
   '/invitation/$eventId/$invitationId': typeof InvitationEventIdInvitationIdRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/app/admin/contribution-types': typeof AuthenticatedAppAdminContributionTypesRoute
   '/_authenticated/app/admin/contributions': typeof AuthenticatedAppAdminContributionsRoute
@@ -382,8 +456,15 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/verify-email'
+    | '/admin'
     | '/app'
+    | '/dashboard'
     | '/legal/$docType'
+    | '/admin/audit'
+    | '/admin/contacts'
+    | '/admin/events'
+    | '/admin/invitations'
+    | '/admin/users'
     | '/app/admin'
     | '/app/audit'
     | '/app/contacts'
@@ -393,6 +474,7 @@ export interface FileRouteTypes {
     | '/app/search'
     | '/app/tokens'
     | '/invitation/$eventId/$invitationId'
+    | '/admin/'
     | '/app/'
     | '/app/admin/contribution-types'
     | '/app/admin/contributions'
@@ -421,7 +503,13 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/verify-email'
+    | '/dashboard'
     | '/legal/$docType'
+    | '/admin/audit'
+    | '/admin/contacts'
+    | '/admin/events'
+    | '/admin/invitations'
+    | '/admin/users'
     | '/app/audit'
     | '/app/contacts'
     | '/app/notifications'
@@ -429,6 +517,7 @@ export interface FileRouteTypes {
     | '/app/search'
     | '/app/tokens'
     | '/invitation/$eventId/$invitationId'
+    | '/admin'
     | '/app'
     | '/app/admin/contribution-types'
     | '/app/admin/contributions'
@@ -458,8 +547,15 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/verify-email'
+    | '/_authenticated/admin'
     | '/_authenticated/app'
+    | '/_authenticated/dashboard'
     | '/legal/$docType'
+    | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/contacts'
+    | '/_authenticated/admin/events'
+    | '/_authenticated/admin/invitations'
+    | '/_authenticated/admin/users'
     | '/_authenticated/app/admin'
     | '/_authenticated/app/audit'
     | '/_authenticated/app/contacts'
@@ -469,6 +565,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/search'
     | '/_authenticated/app/tokens'
     | '/invitation/$eventId/$invitationId'
+    | '/_authenticated/admin/'
     | '/_authenticated/app/'
     | '/_authenticated/app/admin/contribution-types'
     | '/_authenticated/app/admin/contributions'
@@ -556,11 +653,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegalDocTypeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/app': {
       id: '/_authenticated/app'
       path: '/app'
       fullPath: '/app'
       preLoaderRoute: typeof AuthenticatedAppRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/app/': {
@@ -569,6 +680,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/'
       preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/invitation/$eventId/$invitationId': {
       id: '/invitation/$eventId/$invitationId'
@@ -632,6 +750,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/admin'
       preLoaderRoute: typeof AuthenticatedAppAdminRouteImport
       parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/invitations': {
+      id: '/_authenticated/admin/invitations'
+      path: '/invitations'
+      fullPath: '/admin/invitations'
+      preLoaderRoute: typeof AuthenticatedAdminInvitationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/events': {
+      id: '/_authenticated/admin/events'
+      path: '/events'
+      fullPath: '/admin/events'
+      preLoaderRoute: typeof AuthenticatedAdminEventsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/contacts': {
+      id: '/_authenticated/admin/contacts'
+      path: '/contacts'
+      fullPath: '/admin/contacts'
+      preLoaderRoute: typeof AuthenticatedAdminContactsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/audit': {
+      id: '/_authenticated/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/app/events/': {
       id: '/_authenticated/app/events/'
@@ -776,6 +929,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminContactsRoute: typeof AuthenticatedAdminContactsRoute
+  AuthenticatedAdminEventsRoute: typeof AuthenticatedAdminEventsRoute
+  AuthenticatedAdminInvitationsRoute: typeof AuthenticatedAdminInvitationsRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+  AuthenticatedAdminContactsRoute: AuthenticatedAdminContactsRoute,
+  AuthenticatedAdminEventsRoute: AuthenticatedAdminEventsRoute,
+  AuthenticatedAdminInvitationsRoute: AuthenticatedAdminInvitationsRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedAppAdminExtensionsRouteChildren {
   AuthenticatedAppAdminExtensionsKeyRoute: typeof AuthenticatedAppAdminExtensionsKeyRoute
   AuthenticatedAppAdminExtensionsInstallRoute: typeof AuthenticatedAppAdminExtensionsInstallRoute
@@ -883,11 +1057,15 @@ const AuthenticatedAppRouteWithChildren =
   AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAppRoute: typeof AuthenticatedAppRouteWithChildren
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAppRoute: AuthenticatedAppRouteWithChildren,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
