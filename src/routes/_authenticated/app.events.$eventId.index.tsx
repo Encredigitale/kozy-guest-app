@@ -257,14 +257,6 @@ function EventDetailPage() {
         </CardContent>
       </Card>
 
-      {welcome && isOrganizer && (
-        <div className="rounded-lg border-2 border-primary bg-accent/35 p-4 shadow-[4px_4px_0_var(--color-primary)]">
-          <p className="font-medium">Votre événement est créé 🎉</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Ajoutez maintenant uniquement les fonctionnalités dont vous avez besoin.
-          </p>
-        </div>
-      )}
 
       {/* FONCTIONNALITÉS : générées dynamiquement depuis le registry */}
       {active.length > 0 ? (
@@ -306,12 +298,27 @@ function EventDetailPage() {
             </div>
           </CardContent>
         </Card>
-      ) : (
-        <Card className="rounded-2xl border-dashed border-border">
-          <CardContent className="p-6 text-center text-sm text-muted-foreground">
-            L'organisateur n'a pas encore ajouté de fonctionnalité à cet événement.
-          </CardContent>
-        </Card>
+      {isOrganizer && (
+        <>
+          <div className="rounded-lg border-2 border-primary bg-card p-5 shadow-[6px_6px_0_var(--color-accent)]">
+            <p className="font-serif text-xl text-primary">🎉 C'est parti !</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Votre événement est créé. Lancez les invitations, préparez le menu et choisissez les
+              fonctionnalités qui feront de ce moment une réussite.
+            </p>
+            <Button className="mt-4 h-11 rounded-full" onClick={() => setPickerOpen(true)}>
+              Organiser mon événement <ArrowRight className="h-4 w-4" />
+            </Button>
+          </div>
+
+          <FeaturePicker
+            open={pickerOpen}
+            onOpenChange={setPickerOpen}
+            features={features}
+            onAdd={addFeature}
+            busyId={busyId}
+          />
+        </>
       )}
 
       {isOrganizer && (
