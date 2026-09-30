@@ -615,19 +615,29 @@ export const listEventGuests = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => z.object({ eventId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     // Vérifie que l'appelant a bien accès à cet événement.
-    const { data: participant } = await context.supabase
-      .from("event_participants")
-      .select("id")
-      .eq("event_id", data.eventId)
-      .eq("user_id", context.userId)
-      .maybeSingle();
-    const { data: ownInvitation } = await context.supabase
-      .from("invitations")
-      .select("id")
-      .eq("event_id", data.eventId)
-      .eq("guest_user_id", context.userId)
-      .maybeSingle();
-    if (!participant && !ownInvitation) throw new Error("Accès refusé");
+    const [{ data: ownEvent }, { data: participants }, { data: ownInvitations }] = await Promise.all([
+      context.supabase
+        .from("events")
+        .select("id")
+        .eq("id", data.eventId)
+        .eq("organizer_id", context.userId)
+        .limit(1),
+      context.supabase
+        .from("event_participants")
+        .select("id")
+        .eq("event_id", data.eventId)
+        .eq("user_id", context.userId)
+        .limit(1),
+      context.supabase
+        .from("invitations")
+        .select("id")
+        .eq("event_id", data.eventId)
+        .eq("guest_user_id", context.userId)
+        .limit(1),
+    ]);
+    const allowed =
+      (ownEvent?.length ?? 0) > 0 || (participants?.length ?? 0) > 0 || (ownInvitations?.length ?? 0) > 0;
+    if (!allowed) return { people: [] as Array<{ id: string; name: string; status: string; isSelf: boolean; isOrganizer: boolean }> };
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
