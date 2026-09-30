@@ -33,7 +33,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
   ),
   errorComponent: ({ error }) => (
     <div className="grid min-h-screen place-items-center bg-background p-6 text-center">
-      <div><p className="font-semibold">{error.message}</p>
+      <div><p className="font-semibold">{error instanceof Error ? error.message : "Impossible de vérifier vos autorisations. Veuillez réessayer."}</p>
         <Button className="mt-4" onClick={() => window.location.reload()}>Réessayer</Button></div>
     </div>
   ),
