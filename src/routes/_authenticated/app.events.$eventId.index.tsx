@@ -76,16 +76,8 @@ function EventDetailPage() {
 
   const [pickerOpen, setPickerOpen] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [welcome, setWelcome] = useState(false);
   const [online, setOnline] = useState(true);
 
-  useEffect(() => {
-    const key = `kozy.event.welcome.${eventId}`;
-    if (typeof window !== "undefined" && !localStorage.getItem(key)) {
-      setWelcome(true);
-      localStorage.setItem(key, "1");
-    }
-  }, [eventId]);
 
   useEffect(() => {
     const sync = () => setOnline(navigator.onLine);
