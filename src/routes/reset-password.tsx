@@ -17,6 +17,7 @@ export const Route = createFileRoute("/reset-password")({
 function ResetPasswordPage() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
+  const [invalid, setInvalid] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [confirm, setConfirm] = useState("");
@@ -24,13 +25,25 @@ function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Supabase parses the recovery token from the URL hash and emits PASSWORD_RECOVERY
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") setReady(true);
     });
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
-    });
+    const params = new URLSearchParams(window.location.search);
+    const tokenHash = params.get("token_hash");
+    if (tokenHash) {
+      supabase.auth
+        .verifyOtp({ token_hash: tokenHash, type: "recovery" })
+        .then(({ error }) => {
+          window.history.replaceState(null, "", "/reset-password");
+          if (error) setInvalid(true);
+          else setReady(true);
+        });
+    } else {
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session) setReady(true);
+        else setTimeout(() => setInvalid((v) => v || true), 3000);
+      });
+    }
     return () => sub.subscription.unsubscribe();
   }, []);
 
