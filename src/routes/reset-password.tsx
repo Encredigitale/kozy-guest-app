@@ -74,7 +74,11 @@ function ResetPasswordPage() {
         <CardHeader>
           <CardTitle>Nouveau mot de passe</CardTitle>
           <CardDescription>
-            {ready ? "Choisissez un nouveau mot de passe." : "Vérification du lien..."}
+            {ready
+              ? "Choisissez un nouveau mot de passe."
+              : invalid
+                ? "Ce lien est invalide ou a expiré. Demandez un nouveau lien depuis la page de connexion."
+                : "Vérification du lien..."}
           </CardDescription>
         </CardHeader>
         <CardContent>
