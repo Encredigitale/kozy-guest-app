@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
 import { sendVerificationEmail } from "@/lib/email-verification.functions";
 import { sendPasswordResetEmail } from "@/lib/password-reset.functions";
+import { homePathFor } from "@/core/auth/role";
 
 
 
@@ -33,8 +34,8 @@ function LoginPage() {
   const [forgot, setForgot] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/app" });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (data.session) navigate({ to: await homePathFor(data.session.user.id), replace: true });
     });
   }, [navigate]);
 
@@ -65,9 +66,10 @@ function LoginPage() {
       }
       return;
     }
+    const dest = await homePathFor(userId!);
     setLoading(false);
     toast.success("Bienvenue !");
-    navigate({ to: "/app" });
+    navigate({ to: dest, replace: true });
   };
 
 
