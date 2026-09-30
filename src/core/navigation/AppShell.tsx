@@ -9,6 +9,7 @@ import { useActiveExtensions } from "@/core/extensions";
 import { useSession } from "@/core/auth/useSession";
 import { Button } from "@/components/ui/button";
 import { NotificationBell } from "@/core/notifications/NotificationBell";
+import { BrandLogo } from "@/core/branding/BrandLogo";
 
 type CoreLink = {
   key: string;
@@ -85,9 +86,9 @@ export function AppShell() {
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <header className="min-h-16 border-b-2 border-primary bg-primary text-primary-foreground grid grid-cols-[auto_minmax(0,1fr)] items-center px-3 gap-2 shrink-0 sm:px-5 sm:gap-4">
-          <Link to="/app" className="shrink-0 font-serif text-xl text-accent">
-            Ma Belle Table
-          </Link>
+          <div className="shrink-0">
+            <BrandLogo />
+          </div>
           <nav className="flex min-w-0 items-center justify-end gap-0.5 text-sm sm:gap-1">
             <Link
               to="/app/search"
@@ -132,9 +133,7 @@ export function AppShell() {
     <div className="min-h-screen bg-background flex">
       <main className="flex-1 overflow-x-hidden flex flex-col">
         <header className="min-h-16 border-b-2 border-primary bg-primary text-primary-foreground flex items-center justify-between px-5 gap-2 shrink-0">
-          <Link to="/app" className="font-serif text-xl text-accent">
-            Ma Belle Table
-          </Link>
+          <BrandLogo />
           <div className="flex items-center gap-2">
             <span className="hidden md:inline text-xs text-primary-foreground/75 truncate max-w-[200px]">
               {user?.email}

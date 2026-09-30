@@ -10,12 +10,14 @@ import {
   Users,
   UtensilsCrossed,
   Wine,
+  PartyPopper,
 } from "lucide-react";
 import heroAsset from "@/assets/hero-gathering.jpg.asset.json";
 import organizeImg from "@/assets/kozy-organize.jpg";
 import shareImg from "@/assets/kozy-share.jpg";
 import rememberImg from "@/assets/kozy-remember.jpg";
 import readyImg from "@/assets/kozy-ready.jpg";
+import { BrandLogo } from "@/core/branding/BrandLogo";
 
 const heroImg = heroAsset.url;
 
@@ -80,9 +82,7 @@ function Landing() {
         </div>
 
         <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-8 lg:px-12">
-          <Link to="/" className="font-display text-3xl font-extrabold text-accent">
-            Ma Belle Table.
-          </Link>
+          <BrandLogo size="md" />
           <Button asChild variant="outline" className="rounded-full border-primary-foreground/50 bg-transparent text-primary-foreground hover:bg-primary-foreground hover:text-primary">
             <Link to="/login">Se connecter</Link>
           </Button>
@@ -224,7 +224,9 @@ function Landing() {
       <footer className="border-t-2 border-primary bg-accent text-accent-foreground">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-8 text-sm sm:px-8 lg:px-12">
           <div>© {new Date().getFullYear()} Ma Belle Table</div>
-          <div className="font-display text-2xl font-extrabold">Ma Belle Table.</div>
+          <div className="inline-flex items-center gap-2 font-display text-2xl font-extrabold">
+            <PartyPopper className="h-6 w-6 -rotate-12" strokeWidth={2.4} aria-hidden /> Ma Belle Table
+          </div>
         </div>
       </footer>
     </div>

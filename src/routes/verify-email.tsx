@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { confirmEmailVerification } from "@/lib/email-verification.functions";
+import { BrandLogo } from "@/core/branding/BrandLogo";
 
 type State = "loading" | "verified" | "used" | "expired" | "invalid" | "error";
 
@@ -42,7 +43,7 @@ function VerifyEmailPage() {
     <div className="kozy-auth-shell flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="font-serif text-4xl text-accent">Ma Belle Table</Link>
+          <BrandLogo size="lg" />
         </div>
         <Card className="border-primary bg-popup text-popup-foreground shadow-[10px_10px_0_var(--color-accent)]">
           <CardHeader className="text-center">
