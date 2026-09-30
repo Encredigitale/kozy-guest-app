@@ -21,7 +21,7 @@ export const Route = createFileRoute("/signup")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Créer un compte — Kozy" },
+      { title: "Créer un compte — Ma Belle Table" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -83,7 +83,7 @@ function SignupPage() {
       <div className="kozy-auth-shell flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <Link to="/" className="font-serif text-4xl text-accent">Kozy</Link>
+            <Link to="/" className="font-serif text-4xl text-accent">Ma Belle Table</Link>
           </div>
           <Card className="border-primary bg-popup text-popup-foreground shadow-[10px_10px_0_var(--color-accent)]">
             <CardHeader className="text-center">
@@ -128,7 +128,7 @@ function SignupPage() {
     <div className="kozy-auth-shell flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="font-serif text-4xl text-accent">Kozy</Link>
+          <Link to="/" className="font-serif text-4xl text-accent">Ma Belle Table</Link>
         </div>
         <Card className="border-primary bg-popup text-popup-foreground shadow-[10px_10px_0_var(--color-accent)]">
           <CardHeader>

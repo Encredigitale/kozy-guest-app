@@ -4,9 +4,9 @@ import { EventForm } from "@/core/eventForm/EventForm";
 export const Route = createFileRoute("/_authenticated/app/events/new")({
   head: () => ({
     meta: [
-      { title: "Créer un événement — Kozy" },
+      { title: "Créer un événement — Ma Belle Table" },
       { name: "description", content: "Créez votre événement en quelques blocs : type, informations, date, lieu." },
-      { property: "og:title", content: "Créer un événement — Kozy" },
+      { property: "og:title", content: "Créer un événement — Ma Belle Table" },
       { property: "og:description", content: "Créez votre événement en quelques blocs : type, informations, date, lieu." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

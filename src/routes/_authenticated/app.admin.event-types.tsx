@@ -18,10 +18,10 @@ import { Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 export const Route = createFileRoute("/_authenticated/app/admin/event-types")({
   head: () => ({
     meta: [
-      { title: "Types d'événement — Administration Kozy" },
+      { title: "Types d'événement — Administration Ma Belle Table" },
       { name: "description", content: "Gérez le catalogue des types d'événement proposés aux organisateurs." },
-      { property: "og:title", content: "Types d'événement — Administration Kozy" },
-      { property: "og:description", content: "Catalogue des types d'événement de la plateforme Kozy." },
+      { property: "og:title", content: "Types d'événement — Administration Ma Belle Table" },
+      { property: "og:description", content: "Catalogue des types d'événement de la plateforme Ma Belle Table." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

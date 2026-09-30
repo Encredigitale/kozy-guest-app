@@ -11,10 +11,10 @@ import { BirthdayNotice } from "@/widgets/contacts-book/BirthdayNotice";
 export const Route = createFileRoute("/_authenticated/app/")({
   head: () => ({
     meta: [
-      { title: "Accueil — Kozy" },
-      { name: "description", content: "Votre tableau de bord Kozy." },
-      { property: "og:title", content: "Accueil — Kozy" },
-      { property: "og:description", content: "Votre tableau de bord Kozy." },
+      { title: "Accueil — Ma Belle Table" },
+      { name: "description", content: "Votre tableau de bord Ma Belle Table." },
+      { property: "og:title", content: "Accueil — Ma Belle Table" },
+      { property: "og:description", content: "Votre tableau de bord Ma Belle Table." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

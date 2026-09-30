@@ -13,8 +13,8 @@ export const Route = createFileRoute("/legal/$docType")({
   },
   head: ({ params }) => {
     const label = DOC_LABELS[params.docType as LegalDocType] ?? "Document légal";
-    const title = `${label} — Kozy`;
-    const description = `${label} de Kozy, l'application qui aide à organiser les moments entre proches.`;
+    const title = `${label} — Ma Belle Table`;
+    const description = `${label} de Ma Belle Table, l'application qui aide à organiser les moments entre proches.`;
     return {
       meta: [
         { title },

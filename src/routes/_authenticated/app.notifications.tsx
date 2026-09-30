@@ -7,10 +7,10 @@ import { Bell, Mail, Smartphone, MessageSquare } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/app/notifications")({
   head: () => ({ meta: [
-    { title: "Notifications — Kozy" },
-    { name: "description", content: "Consultez vos notifications Kozy." },
-    { property: "og:title", content: "Notifications — Kozy" },
-    { property: "og:description", content: "Consultez vos notifications Kozy." },
+    { title: "Notifications — Ma Belle Table" },
+    { name: "description", content: "Consultez vos notifications Ma Belle Table." },
+    { property: "og:title", content: "Notifications — Ma Belle Table" },
+    { property: "og:description", content: "Consultez vos notifications Ma Belle Table." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
   ] }),

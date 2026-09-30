@@ -21,10 +21,10 @@ import {
 export const Route = createFileRoute("/_authenticated/app/admin/search")({
   head: () => ({
     meta: [
-      { title: "Recherche — Administration Kozy" },
-      { name: "description", content: "Configurer le plugin Recherche globale de Kozy." },
-      { property: "og:title", content: "Recherche — Administration Kozy" },
-      { property: "og:description", content: "Configurer le plugin Recherche globale de Kozy." },
+      { title: "Recherche — Administration Ma Belle Table" },
+      { name: "description", content: "Configurer le plugin Recherche globale de Ma Belle Table." },
+      { property: "og:title", content: "Recherche — Administration Ma Belle Table" },
+      { property: "og:description", content: "Configurer le plugin Recherche globale de Ma Belle Table." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

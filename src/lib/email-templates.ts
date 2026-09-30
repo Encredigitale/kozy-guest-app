@@ -1,11 +1,11 @@
 /**
- * Templates d'e-mails Kozy (HTML compatible clients mail : tables + styles inline).
- * Palette alignée sur le design system Kozy : bleu marine, bleu bardeau, bleu dragée,
+ * Templates d'e-mails Ma Belle Table (HTML compatible clients mail : tables + styles inline).
+ * Palette alignée sur le design system Ma Belle Table : bleu marine, bleu bardeau, bleu dragée,
  * rouge tomette, saumon, bisque et lin.
  */
 
 const BRAND = {
-  name: "Kozy",
+  name: "Ma Belle Table",
   primary: "#03224C",
   primaryDark: "#6888C6",
   ink: "#03224C",
@@ -15,7 +15,7 @@ const BRAND = {
   pageBg: "#C1DFF4",
 };
 
-export type KozyEmailOptions = {
+export type Ma Belle TableEmailOptions = {
   title: string;
   preheader?: string;
   greeting?: string;
@@ -47,7 +47,7 @@ export function textToParagraphs(text: string): string[] {
     .filter(Boolean);
 }
 
-export function renderKozyEmail(options: KozyEmailOptions): string {
+export function renderMa Belle TableEmail(options: Ma Belle TableEmailOptions): string {
   const {
     title,
     preheader = "",
@@ -170,7 +170,7 @@ export function renderNotificationEmail(params: {
   ctaLabel?: string;
   ctaUrl?: string;
 }): string {
-  return renderKozyEmail({
+  return renderMa Belle TableEmail({
     title: params.title,
     preheader: params.body?.slice(0, 120) ?? params.title,
     paragraphs: params.body ? textToParagraphs(params.body) : [],
@@ -196,7 +196,7 @@ export function renderInvitationEmail(params: {
   if (params.eventDate) infoRows.push({ label: "Quand", value: params.eventDate });
   if (params.eventLocation) infoRows.push({ label: "Où", value: params.eventLocation });
 
-  return renderKozyEmail({
+  return renderMa Belle TableEmail({
     title: `Vous êtes invité·e : ${params.eventTitle}`,
     preheader: `${params.hostName ?? "Un proche"} vous invite à ${params.eventTitle}`,
     greeting: params.guestName ? `Bonjour ${params.guestName},` : "Bonjour,",

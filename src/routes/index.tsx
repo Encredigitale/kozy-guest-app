@@ -22,13 +22,13 @@ const heroImg = heroAsset.url;
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Kozy — Organisez vos moments et gardez-en le souvenir" },
+      { title: "Ma Belle Table — Organisez vos moments et gardez-en le souvenir" },
       {
         name: "description",
         content:
-          "Kozy vous aide à organiser vos repas, anniversaires et moments entre proches, puis à en garder le souvenir.",
+          "Ma Belle Table vous aide à organiser vos repas, anniversaires et moments entre proches, puis à en garder le souvenir.",
       },
-      { property: "og:title", content: "Kozy" },
+      { property: "og:title", content: "Ma Belle Table" },
       {
         property: "og:description",
         content: "Organisez vos moments et gardez-en le souvenir.",
@@ -81,7 +81,7 @@ function Landing() {
 
         <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-5 py-6 sm:px-8 lg:px-12">
           <Link to="/" className="font-display text-3xl font-extrabold text-accent">
-            Kozy.
+            Ma Belle Table.
           </Link>
           <Button asChild variant="outline" className="rounded-full border-primary-foreground/50 bg-transparent text-primary-foreground hover:bg-primary-foreground hover:text-primary">
             <Link to="/login">Se connecter</Link>
@@ -213,7 +213,7 @@ function Landing() {
           <UtensilsCrossed className="absolute right-8 top-20 hidden h-14 w-14 rotate-12 text-primary sm:block" />
           <h2 className="font-display text-4xl font-extrabold sm:text-6xl">Prêt à créer votre prochain moment ?</h2>
           <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">
-            Rejoignez Kozy et rassemblez ceux qui comptent.
+            Rejoignez Ma Belle Table et rassemblez ceux qui comptent.
           </p>
           <Button asChild size="lg" className="mt-8 rounded-full border-2 border-primary bg-primary px-10 text-primary-foreground shadow-[0_6px_0_var(--secondary)] hover:bg-primary/90 active:translate-y-1 active:shadow-none">
             <Link to="/signup">Commencer <ArrowRight className="ml-2 h-5 w-5" /></Link>
@@ -223,8 +223,8 @@ function Landing() {
 
       <footer className="border-t-2 border-primary bg-accent text-accent-foreground">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-5 py-8 text-sm sm:px-8 lg:px-12">
-          <div>© {new Date().getFullYear()} Kozy</div>
-          <div className="font-display text-2xl font-extrabold">Kozy.</div>
+          <div>© {new Date().getFullYear()} Ma Belle Table</div>
+          <div className="font-display text-2xl font-extrabold">Ma Belle Table.</div>
         </div>
       </footer>
     </div>

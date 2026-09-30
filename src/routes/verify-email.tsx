@@ -11,8 +11,8 @@ export const Route = createFileRoute("/verify-email")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Validation de votre e-mail — Kozy" },
-      { name: "description", content: "Confirmez votre adresse e-mail pour activer votre compte Kozy." },
+      { title: "Validation de votre e-mail — Ma Belle Table" },
+      { name: "description", content: "Confirmez votre adresse e-mail pour activer votre compte Ma Belle Table." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -42,7 +42,7 @@ function VerifyEmailPage() {
     <div className="kozy-auth-shell flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="font-serif text-4xl text-accent">Kozy</Link>
+          <Link to="/" className="font-serif text-4xl text-accent">Ma Belle Table</Link>
         </div>
         <Card className="border-primary bg-popup text-popup-foreground shadow-[10px_10px_0_var(--color-accent)]">
           <CardHeader className="text-center">

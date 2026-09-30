@@ -22,7 +22,7 @@ type TokenRow = {
 };
 
 export const Route = createFileRoute("/_authenticated/app/tokens")({
-  head: () => ({ meta: [{ title: "Jetons API — Kozy" }] }),
+  head: () => ({ meta: [{ title: "Jetons API — Ma Belle Table" }] }),
   component: TokensPage,
 });
 
