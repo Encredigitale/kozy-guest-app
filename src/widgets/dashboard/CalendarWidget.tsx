@@ -40,11 +40,11 @@ export default function CalendarWidget() {
   }, [data]);
 
   return (
-    <Card className="rounded-2xl border-border/60">
-      <CardContent className="p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <CalendarDays className="h-4 w-4 text-primary" />
-          <h2 className="text-sm font-semibold">Calendrier</h2>
+    <Card className="rounded-3xl border-2 border-primary bg-background p-1 shadow-[8px_8px_0_var(--color-accent)]">
+      <CardContent className="p-5 pt-6">
+        <div className="mb-4 flex items-center gap-2">
+          <CalendarDays className="h-5 w-5 -rotate-6 text-secondary" strokeWidth={2.4} />
+          <h2 className="font-serif font-extrabold uppercase tracking-tight text-primary">Calendrier</h2>
         </div>
         <div className="grid grid-cols-7 gap-1.5">
           {days.map(({ date, events }) => {
@@ -52,17 +52,17 @@ export default function CalendarWidget() {
             const has = events.length > 0;
             const content = (
               <div
-                className={`aspect-square rounded-lg border flex flex-col items-center justify-center gap-0.5 text-xs transition-colors ${
+                className={`flex aspect-square flex-col items-center justify-center gap-0.5 rounded-full border-2 text-xs transition-all hover:-translate-y-0.5 ${
                   isToday
-                    ? "border-primary bg-primary/10 font-semibold"
+                    ? "border-transparent bg-secondary font-bold text-secondary-foreground shadow-[3px_3px_0_var(--color-primary)]"
                     : has
-                      ? "border-primary/40 bg-accent hover:bg-primary/10"
-                      : "border-border/50 text-muted-foreground"
+                      ? "border-primary/40 bg-accent font-semibold text-primary hover:bg-primary/10"
+                      : "border-transparent text-muted-foreground hover:bg-accent/40"
                 }`}
               >
-                <span className="text-[10px] uppercase">{date.toLocaleDateString("fr-FR", { weekday: "short" }).slice(0, 3)}</span>
-                <span className="text-sm">{date.getDate()}</span>
-                {has && <span className="h-1 w-1 rounded-full bg-primary" />}
+                <span className="text-[10px] uppercase leading-none opacity-80">{date.toLocaleDateString("fr-FR", { weekday: "short" }).slice(0, 3)}</span>
+                <span className="text-sm leading-none">{date.getDate()}</span>
+                {has && <span className={`h-1.5 w-1.5 rounded-full ${isToday ? "bg-secondary-foreground" : "bg-secondary"}`} />}
               </div>
             );
             return has ? (
