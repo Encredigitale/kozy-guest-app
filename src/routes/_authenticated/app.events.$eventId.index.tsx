@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, MapPin, CalendarDays, Plus, Pencil, Search, WifiOff } from "lucide-react";
+import { ChevronLeft, MapPin, CalendarDays, ArrowRight, Pencil, Search, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
