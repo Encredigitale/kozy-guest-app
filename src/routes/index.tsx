@@ -12,10 +12,10 @@ import {
   Wine,
 } from "lucide-react";
 import heroAsset from "@/assets/hero-gathering.jpg.asset.json";
-import organizeImg from "@/assets/onboard-organize.jpg";
-import shareImg from "@/assets/onboard-share.jpg";
-import rememberImg from "@/assets/onboard-remember.jpg";
-import readyImg from "@/assets/onboard-ready.jpg";
+import organizeImg from "@/assets/kozy-organize.jpg";
+import shareImg from "@/assets/kozy-share.jpg";
+import rememberImg from "@/assets/kozy-remember.jpg";
+import readyImg from "@/assets/kozy-ready.jpg";
 
 const heroImg = heroAsset.url;
 
@@ -173,32 +173,35 @@ function Landing() {
           </div>
         </section>
 
-        <section className="bg-primary py-20 text-primary-foreground lg:py-28">
+        <section className="bg-primary py-16 text-primary-foreground lg:py-24">
           <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
-            <div className="mb-12 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+            <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
               <div>
-                <p className="mb-3 font-bold uppercase text-accent">De l'idée au souvenir</p>
-                <h2 className="max-w-2xl font-display text-4xl font-extrabold leading-tight sm:text-5xl">
-                  Chaque moment mérite sa petite histoire.
+                <p className="mb-4 font-bold uppercase text-accent">De l'idée au souvenir</p>
+                <h2 className="max-w-4xl font-display text-4xl leading-tight sm:text-6xl lg:text-7xl">
+                  Chaque moment mérite <span className="text-accent">sa petite histoire.</span>
                 </h2>
               </div>
-              <Camera className="hidden h-16 w-16 rotate-6 text-secondary sm:block" strokeWidth={1.7} />
+              <div className="hidden shrink-0 items-end gap-4 text-accent lg:flex">
+                <p className="max-w-40 -rotate-6 text-right font-serif text-2xl italic leading-snug text-primary-foreground">Des gens, des échanges, des souvenirs.</p>
+                <Camera className="h-16 w-16 rotate-6 text-secondary" strokeWidth={1.7} />
+              </div>
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-4">
               {[
                 { img: organizeImg, title: "Organisez", text: "Créez un événement en moins d'une minute." },
                 { img: shareImg, title: "Partagez", text: "Invitez vos proches, répartissez les rôles." },
                 { img: rememberImg, title: "Souvenez-vous", text: "Photos, menus et invités, tout est gardé." },
                 { img: readyImg, title: "Recommencez", text: "Chaque événement inspire le prochain." },
               ].map((step, index) => (
-                <article key={step.title} className={`relative ${index % 2 === 0 ? "lg:-rotate-1" : "lg:rotate-1"}`}>
-                  <div className="absolute left-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full border-2 border-primary bg-accent font-display font-bold text-accent-foreground">
+                <article key={step.title} className="relative min-w-0">
+                  <div className="absolute left-3 top-3 z-10 grid h-12 w-12 place-items-center rounded-full border-2 border-primary bg-accent font-display text-xl text-accent-foreground shadow-[2px_3px_0_var(--color-primary)]">
                     {index + 1}
                   </div>
-                  <img src={step.img} alt={step.title} width={800} height={800} className="aspect-square w-full rounded-2xl border-4 border-primary-foreground object-cover" />
-                  <h3 className="mt-5 font-display text-2xl font-bold text-accent">{step.title}</h3>
-                  <p className="mt-1 text-sm leading-relaxed text-primary-foreground/70">{step.text}</p>
+                  <img src={step.img} alt={step.title} width={1024} height={1024} loading="lazy" className="aspect-square w-full rounded-2xl border-2 border-primary-foreground object-cover" />
+                  <h3 className="mt-4 font-display text-2xl text-accent lg:text-3xl">{step.title}</h3>
+                  <p className="mt-1 text-base leading-snug text-primary-foreground/85">{step.text}</p>
                 </article>
               ))}
             </div>
