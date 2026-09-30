@@ -298,6 +298,14 @@ function EventDetailPage() {
             </div>
           </CardContent>
         </Card>
+      ) : (
+        <Card className="rounded-2xl border-dashed border-border">
+          <CardContent className="p-6 text-center text-sm text-muted-foreground">
+            L'organisateur n'a pas encore ajouté de fonctionnalité à cet événement.
+          </CardContent>
+        </Card>
+      )}
+
       {isOrganizer && (
         <>
           <div className="rounded-lg border-2 border-primary bg-card p-5 shadow-[6px_6px_0_var(--color-accent)]">
@@ -310,22 +318,6 @@ function EventDetailPage() {
               Organiser mon événement <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
-
-          <FeaturePicker
-            open={pickerOpen}
-            onOpenChange={setPickerOpen}
-            features={features}
-            onAdd={addFeature}
-            busyId={busyId}
-          />
-        </>
-      )}
-
-      {isOrganizer && (
-        <>
-          <Button className="h-12 w-full rounded-full" onClick={() => setPickerOpen(true)}>
-            <Plus className="h-5 w-5" /> Ajouter une fonctionnalité
-          </Button>
 
           <FeaturePicker
             open={pickerOpen}
