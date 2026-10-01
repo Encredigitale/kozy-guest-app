@@ -1,3 +1,4 @@
+import { openNotificationTarget } from "@/core/notifications/NotificationBell";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNotifications, markNotificationRead, markAllRead, notificationsQueryOptions } from "@/core/notifications/useNotifications";
@@ -74,7 +75,7 @@ function NotificationsPage() {
             return (
               <Card
                 key={n.id}
-                onClick={() => !n.read_at && readOne(n.id)}
+                onClick={() => { if (!n.read_at) readOne(n.id); openNotificationTarget(n); }}
                 className={`rounded-2xl border-border/60 cursor-pointer transition-colors ${
                   !n.read_at ? "bg-accent/30" : ""
                 }`}

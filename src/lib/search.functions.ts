@@ -591,6 +591,51 @@ export const globalSearch = createServerFn({ method: "POST" })
       }
     }
 
+    // 12. Messages -------------------------------------------------------------
+    // Mêmes permissions que la discussion : chaque événement est revérifié.
+    if (enabled("messages") && eventIds.length > 0) {
+      const m = await import("@/lib/messages.server");
+      const cfg = await m.loadMessagesConfig();
+      const term = query.trim().replace(/[%_,()]/g, " ").trim();
+      if (cfg.searchEnabled && term.length >= 2) {
+        const adminDb = await m.admin();
+        const { data: msgs } = await adminDb
+          .from("event_message")
+          .select("id, event_id, author_user_id, text_content, created_at")
+          .in("event_id", eventIds)
+          .is("deleted_at", null)
+          .ilike("text_content", `%${term}%`)
+          .order("created_at", { ascending: false })
+          .limit(200);
+        const rows = (msgs ?? []) as { id: string; event_id: string; author_user_id: string; text_content: string | null; created_at: string }[];
+        const allowed = new Set<string>();
+        for (const evId of [...new Set(rows.map((r) => r.event_id))]) {
+          if ((await m.checkAccess(evId, userId)).ok) allowed.add(evId);
+        }
+        const visible = rows.filter((r) => allowed.has(r.event_id));
+        const authors = [...new Set(visible.map((r) => r.author_user_id))];
+        const { data: profs } = authors.length
+          ? await adminDb.from("profiles").select("user_id, display_name").in("user_id", authors)
+          : { data: [] };
+        const names = new Map(((profs ?? []) as { user_id: string; display_name: string | null }[]).map((p) => [p.user_id, p.display_name]));
+        for (const r of visible) {
+          const ev = eventById.get(r.event_id);
+          const score = scoreFields(query, [{ value: r.text_content, weight: 2 }], { fuzzy });
+          push({
+            id: r.id,
+            source: "messages",
+            entityType: "message",
+            title: `« ${(r.text_content ?? "").slice(0, 120)} »`,
+            subtitle: names.get(r.author_user_id) ?? "Participant",
+            context: eventContext(ev),
+            eventId: r.event_id,
+            blockId: "ext.messages",
+            score: (score > 0 ? score : 1) + recencyBoost(r.created_at),
+          });
+        }
+      }
+    }
+
     return finish(results, settings, activeSources.map((s) => s.id), query);
   });
 

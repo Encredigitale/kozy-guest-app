@@ -22,6 +22,13 @@ function timeAgo(iso: string) {
   return `il y a ${d} j`;
 }
 
+export function openNotificationTarget(n: { type?: string; metadata?: unknown }) {
+  const m = (n.metadata ?? {}) as { eventId?: string; messageId?: string };
+  if (n.type === "event_message" && m.eventId) {
+    window.location.assign(`/app/events/${m.eventId}/messages${m.messageId ? `?m=${m.messageId}` : ""}`);
+  }
+}
+
 export function NotificationBell() {
   const { data } = useNotifications();
   const qc = useQueryClient();
@@ -66,7 +73,7 @@ export function NotificationBell() {
             items.slice(0, 15).map((n) => (
               <button
                 key={n.id}
-                onClick={() => !n.read_at && onOpen(n.id)}
+                onClick={() => { if (!n.read_at) onOpen(n.id); openNotificationTarget(n); }}
                 className={`w-full text-left px-3 py-3 border-b last:border-0 hover:bg-accent ${
                   !n.read_at ? "bg-accent/40" : ""
                 }`}

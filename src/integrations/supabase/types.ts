@@ -734,6 +734,181 @@ export type Database = {
           },
         ]
       }
+      event_message: {
+        Row: {
+          author_invitation_id: string | null
+          author_user_id: string
+          created_at: string
+          deleted_at: string | null
+          deleted_by: string | null
+          edited_at: string | null
+          event_id: string
+          id: string
+          message_type: string
+          photo_path: string | null
+          text_content: string | null
+          updated_at: string
+        }
+        Insert: {
+          author_invitation_id?: string | null
+          author_user_id: string
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          edited_at?: string | null
+          event_id: string
+          id?: string
+          message_type?: string
+          photo_path?: string | null
+          text_content?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author_invitation_id?: string | null
+          author_user_id?: string
+          created_at?: string
+          deleted_at?: string | null
+          deleted_by?: string | null
+          edited_at?: string | null
+          event_id?: string
+          id?: string
+          message_type?: string
+          photo_path?: string | null
+          text_content?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_message_author_invitation_id_fkey"
+            columns: ["author_invitation_id"]
+            isOneToOne: false
+            referencedRelation: "invitations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_message_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_message_moderation_log: {
+        Row: {
+          action: string
+          created_at: string
+          event_id: string
+          id: string
+          message_id: string
+          moderator_user_id: string
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          event_id: string
+          id?: string
+          message_id: string
+          moderator_user_id: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          message_id?: string
+          moderator_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_message_moderation_log_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_message_moderation_log_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "event_message"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_message_preferences: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          invitation_id: string | null
+          notifications_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          invitation_id?: string | null
+          notifications_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          invitation_id?: string | null
+          notifications_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_message_preferences_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_message_read_state: {
+        Row: {
+          event_id: string
+          id: string
+          invitation_id: string | null
+          last_read_at: string
+          last_read_message_id: string | null
+          user_id: string
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          invitation_id?: string | null
+          last_read_at?: string
+          last_read_message_id?: string | null
+          user_id: string
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          invitation_id?: string | null
+          last_read_at?: string
+          last_read_message_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_message_read_state_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_participants: {
         Row: {
           created_at: string

@@ -217,6 +217,19 @@ export const EXTENSIONS: ExtensionDefinition[] = [
     scope: "event",
     settingsComponent: lazy(() => import("@/extensions/recipes/AdminSettings")),
   },
+  {
+    key: "messages",
+    name: "Messages",
+    description: "Échangez facilement avec tous les participants de votre événement.",
+    category: "engagement",
+    icon: "MessageCircle",
+    version: "1.0.0",
+    scope: "event",
+    settingsComponent: lazy(() => import("@/extensions/messages/AdminSettings")),
+    widgets: [
+      { key: "ext.messages", component: lazy(() => import("@/extensions/messages/MessagesWidget")) },
+    ],
+  },
 ];
 
 
