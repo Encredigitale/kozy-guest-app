@@ -57,6 +57,7 @@ import { Route as AuthenticatedAppAdminEventTypesRouteImport } from './routes/_a
 import { Route as AuthenticatedAppAdminContributionsRouteImport } from './routes/_authenticated/app.admin.contributions'
 import { Route as AuthenticatedAppAdminContributionTypesRouteImport } from './routes/_authenticated/app.admin.contribution-types'
 import { Route as AuthenticatedAppEventsEventIdIndexRouteImport } from './routes/_authenticated/app.events.$eventId.index'
+import { Route as AuthenticatedAppEventsEventIdMessagesRouteImport } from './routes/_authenticated/app.events.$eventId.messages'
 import { Route as AuthenticatedAppEventsEventIdEditRouteImport } from './routes/_authenticated/app.events.$eventId.edit'
 import { Route as AuthenticatedAppAdminExtensionsInstallRouteImport } from './routes/_authenticated/app.admin.extensions.install'
 import { Route as AuthenticatedAppAdminExtensionsKeyRouteImport } from './routes/_authenticated/app.admin.extensions.$key'
@@ -324,6 +325,12 @@ const AuthenticatedAppEventsEventIdIndexRoute =
     path: '/$eventId/',
     getParentRoute: () => AuthenticatedAppEventsRoute,
   } as any)
+const AuthenticatedAppEventsEventIdMessagesRoute =
+  AuthenticatedAppEventsEventIdMessagesRouteImport.update({
+    id: '/$eventId/messages',
+    path: '/$eventId/messages',
+    getParentRoute: () => AuthenticatedAppEventsRoute,
+  } as any)
 const AuthenticatedAppEventsEventIdEditRoute =
   AuthenticatedAppEventsEventIdEditRouteImport.update({
     id: '/$eventId/edit',
@@ -393,6 +400,7 @@ export interface FileRoutesByFullPath {
   '/app/admin/extensions/$key': typeof AuthenticatedAppAdminExtensionsKeyRoute
   '/app/admin/extensions/install': typeof AuthenticatedAppAdminExtensionsInstallRoute
   '/app/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
+  '/app/events/$eventId/messages': typeof AuthenticatedAppEventsEventIdMessagesRoute
   '/app/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -441,6 +449,7 @@ export interface FileRoutesByTo {
   '/app/admin/extensions/$key': typeof AuthenticatedAppAdminExtensionsKeyRoute
   '/app/admin/extensions/install': typeof AuthenticatedAppAdminExtensionsInstallRoute
   '/app/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
+  '/app/events/$eventId/messages': typeof AuthenticatedAppEventsEventIdMessagesRoute
   '/app/events/$eventId': typeof AuthenticatedAppEventsEventIdIndexRoute
 }
 export interface FileRoutesById {
@@ -495,6 +504,7 @@ export interface FileRoutesById {
   '/_authenticated/app/admin/extensions/$key': typeof AuthenticatedAppAdminExtensionsKeyRoute
   '/_authenticated/app/admin/extensions/install': typeof AuthenticatedAppAdminExtensionsInstallRoute
   '/_authenticated/app/events/$eventId/edit': typeof AuthenticatedAppEventsEventIdEditRoute
+  '/_authenticated/app/events/$eventId/messages': typeof AuthenticatedAppEventsEventIdMessagesRoute
   '/_authenticated/app/events/$eventId/': typeof AuthenticatedAppEventsEventIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -549,6 +559,7 @@ export interface FileRouteTypes {
     | '/app/admin/extensions/$key'
     | '/app/admin/extensions/install'
     | '/app/events/$eventId/edit'
+    | '/app/events/$eventId/messages'
     | '/app/events/$eventId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -597,6 +608,7 @@ export interface FileRouteTypes {
     | '/app/admin/extensions/$key'
     | '/app/admin/extensions/install'
     | '/app/events/$eventId/edit'
+    | '/app/events/$eventId/messages'
     | '/app/events/$eventId'
   id:
     | '__root__'
@@ -650,6 +662,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/admin/extensions/$key'
     | '/_authenticated/app/admin/extensions/install'
     | '/_authenticated/app/events/$eventId/edit'
+    | '/_authenticated/app/events/$eventId/messages'
     | '/_authenticated/app/events/$eventId/'
   fileRoutesById: FileRoutesById
 }
@@ -1004,6 +1017,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppEventsEventIdIndexRouteImport
       parentRoute: typeof AuthenticatedAppEventsRoute
     }
+    '/_authenticated/app/events/$eventId/messages': {
+      id: '/_authenticated/app/events/$eventId/messages'
+      path: '/$eventId/messages'
+      fullPath: '/app/events/$eventId/messages'
+      preLoaderRoute: typeof AuthenticatedAppEventsEventIdMessagesRouteImport
+      parentRoute: typeof AuthenticatedAppEventsRoute
+    }
     '/_authenticated/app/events/$eventId/edit': {
       id: '/_authenticated/app/events/$eventId/edit'
       path: '/$eventId/edit'
@@ -1116,6 +1136,7 @@ interface AuthenticatedAppEventsRouteChildren {
   AuthenticatedAppEventsNewRoute: typeof AuthenticatedAppEventsNewRoute
   AuthenticatedAppEventsIndexRoute: typeof AuthenticatedAppEventsIndexRoute
   AuthenticatedAppEventsEventIdEditRoute: typeof AuthenticatedAppEventsEventIdEditRoute
+  AuthenticatedAppEventsEventIdMessagesRoute: typeof AuthenticatedAppEventsEventIdMessagesRoute
   AuthenticatedAppEventsEventIdIndexRoute: typeof AuthenticatedAppEventsEventIdIndexRoute
 }
 
@@ -1125,6 +1146,8 @@ const AuthenticatedAppEventsRouteChildren: AuthenticatedAppEventsRouteChildren =
     AuthenticatedAppEventsIndexRoute: AuthenticatedAppEventsIndexRoute,
     AuthenticatedAppEventsEventIdEditRoute:
       AuthenticatedAppEventsEventIdEditRoute,
+    AuthenticatedAppEventsEventIdMessagesRoute:
+      AuthenticatedAppEventsEventIdMessagesRoute,
     AuthenticatedAppEventsEventIdIndexRoute:
       AuthenticatedAppEventsEventIdIndexRoute,
   }
