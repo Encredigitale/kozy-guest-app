@@ -9,71 +9,65 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VerifyEmailRouteImport } from './routes/verify-email'
-import { Route as SignupRouteImport } from './routes/signup'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as LegalDocTypeRouteImport } from './routes/legal.$docType'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
-import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
+import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as LegalDocTypeRouteImport } from './routes/legal.$docType'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
-import { Route as InvitationEventIdInvitationIdRouteImport } from './routes/invitation.$eventId.$invitationId'
-import { Route as AuthenticatedAppTokensRouteImport } from './routes/_authenticated/app.tokens'
-import { Route as AuthenticatedAppSearchRouteImport } from './routes/_authenticated/app.search'
-import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
-import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/app.notifications'
-import { Route as AuthenticatedAppEventsRouteImport } from './routes/_authenticated/app.events'
-import { Route as AuthenticatedAppContactsRouteImport } from './routes/_authenticated/app.contacts'
-import { Route as AuthenticatedAppAuditRouteImport } from './routes/_authenticated/app.audit'
-import { Route as AuthenticatedAppAdminRouteImport } from './routes/_authenticated/app.admin'
-import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
-import { Route as AuthenticatedAdminStatsRouteImport } from './routes/_authenticated/admin.stats'
-import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
-import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin.notifications'
-import { Route as AuthenticatedAdminInvitationsRouteImport } from './routes/_authenticated/admin.invitations'
-import { Route as AuthenticatedAdminFeaturesRouteImport } from './routes/_authenticated/admin.features'
-import { Route as AuthenticatedAdminEventsRouteImport } from './routes/_authenticated/admin.events'
-import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
-import { Route as AuthenticatedAdminContactsRouteImport } from './routes/_authenticated/admin.contacts'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
-import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/app.events.index'
+import { Route as AuthenticatedAdminContactsRouteImport } from './routes/_authenticated/admin.contacts'
+import { Route as AuthenticatedAdminDashboardRouteImport } from './routes/_authenticated/admin.dashboard'
+import { Route as AuthenticatedAdminEventsRouteImport } from './routes/_authenticated/admin.events'
+import { Route as AuthenticatedAdminFeaturesRouteImport } from './routes/_authenticated/admin.features'
+import { Route as AuthenticatedAdminInvitationsRouteImport } from './routes/_authenticated/admin.invitations'
+import { Route as AuthenticatedAdminNotificationsRouteImport } from './routes/_authenticated/admin.notifications'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
+import { Route as AuthenticatedAdminStatsRouteImport } from './routes/_authenticated/admin.stats'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
+import { Route as AuthenticatedAppAdminRouteImport } from './routes/_authenticated/app.admin'
+import { Route as AuthenticatedAppAuditRouteImport } from './routes/_authenticated/app.audit'
+import { Route as AuthenticatedAppContactsRouteImport } from './routes/_authenticated/app.contacts'
+import { Route as AuthenticatedAppEventsRouteImport } from './routes/_authenticated/app.events'
+import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/app.notifications'
+import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
+import { Route as AuthenticatedAppSearchRouteImport } from './routes/_authenticated/app.search'
+import { Route as AuthenticatedAppTokensRouteImport } from './routes/_authenticated/app.tokens'
+import { Route as InvitationEventIdInvitationIdRouteImport } from './routes/invitation.$eventId.$invitationId'
 import { Route as AuthenticatedAppAdminIndexRouteImport } from './routes/_authenticated/app.admin.index'
-import { Route as ApiPublicV1MeRouteImport } from './routes/api/public/v1/me'
-import { Route as ApiPublicInvitationsRemindersRouteImport } from './routes/api/public/invitations/reminders'
-import { Route as AuthenticatedAppXSplatRouteImport } from './routes/_authenticated/app.x.$'
-import { Route as AuthenticatedAppWSplatRouteImport } from './routes/_authenticated/app.w.$'
-import { Route as AuthenticatedAppEventsNewRouteImport } from './routes/_authenticated/app.events.new'
-import { Route as AuthenticatedAppAdminStudioRouteImport } from './routes/_authenticated/app.admin.studio'
-import { Route as AuthenticatedAppAdminSearchRouteImport } from './routes/_authenticated/app.admin.search'
-import { Route as AuthenticatedAppAdminScreensRouteImport } from './routes/_authenticated/app.admin.screens'
-import { Route as AuthenticatedAppAdminRegistryRouteImport } from './routes/_authenticated/app.admin.registry'
-import { Route as AuthenticatedAppAdminMenuComponentsRouteImport } from './routes/_authenticated/app.admin.menu-components'
-import { Route as AuthenticatedAppAdminExtensionsRouteImport } from './routes/_authenticated/app.admin.extensions'
-import { Route as AuthenticatedAppAdminEventTypesRouteImport } from './routes/_authenticated/app.admin.event-types'
-import { Route as AuthenticatedAppAdminContributionsRouteImport } from './routes/_authenticated/app.admin.contributions'
 import { Route as AuthenticatedAppAdminContributionTypesRouteImport } from './routes/_authenticated/app.admin.contribution-types'
+import { Route as AuthenticatedAppAdminContributionsRouteImport } from './routes/_authenticated/app.admin.contributions'
+import { Route as AuthenticatedAppAdminEventTypesRouteImport } from './routes/_authenticated/app.admin.event-types'
+import { Route as AuthenticatedAppAdminExtensionsRouteImport } from './routes/_authenticated/app.admin.extensions'
+import { Route as AuthenticatedAppAdminMenuComponentsRouteImport } from './routes/_authenticated/app.admin.menu-components'
+import { Route as AuthenticatedAppAdminRegistryRouteImport } from './routes/_authenticated/app.admin.registry'
+import { Route as AuthenticatedAppAdminScreensRouteImport } from './routes/_authenticated/app.admin.screens'
+import { Route as AuthenticatedAppAdminSearchRouteImport } from './routes/_authenticated/app.admin.search'
+import { Route as AuthenticatedAppAdminStudioRouteImport } from './routes/_authenticated/app.admin.studio'
+import { Route as AuthenticatedAppEventsIndexRouteImport } from './routes/_authenticated/app.events.index'
+import { Route as AuthenticatedAppEventsNewRouteImport } from './routes/_authenticated/app.events.new'
+import { Route as AuthenticatedAppWSplatRouteImport } from './routes/_authenticated/app.w.$'
+import { Route as AuthenticatedAppXSplatRouteImport } from './routes/_authenticated/app.x.$'
+import { Route as ApiPublicInvitationsRemindersRouteImport } from './routes/api/public/invitations/reminders'
+import { Route as ApiPublicV1MeRouteImport } from './routes/api/public/v1/me'
+import { Route as AuthenticatedAppAdminExtensionsKeyRouteImport } from './routes/_authenticated/app.admin.extensions.$key'
+import { Route as AuthenticatedAppAdminExtensionsInstallRouteImport } from './routes/_authenticated/app.admin.extensions.install'
 import { Route as AuthenticatedAppEventsEventIdIndexRouteImport } from './routes/_authenticated/app.events.$eventId.index'
 import { Route as AuthenticatedAppEventsEventIdEditRouteImport } from './routes/_authenticated/app.events.$eventId.edit'
-import { Route as AuthenticatedAppAdminExtensionsInstallRouteImport } from './routes/_authenticated/app.admin.extensions.install'
-import { Route as AuthenticatedAppAdminExtensionsKeyRouteImport } from './routes/_authenticated/app.admin.extensions.$key'
 
-const VerifyEmailRoute = VerifyEmailRouteImport.update({
-  id: '/verify-email',
-  path: '/verify-email',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -81,23 +75,24 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LegalDocTypeRoute = LegalDocTypeRouteImport.update({
-  id: '/legal/$docType',
-  path: '/legal/$docType',
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
@@ -105,107 +100,30 @@ const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
   path: '/app',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedAppRoute,
+const LegalDocTypeRoute = LegalDocTypeRouteImport.update({
+  id: '/legal/$docType',
+  path: '/legal/$docType',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const InvitationEventIdInvitationIdRoute =
-  InvitationEventIdInvitationIdRouteImport.update({
-    id: '/invitation/$eventId/$invitationId',
-    path: '/invitation/$eventId/$invitationId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AuthenticatedAppTokensRoute = AuthenticatedAppTokensRouteImport.update({
-  id: '/tokens',
-  path: '/tokens',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppSearchRoute = AuthenticatedAppSearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppNotificationsRoute =
-  AuthenticatedAppNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppEventsRoute = AuthenticatedAppEventsRouteImport.update({
-  id: '/events',
-  path: '/events',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppContactsRoute =
-  AuthenticatedAppContactsRouteImport.update({
-    id: '/contacts',
-    path: '/contacts',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppAuditRoute = AuthenticatedAppAuditRouteImport.update({
+const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   id: '/audit',
   path: '/audit',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppAdminRoute = AuthenticatedAppAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const AuthenticatedAdminStatsRoute = AuthenticatedAdminStatsRouteImport.update({
-  id: '/stats',
-  path: '/stats',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAdminSettingsRoute =
-  AuthenticatedAdminSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminNotificationsRoute =
-  AuthenticatedAdminNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminInvitationsRoute =
-  AuthenticatedAdminInvitationsRouteImport.update({
-    id: '/invitations',
-    path: '/invitations',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminFeaturesRoute =
-  AuthenticatedAdminFeaturesRouteImport.update({
-    id: '/features',
-    path: '/features',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminEventsRoute =
-  AuthenticatedAdminEventsRouteImport.update({
-    id: '/events',
-    path: '/events',
+const AuthenticatedAdminContactsRoute =
+  AuthenticatedAdminContactsRouteImport.update({
+    id: '/contacts',
+    path: '/contacts',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminDashboardRoute =
@@ -214,22 +132,98 @@ const AuthenticatedAdminDashboardRoute =
     path: '/dashboard',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminContactsRoute =
-  AuthenticatedAdminContactsRouteImport.update({
-    id: '/contacts',
-    path: '/contacts',
+const AuthenticatedAdminEventsRoute =
+  AuthenticatedAdminEventsRouteImport.update({
+    id: '/events',
+    path: '/events',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
-  id: '/audit',
-  path: '/audit',
+const AuthenticatedAdminFeaturesRoute =
+  AuthenticatedAdminFeaturesRouteImport.update({
+    id: '/features',
+    path: '/features',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminInvitationsRoute =
+  AuthenticatedAdminInvitationsRouteImport.update({
+    id: '/invitations',
+    path: '/invitations',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminNotificationsRoute =
+  AuthenticatedAdminNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminStatsRoute = AuthenticatedAdminStatsRouteImport.update({
+  id: '/stats',
+  path: '/stats',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const AuthenticatedAppEventsIndexRoute =
-  AuthenticatedAppEventsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedAppEventsRoute,
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppAdminRoute = AuthenticatedAppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppAuditRoute = AuthenticatedAppAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppContactsRoute =
+  AuthenticatedAppContactsRouteImport.update({
+    id: '/contacts',
+    path: '/contacts',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppEventsRoute = AuthenticatedAppEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppNotificationsRoute =
+  AuthenticatedAppNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppSearchRoute = AuthenticatedAppSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppTokensRoute = AuthenticatedAppTokensRouteImport.update({
+  id: '/tokens',
+  path: '/tokens',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const InvitationEventIdInvitationIdRoute =
+  InvitationEventIdInvitationIdRouteImport.update({
+    id: '/invitation/$eventId/$invitationId',
+    path: '/invitation/$eventId/$invitationId',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedAppAdminIndexRoute =
   AuthenticatedAppAdminIndexRouteImport.update({
@@ -237,73 +231,10 @@ const AuthenticatedAppAdminIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAppAdminRoute,
   } as any)
-const ApiPublicV1MeRoute = ApiPublicV1MeRouteImport.update({
-  id: '/api/public/v1/me',
-  path: '/api/public/v1/me',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicInvitationsRemindersRoute =
-  ApiPublicInvitationsRemindersRouteImport.update({
-    id: '/api/public/invitations/reminders',
-    path: '/api/public/invitations/reminders',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AuthenticatedAppXSplatRoute = AuthenticatedAppXSplatRouteImport.update({
-  id: '/x/$',
-  path: '/x/$',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppWSplatRoute = AuthenticatedAppWSplatRouteImport.update({
-  id: '/w/$',
-  path: '/w/$',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppEventsNewRoute =
-  AuthenticatedAppEventsNewRouteImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => AuthenticatedAppEventsRoute,
-  } as any)
-const AuthenticatedAppAdminStudioRoute =
-  AuthenticatedAppAdminStudioRouteImport.update({
-    id: '/studio',
-    path: '/studio',
-    getParentRoute: () => AuthenticatedAppAdminRoute,
-  } as any)
-const AuthenticatedAppAdminSearchRoute =
-  AuthenticatedAppAdminSearchRouteImport.update({
-    id: '/search',
-    path: '/search',
-    getParentRoute: () => AuthenticatedAppAdminRoute,
-  } as any)
-const AuthenticatedAppAdminScreensRoute =
-  AuthenticatedAppAdminScreensRouteImport.update({
-    id: '/screens',
-    path: '/screens',
-    getParentRoute: () => AuthenticatedAppAdminRoute,
-  } as any)
-const AuthenticatedAppAdminRegistryRoute =
-  AuthenticatedAppAdminRegistryRouteImport.update({
-    id: '/registry',
-    path: '/registry',
-    getParentRoute: () => AuthenticatedAppAdminRoute,
-  } as any)
-const AuthenticatedAppAdminMenuComponentsRoute =
-  AuthenticatedAppAdminMenuComponentsRouteImport.update({
-    id: '/menu-components',
-    path: '/menu-components',
-    getParentRoute: () => AuthenticatedAppAdminRoute,
-  } as any)
-const AuthenticatedAppAdminExtensionsRoute =
-  AuthenticatedAppAdminExtensionsRouteImport.update({
-    id: '/extensions',
-    path: '/extensions',
-    getParentRoute: () => AuthenticatedAppAdminRoute,
-  } as any)
-const AuthenticatedAppAdminEventTypesRoute =
-  AuthenticatedAppAdminEventTypesRouteImport.update({
-    id: '/event-types',
-    path: '/event-types',
+const AuthenticatedAppAdminContributionTypesRoute =
+  AuthenticatedAppAdminContributionTypesRouteImport.update({
+    id: '/contribution-types',
+    path: '/contribution-types',
     getParentRoute: () => AuthenticatedAppAdminRoute,
   } as any)
 const AuthenticatedAppAdminContributionsRoute =
@@ -312,11 +243,92 @@ const AuthenticatedAppAdminContributionsRoute =
     path: '/contributions',
     getParentRoute: () => AuthenticatedAppAdminRoute,
   } as any)
-const AuthenticatedAppAdminContributionTypesRoute =
-  AuthenticatedAppAdminContributionTypesRouteImport.update({
-    id: '/contribution-types',
-    path: '/contribution-types',
+const AuthenticatedAppAdminEventTypesRoute =
+  AuthenticatedAppAdminEventTypesRouteImport.update({
+    id: '/event-types',
+    path: '/event-types',
     getParentRoute: () => AuthenticatedAppAdminRoute,
+  } as any)
+const AuthenticatedAppAdminExtensionsRoute =
+  AuthenticatedAppAdminExtensionsRouteImport.update({
+    id: '/extensions',
+    path: '/extensions',
+    getParentRoute: () => AuthenticatedAppAdminRoute,
+  } as any)
+const AuthenticatedAppAdminMenuComponentsRoute =
+  AuthenticatedAppAdminMenuComponentsRouteImport.update({
+    id: '/menu-components',
+    path: '/menu-components',
+    getParentRoute: () => AuthenticatedAppAdminRoute,
+  } as any)
+const AuthenticatedAppAdminRegistryRoute =
+  AuthenticatedAppAdminRegistryRouteImport.update({
+    id: '/registry',
+    path: '/registry',
+    getParentRoute: () => AuthenticatedAppAdminRoute,
+  } as any)
+const AuthenticatedAppAdminScreensRoute =
+  AuthenticatedAppAdminScreensRouteImport.update({
+    id: '/screens',
+    path: '/screens',
+    getParentRoute: () => AuthenticatedAppAdminRoute,
+  } as any)
+const AuthenticatedAppAdminSearchRoute =
+  AuthenticatedAppAdminSearchRouteImport.update({
+    id: '/search',
+    path: '/search',
+    getParentRoute: () => AuthenticatedAppAdminRoute,
+  } as any)
+const AuthenticatedAppAdminStudioRoute =
+  AuthenticatedAppAdminStudioRouteImport.update({
+    id: '/studio',
+    path: '/studio',
+    getParentRoute: () => AuthenticatedAppAdminRoute,
+  } as any)
+const AuthenticatedAppEventsIndexRoute =
+  AuthenticatedAppEventsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedAppEventsRoute,
+  } as any)
+const AuthenticatedAppEventsNewRoute =
+  AuthenticatedAppEventsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedAppEventsRoute,
+  } as any)
+const AuthenticatedAppWSplatRoute = AuthenticatedAppWSplatRouteImport.update({
+  id: '/w/$',
+  path: '/w/$',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppXSplatRoute = AuthenticatedAppXSplatRouteImport.update({
+  id: '/x/$',
+  path: '/x/$',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const ApiPublicInvitationsRemindersRoute =
+  ApiPublicInvitationsRemindersRouteImport.update({
+    id: '/api/public/invitations/reminders',
+    path: '/api/public/invitations/reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicV1MeRoute = ApiPublicV1MeRouteImport.update({
+  id: '/api/public/v1/me',
+  path: '/api/public/v1/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAppAdminExtensionsKeyRoute =
+  AuthenticatedAppAdminExtensionsKeyRouteImport.update({
+    id: '/$key',
+    path: '/$key',
+    getParentRoute: () => AuthenticatedAppAdminExtensionsRoute,
+  } as any)
+const AuthenticatedAppAdminExtensionsInstallRoute =
+  AuthenticatedAppAdminExtensionsInstallRouteImport.update({
+    id: '/install',
+    path: '/install',
+    getParentRoute: () => AuthenticatedAppAdminExtensionsRoute,
   } as any)
 const AuthenticatedAppEventsEventIdIndexRoute =
   AuthenticatedAppEventsEventIdIndexRouteImport.update({
@@ -329,18 +341,6 @@ const AuthenticatedAppEventsEventIdEditRoute =
     id: '/$eventId/edit',
     path: '/$eventId/edit',
     getParentRoute: () => AuthenticatedAppEventsRoute,
-  } as any)
-const AuthenticatedAppAdminExtensionsInstallRoute =
-  AuthenticatedAppAdminExtensionsInstallRouteImport.update({
-    id: '/install',
-    path: '/install',
-    getParentRoute: () => AuthenticatedAppAdminExtensionsRoute,
-  } as any)
-const AuthenticatedAppAdminExtensionsKeyRoute =
-  AuthenticatedAppAdminExtensionsKeyRouteImport.update({
-    id: '/$key',
-    path: '/$key',
-    getParentRoute: () => AuthenticatedAppAdminExtensionsRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -668,32 +668,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/verify-email': {
-      id: '/verify-email'
-      path: '/verify-email'
-      fullPath: '/verify-email'
-      preLoaderRoute: typeof VerifyEmailRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -703,25 +682,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/legal/$docType': {
-      id: '/legal/$docType'
-      path: '/legal/$docType'
-      fullPath: '/legal/$docType'
-      preLoaderRoute: typeof LegalDocTypeRouteImport
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/app': {
@@ -731,151 +724,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/app/': {
-      id: '/_authenticated/app/'
-      path: '/'
-      fullPath: '/app/'
-      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
+    '/legal/$docType': {
+      id: '/legal/$docType'
+      path: '/legal/$docType'
+      fullPath: '/legal/$docType'
+      preLoaderRoute: typeof LegalDocTypeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/invitation/$eventId/$invitationId': {
-      id: '/invitation/$eventId/$invitationId'
-      path: '/invitation/$eventId/$invitationId'
-      fullPath: '/invitation/$eventId/$invitationId'
-      preLoaderRoute: typeof InvitationEventIdInvitationIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/app/tokens': {
-      id: '/_authenticated/app/tokens'
-      path: '/tokens'
-      fullPath: '/app/tokens'
-      preLoaderRoute: typeof AuthenticatedAppTokensRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/search': {
-      id: '/_authenticated/app/search'
-      path: '/search'
-      fullPath: '/app/search'
-      preLoaderRoute: typeof AuthenticatedAppSearchRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/profile': {
-      id: '/_authenticated/app/profile'
-      path: '/profile'
-      fullPath: '/app/profile'
-      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/notifications': {
-      id: '/_authenticated/app/notifications'
-      path: '/notifications'
-      fullPath: '/app/notifications'
-      preLoaderRoute: typeof AuthenticatedAppNotificationsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/events': {
-      id: '/_authenticated/app/events'
-      path: '/events'
-      fullPath: '/app/events'
-      preLoaderRoute: typeof AuthenticatedAppEventsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/contacts': {
-      id: '/_authenticated/app/contacts'
-      path: '/contacts'
-      fullPath: '/app/contacts'
-      preLoaderRoute: typeof AuthenticatedAppContactsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/audit': {
-      id: '/_authenticated/app/audit'
-      path: '/audit'
-      fullPath: '/app/audit'
-      preLoaderRoute: typeof AuthenticatedAppAuditRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/admin': {
-      id: '/_authenticated/app/admin'
-      path: '/admin'
-      fullPath: '/app/admin'
-      preLoaderRoute: typeof AuthenticatedAppAdminRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/admin/users': {
-      id: '/_authenticated/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/stats': {
-      id: '/_authenticated/admin/stats'
-      path: '/stats'
-      fullPath: '/admin/stats'
-      preLoaderRoute: typeof AuthenticatedAdminStatsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/settings': {
-      id: '/_authenticated/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/notifications': {
-      id: '/_authenticated/admin/notifications'
-      path: '/notifications'
-      fullPath: '/admin/notifications'
-      preLoaderRoute: typeof AuthenticatedAdminNotificationsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/invitations': {
-      id: '/_authenticated/admin/invitations'
-      path: '/invitations'
-      fullPath: '/admin/invitations'
-      preLoaderRoute: typeof AuthenticatedAdminInvitationsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/features': {
-      id: '/_authenticated/admin/features'
-      path: '/features'
-      fullPath: '/admin/features'
-      preLoaderRoute: typeof AuthenticatedAdminFeaturesRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/events': {
-      id: '/_authenticated/admin/events'
-      path: '/events'
-      fullPath: '/admin/events'
-      preLoaderRoute: typeof AuthenticatedAdminEventsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/dashboard': {
-      id: '/_authenticated/admin/dashboard'
-      path: '/dashboard'
-      fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/contacts': {
-      id: '/_authenticated/admin/contacts'
-      path: '/contacts'
-      fullPath: '/admin/contacts'
-      preLoaderRoute: typeof AuthenticatedAdminContactsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/audit': {
@@ -885,12 +752,138 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/app/events/': {
-      id: '/_authenticated/app/events/'
+    '/_authenticated/admin/contacts': {
+      id: '/_authenticated/admin/contacts'
+      path: '/contacts'
+      fullPath: '/admin/contacts'
+      preLoaderRoute: typeof AuthenticatedAdminContactsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/dashboard': {
+      id: '/_authenticated/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AuthenticatedAdminDashboardRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/events': {
+      id: '/_authenticated/admin/events'
+      path: '/events'
+      fullPath: '/admin/events'
+      preLoaderRoute: typeof AuthenticatedAdminEventsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/features': {
+      id: '/_authenticated/admin/features'
+      path: '/features'
+      fullPath: '/admin/features'
+      preLoaderRoute: typeof AuthenticatedAdminFeaturesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/invitations': {
+      id: '/_authenticated/admin/invitations'
+      path: '/invitations'
+      fullPath: '/admin/invitations'
+      preLoaderRoute: typeof AuthenticatedAdminInvitationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/notifications': {
+      id: '/_authenticated/admin/notifications'
+      path: '/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AuthenticatedAdminNotificationsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/stats': {
+      id: '/_authenticated/admin/stats'
+      path: '/stats'
+      fullPath: '/admin/stats'
+      preLoaderRoute: typeof AuthenticatedAdminStatsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/app/': {
+      id: '/_authenticated/app/'
       path: '/'
-      fullPath: '/app/events/'
-      preLoaderRoute: typeof AuthenticatedAppEventsIndexRouteImport
-      parentRoute: typeof AuthenticatedAppEventsRoute
+      fullPath: '/app/'
+      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/admin': {
+      id: '/_authenticated/app/admin'
+      path: '/admin'
+      fullPath: '/app/admin'
+      preLoaderRoute: typeof AuthenticatedAppAdminRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/audit': {
+      id: '/_authenticated/app/audit'
+      path: '/audit'
+      fullPath: '/app/audit'
+      preLoaderRoute: typeof AuthenticatedAppAuditRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/contacts': {
+      id: '/_authenticated/app/contacts'
+      path: '/contacts'
+      fullPath: '/app/contacts'
+      preLoaderRoute: typeof AuthenticatedAppContactsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/events': {
+      id: '/_authenticated/app/events'
+      path: '/events'
+      fullPath: '/app/events'
+      preLoaderRoute: typeof AuthenticatedAppEventsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/notifications': {
+      id: '/_authenticated/app/notifications'
+      path: '/notifications'
+      fullPath: '/app/notifications'
+      preLoaderRoute: typeof AuthenticatedAppNotificationsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/profile': {
+      id: '/_authenticated/app/profile'
+      path: '/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/search': {
+      id: '/_authenticated/app/search'
+      path: '/search'
+      fullPath: '/app/search'
+      preLoaderRoute: typeof AuthenticatedAppSearchRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/tokens': {
+      id: '/_authenticated/app/tokens'
+      path: '/tokens'
+      fullPath: '/app/tokens'
+      preLoaderRoute: typeof AuthenticatedAppTokensRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/invitation/$eventId/$invitationId': {
+      id: '/invitation/$eventId/$invitationId'
+      path: '/invitation/$eventId/$invitationId'
+      fullPath: '/invitation/$eventId/$invitationId'
+      preLoaderRoute: typeof InvitationEventIdInvitationIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/app/admin/': {
       id: '/_authenticated/app/admin/'
@@ -899,88 +892,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAppAdminRoute
     }
-    '/api/public/v1/me': {
-      id: '/api/public/v1/me'
-      path: '/api/public/v1/me'
-      fullPath: '/api/public/v1/me'
-      preLoaderRoute: typeof ApiPublicV1MeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/invitations/reminders': {
-      id: '/api/public/invitations/reminders'
-      path: '/api/public/invitations/reminders'
-      fullPath: '/api/public/invitations/reminders'
-      preLoaderRoute: typeof ApiPublicInvitationsRemindersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/app/x/$': {
-      id: '/_authenticated/app/x/$'
-      path: '/x/$'
-      fullPath: '/app/x/$'
-      preLoaderRoute: typeof AuthenticatedAppXSplatRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/w/$': {
-      id: '/_authenticated/app/w/$'
-      path: '/w/$'
-      fullPath: '/app/w/$'
-      preLoaderRoute: typeof AuthenticatedAppWSplatRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/events/new': {
-      id: '/_authenticated/app/events/new'
-      path: '/new'
-      fullPath: '/app/events/new'
-      preLoaderRoute: typeof AuthenticatedAppEventsNewRouteImport
-      parentRoute: typeof AuthenticatedAppEventsRoute
-    }
-    '/_authenticated/app/admin/studio': {
-      id: '/_authenticated/app/admin/studio'
-      path: '/studio'
-      fullPath: '/app/admin/studio'
-      preLoaderRoute: typeof AuthenticatedAppAdminStudioRouteImport
-      parentRoute: typeof AuthenticatedAppAdminRoute
-    }
-    '/_authenticated/app/admin/search': {
-      id: '/_authenticated/app/admin/search'
-      path: '/search'
-      fullPath: '/app/admin/search'
-      preLoaderRoute: typeof AuthenticatedAppAdminSearchRouteImport
-      parentRoute: typeof AuthenticatedAppAdminRoute
-    }
-    '/_authenticated/app/admin/screens': {
-      id: '/_authenticated/app/admin/screens'
-      path: '/screens'
-      fullPath: '/app/admin/screens'
-      preLoaderRoute: typeof AuthenticatedAppAdminScreensRouteImport
-      parentRoute: typeof AuthenticatedAppAdminRoute
-    }
-    '/_authenticated/app/admin/registry': {
-      id: '/_authenticated/app/admin/registry'
-      path: '/registry'
-      fullPath: '/app/admin/registry'
-      preLoaderRoute: typeof AuthenticatedAppAdminRegistryRouteImport
-      parentRoute: typeof AuthenticatedAppAdminRoute
-    }
-    '/_authenticated/app/admin/menu-components': {
-      id: '/_authenticated/app/admin/menu-components'
-      path: '/menu-components'
-      fullPath: '/app/admin/menu-components'
-      preLoaderRoute: typeof AuthenticatedAppAdminMenuComponentsRouteImport
-      parentRoute: typeof AuthenticatedAppAdminRoute
-    }
-    '/_authenticated/app/admin/extensions': {
-      id: '/_authenticated/app/admin/extensions'
-      path: '/extensions'
-      fullPath: '/app/admin/extensions'
-      preLoaderRoute: typeof AuthenticatedAppAdminExtensionsRouteImport
-      parentRoute: typeof AuthenticatedAppAdminRoute
-    }
-    '/_authenticated/app/admin/event-types': {
-      id: '/_authenticated/app/admin/event-types'
-      path: '/event-types'
-      fullPath: '/app/admin/event-types'
-      preLoaderRoute: typeof AuthenticatedAppAdminEventTypesRouteImport
+    '/_authenticated/app/admin/contribution-types': {
+      id: '/_authenticated/app/admin/contribution-types'
+      path: '/contribution-types'
+      fullPath: '/app/admin/contribution-types'
+      preLoaderRoute: typeof AuthenticatedAppAdminContributionTypesRouteImport
       parentRoute: typeof AuthenticatedAppAdminRoute
     }
     '/_authenticated/app/admin/contributions': {
@@ -990,12 +906,110 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAdminContributionsRouteImport
       parentRoute: typeof AuthenticatedAppAdminRoute
     }
-    '/_authenticated/app/admin/contribution-types': {
-      id: '/_authenticated/app/admin/contribution-types'
-      path: '/contribution-types'
-      fullPath: '/app/admin/contribution-types'
-      preLoaderRoute: typeof AuthenticatedAppAdminContributionTypesRouteImport
+    '/_authenticated/app/admin/event-types': {
+      id: '/_authenticated/app/admin/event-types'
+      path: '/event-types'
+      fullPath: '/app/admin/event-types'
+      preLoaderRoute: typeof AuthenticatedAppAdminEventTypesRouteImport
       parentRoute: typeof AuthenticatedAppAdminRoute
+    }
+    '/_authenticated/app/admin/extensions': {
+      id: '/_authenticated/app/admin/extensions'
+      path: '/extensions'
+      fullPath: '/app/admin/extensions'
+      preLoaderRoute: typeof AuthenticatedAppAdminExtensionsRouteImport
+      parentRoute: typeof AuthenticatedAppAdminRoute
+    }
+    '/_authenticated/app/admin/menu-components': {
+      id: '/_authenticated/app/admin/menu-components'
+      path: '/menu-components'
+      fullPath: '/app/admin/menu-components'
+      preLoaderRoute: typeof AuthenticatedAppAdminMenuComponentsRouteImport
+      parentRoute: typeof AuthenticatedAppAdminRoute
+    }
+    '/_authenticated/app/admin/registry': {
+      id: '/_authenticated/app/admin/registry'
+      path: '/registry'
+      fullPath: '/app/admin/registry'
+      preLoaderRoute: typeof AuthenticatedAppAdminRegistryRouteImport
+      parentRoute: typeof AuthenticatedAppAdminRoute
+    }
+    '/_authenticated/app/admin/screens': {
+      id: '/_authenticated/app/admin/screens'
+      path: '/screens'
+      fullPath: '/app/admin/screens'
+      preLoaderRoute: typeof AuthenticatedAppAdminScreensRouteImport
+      parentRoute: typeof AuthenticatedAppAdminRoute
+    }
+    '/_authenticated/app/admin/search': {
+      id: '/_authenticated/app/admin/search'
+      path: '/search'
+      fullPath: '/app/admin/search'
+      preLoaderRoute: typeof AuthenticatedAppAdminSearchRouteImport
+      parentRoute: typeof AuthenticatedAppAdminRoute
+    }
+    '/_authenticated/app/admin/studio': {
+      id: '/_authenticated/app/admin/studio'
+      path: '/studio'
+      fullPath: '/app/admin/studio'
+      preLoaderRoute: typeof AuthenticatedAppAdminStudioRouteImport
+      parentRoute: typeof AuthenticatedAppAdminRoute
+    }
+    '/_authenticated/app/events/': {
+      id: '/_authenticated/app/events/'
+      path: '/'
+      fullPath: '/app/events/'
+      preLoaderRoute: typeof AuthenticatedAppEventsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppEventsRoute
+    }
+    '/_authenticated/app/events/new': {
+      id: '/_authenticated/app/events/new'
+      path: '/new'
+      fullPath: '/app/events/new'
+      preLoaderRoute: typeof AuthenticatedAppEventsNewRouteImport
+      parentRoute: typeof AuthenticatedAppEventsRoute
+    }
+    '/_authenticated/app/w/$': {
+      id: '/_authenticated/app/w/$'
+      path: '/w/$'
+      fullPath: '/app/w/$'
+      preLoaderRoute: typeof AuthenticatedAppWSplatRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/x/$': {
+      id: '/_authenticated/app/x/$'
+      path: '/x/$'
+      fullPath: '/app/x/$'
+      preLoaderRoute: typeof AuthenticatedAppXSplatRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/api/public/invitations/reminders': {
+      id: '/api/public/invitations/reminders'
+      path: '/api/public/invitations/reminders'
+      fullPath: '/api/public/invitations/reminders'
+      preLoaderRoute: typeof ApiPublicInvitationsRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/me': {
+      id: '/api/public/v1/me'
+      path: '/api/public/v1/me'
+      fullPath: '/api/public/v1/me'
+      preLoaderRoute: typeof ApiPublicV1MeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/app/admin/extensions/$key': {
+      id: '/_authenticated/app/admin/extensions/$key'
+      path: '/$key'
+      fullPath: '/app/admin/extensions/$key'
+      preLoaderRoute: typeof AuthenticatedAppAdminExtensionsKeyRouteImport
+      parentRoute: typeof AuthenticatedAppAdminExtensionsRoute
+    }
+    '/_authenticated/app/admin/extensions/install': {
+      id: '/_authenticated/app/admin/extensions/install'
+      path: '/install'
+      fullPath: '/app/admin/extensions/install'
+      preLoaderRoute: typeof AuthenticatedAppAdminExtensionsInstallRouteImport
+      parentRoute: typeof AuthenticatedAppAdminExtensionsRoute
     }
     '/_authenticated/app/events/$eventId/': {
       id: '/_authenticated/app/events/$eventId/'
@@ -1010,20 +1024,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/events/$eventId/edit'
       preLoaderRoute: typeof AuthenticatedAppEventsEventIdEditRouteImport
       parentRoute: typeof AuthenticatedAppEventsRoute
-    }
-    '/_authenticated/app/admin/extensions/install': {
-      id: '/_authenticated/app/admin/extensions/install'
-      path: '/install'
-      fullPath: '/app/admin/extensions/install'
-      preLoaderRoute: typeof AuthenticatedAppAdminExtensionsInstallRouteImport
-      parentRoute: typeof AuthenticatedAppAdminExtensionsRoute
-    }
-    '/_authenticated/app/admin/extensions/$key': {
-      id: '/_authenticated/app/admin/extensions/$key'
-      path: '/$key'
-      fullPath: '/app/admin/extensions/$key'
-      preLoaderRoute: typeof AuthenticatedAppAdminExtensionsKeyRouteImport
-      parentRoute: typeof AuthenticatedAppAdminExtensionsRoute
     }
   }
 }
