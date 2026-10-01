@@ -109,6 +109,15 @@ export const SEARCH_SOURCES: SearchSource[] = [
     searchFields: ["title", "text_content", "external_url_note"],
     order: 10,
   },
+  {
+    id: "messages",
+    entityType: "message",
+    label: "Messages",
+    icon: "MessageCircle",
+    widgetId: "ext.messages",
+    searchFields: ["text_content"],
+    order: 11,
+  },
 ];
 
 export function findSearchSource(id: string): SearchSource | undefined {

@@ -334,6 +334,9 @@ function resultLink(r: SearchResult): { to: string; params?: Record<string, stri
   if (r.source === "contacts") {
     return { to: "/app/contacts", search: { c: r.id } };
   }
+  if (r.source === "messages" && r.eventId) {
+    return { to: "/app/events/$eventId/messages", params: { eventId: r.eventId }, search: { m: r.id } };
+  }
   if (r.source === "events" || !r.eventId) {
     return { to: "/app/events/$eventId", params: { eventId: r.eventId ?? r.id } };
   }

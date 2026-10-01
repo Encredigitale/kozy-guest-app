@@ -13,7 +13,8 @@ export type SearchEntityType =
   | "gift"
   | "photo"
   | "note"
-  | "recipe";
+  | "recipe"
+  | "message";
 
 export type SearchSourceId =
   | "events"
@@ -25,7 +26,8 @@ export type SearchSourceId =
   | "gifts"
   | "photos"
   | "notes"
-  | "recipes";
+  | "recipes"
+  | "messages";
 
 /** Résultat standardisé renvoyé par le moteur. */
 export type SearchResult = {
