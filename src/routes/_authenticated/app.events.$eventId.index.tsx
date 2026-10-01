@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeft, MapPin, CalendarDays, ArrowRight, Pencil, Search, WifiOff } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -120,10 +120,6 @@ function EventDetailPage() {
     reorder.mutate(ids);
   };
 
-  const suggestions = useMemo(
-    () => features.filter((f) => f.recommended && f.state !== "active").slice(0, 3),
-    [features],
-  );
 
   const dateLabel = formatDate(ev?.starts_at ?? null);
 
@@ -267,36 +263,13 @@ function EventDetailPage() {
             />
           ))}
         </div>
-      ) : isOrganizer ? (
-        <Card className="rounded-2xl border-dashed border-border">
-          <CardContent className="space-y-4 p-6 text-center">
-            <p className="font-serif text-xl text-primary">Votre événement est prêt</p>
-            <p className="text-sm text-muted-foreground">
-              Ajoutez les fonctionnalités qui vous seront utiles pour l'organiser.
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {suggestions.map((f) => (
-                <Button
-                  key={f.id}
-                  variant="outline"
-                  className="h-11 rounded-full"
-                  disabled={busyId === f.id}
-                  onClick={() => addFeature(f)}
-                >
-                  <FeatureIcon id={f.id} name={f.icon} className="h-4 w-4 text-primary" />
-                  {f.name}
-                </Button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
+      ) : !isOrganizer ? (
         <Card className="rounded-2xl border-dashed border-border">
           <CardContent className="p-6 text-center text-sm text-muted-foreground">
             L'organisateur n'a pas encore ajouté de fonctionnalité à cet événement.
           </CardContent>
         </Card>
-      )}
+      ) : null}
 
       {isOrganizer && (
         <>
