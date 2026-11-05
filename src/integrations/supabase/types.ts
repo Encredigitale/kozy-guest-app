@@ -734,6 +734,38 @@ export type Database = {
           },
         ]
       }
+      event_invitation_links: {
+        Row: {
+          active: boolean
+          created_at: string
+          event_id: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          event_id: string
+          token?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          event_id?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_invitation_links_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: true
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_message: {
         Row: {
           author_invitation_id: string | null
@@ -1452,14 +1484,18 @@ export type Database = {
           email: string | null
           event_id: string
           expires_at: string | null
+          first_name: string | null
           guest_user_id: string | null
           id: string
+          invitation_source: string
+          last_name: string | null
           message: string | null
           name: string | null
           opened_at: string | null
           organizer_id: string
           phone: string | null
           phone_e164: string | null
+          registration_key_hash: string | null
           responded_at: string | null
           revoked_at: string | null
           sent_at: string | null
@@ -1476,14 +1512,18 @@ export type Database = {
           email?: string | null
           event_id: string
           expires_at?: string | null
+          first_name?: string | null
           guest_user_id?: string | null
           id?: string
+          invitation_source?: string
+          last_name?: string | null
           message?: string | null
           name?: string | null
           opened_at?: string | null
           organizer_id: string
           phone?: string | null
           phone_e164?: string | null
+          registration_key_hash?: string | null
           responded_at?: string | null
           revoked_at?: string | null
           sent_at?: string | null
@@ -1500,14 +1540,18 @@ export type Database = {
           email?: string | null
           event_id?: string
           expires_at?: string | null
+          first_name?: string | null
           guest_user_id?: string | null
           id?: string
+          invitation_source?: string
+          last_name?: string | null
           message?: string | null
           name?: string | null
           opened_at?: string | null
           organizer_id?: string
           phone?: string | null
           phone_e164?: string | null
+          registration_key_hash?: string | null
           responded_at?: string | null
           revoked_at?: string | null
           sent_at?: string | null
@@ -2196,6 +2240,15 @@ export type Database = {
         Returns: boolean
       }
       is_superadmin: { Args: { _user_id: string }; Returns: boolean }
+      register_free_invitation: {
+        Args: {
+          _first_name: string
+          _key_hash: string
+          _last_name: string
+          _token: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "user" | "superadmin"

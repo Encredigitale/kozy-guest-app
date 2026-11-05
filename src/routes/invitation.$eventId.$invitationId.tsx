@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { CalendarDays, Check, HelpCircle, Loader2, MapPin, PartyPopper, X } from "lucide-react";
+import { CalendarDays, Check, Copy, HelpCircle, Loader2, MapPin, PartyPopper, X } from "lucide-react";
 
 export const Route = createFileRoute("/invitation/$eventId/$invitationId")({
   validateSearch: z.object({ token: z.string().optional() }),
@@ -33,6 +33,7 @@ export const Route = createFileRoute("/invitation/$eventId/$invitationId")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
+      { name: "referrer", content: "no-referrer" },
     ],
   }),
   component: PublicInvitationPage,
@@ -221,6 +222,11 @@ function PublicInvitationPage() {
             <p className="text-sm text-muted-foreground">Invitation de {p.event.organizerName}</p>
           )}
         </header>
+
+        <Button variant="outline" className="h-11 w-full" onClick={async () => {
+          try { await navigator.clipboard.writeText(window.location.href); toast.success("Votre lien personnel est copié. Conservez-le pour retrouver votre réponse."); }
+          catch { toast.error("Copie impossible. Conservez l’adresse de cette page."); }
+        }}><Copy className="h-4 w-4" /> Copier mon lien personnel</Button>
 
         <Card className="rounded-3xl border-border/60">
           <CardContent className="p-6 space-y-3 text-sm">

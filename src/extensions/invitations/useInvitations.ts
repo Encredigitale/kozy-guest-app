@@ -9,6 +9,7 @@ export type InvitationRow = {
   contact_id: string | null;
   guest_user_id: string | null;
   name: string | null;
+  invitation_source?: string;
   email: string | null;
   phone: string | null;
   phone_e164: string | null;
@@ -70,6 +71,7 @@ export function useEventInvitations(eventId: string) {
   const query = useQuery<InvitationRow[]>({
     queryKey: key,
     enabled: !!eventId,
+    refetchInterval: 15_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("invitations")

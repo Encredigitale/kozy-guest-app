@@ -18,6 +18,7 @@ import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as InvitationTokenRouteImport } from './routes/invitation.$token'
 import { Route as LegalDocTypeRouteImport } from './routes/legal.$docType'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
@@ -105,6 +106,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const InvitationTokenRoute = InvitationTokenRouteImport.update({
+  id: '/invitation/$token',
+  path: '/invitation/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LegalDocTypeRoute = LegalDocTypeRouteImport.update({
   id: '/legal/$docType',
@@ -359,6 +365,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/invitation/$token': typeof InvitationTokenRoute
   '/legal/$docType': typeof LegalDocTypeRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/contacts': typeof AuthenticatedAdminContactsRoute
@@ -410,6 +417,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/verify-email': typeof VerifyEmailRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/invitation/$token': typeof InvitationTokenRoute
   '/legal/$docType': typeof LegalDocTypeRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/contacts': typeof AuthenticatedAdminContactsRoute
@@ -463,6 +471,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/invitation/$token': typeof InvitationTokenRoute
   '/legal/$docType': typeof LegalDocTypeRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/contacts': typeof AuthenticatedAdminContactsRoute
@@ -518,6 +527,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/dashboard'
+    | '/invitation/$token'
     | '/legal/$docType'
     | '/admin/audit'
     | '/admin/contacts'
@@ -569,6 +579,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/verify-email'
     | '/dashboard'
+    | '/invitation/$token'
     | '/legal/$docType'
     | '/admin/audit'
     | '/admin/contacts'
@@ -621,6 +632,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/app'
     | '/_authenticated/dashboard'
+    | '/invitation/$token'
     | '/legal/$docType'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/contacts'
@@ -673,6 +685,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
+  InvitationTokenRoute: typeof InvitationTokenRoute
   LegalDocTypeRoute: typeof LegalDocTypeRoute
   InvitationEventIdInvitationIdRoute: typeof InvitationEventIdInvitationIdRoute
   ApiPublicInvitationsRemindersRoute: typeof ApiPublicInvitationsRemindersRoute
@@ -743,6 +756,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/invitation/$token': {
+      id: '/invitation/$token'
+      path: '/invitation/$token'
+      fullPath: '/invitation/$token'
+      preLoaderRoute: typeof InvitationTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/legal/$docType': {
       id: '/legal/$docType'
@@ -1210,6 +1230,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   VerifyEmailRoute: VerifyEmailRoute,
+  InvitationTokenRoute: InvitationTokenRoute,
   LegalDocTypeRoute: LegalDocTypeRoute,
   InvitationEventIdInvitationIdRoute: InvitationEventIdInvitationIdRoute,
   ApiPublicInvitationsRemindersRoute: ApiPublicInvitationsRemindersRoute,

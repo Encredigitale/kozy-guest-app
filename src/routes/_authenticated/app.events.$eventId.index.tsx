@@ -14,6 +14,7 @@ import { FeatureIcon } from "@/core/features/FeatureIcon";
 import { useSession } from "@/core/auth/useSession";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { InviteByLink } from "@/extensions/invitations/InviteByLink";
 
 export const Route = createFileRoute("/_authenticated/app/events/$eventId/")({
   validateSearch: (search: Record<string, unknown>): { bloc?: string; item?: string } => ({
@@ -245,6 +246,11 @@ function EventDetailPage() {
         </CardContent>
       </Card>
 
+      {isOrganizer && ev && (
+        <div className="min-w-0 border-y-2 border-border py-5">
+          <InviteByLink eventId={eventId} title={ev.title} status={ev.status} />
+        </div>
+      )}
 
       {/* FONCTIONNALITÉS : générées dynamiquement depuis le registry */}
       {active.length > 0 ? (

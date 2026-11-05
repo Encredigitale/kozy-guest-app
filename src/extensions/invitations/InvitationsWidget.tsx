@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import type { WidgetProps } from "@/core/registry/components";
 import { useSession } from "@/core/auth/useSession";
 import { useEvent } from "@/widgets/event-shared/queries";
+import { InviteByLink } from "./InviteByLink";
 import {
   createInvitation,
   markInvitationChannel,
@@ -421,6 +422,7 @@ export default function InvitationsWidget({ config }: WidgetProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
+        {isOrganizer && ev && <InviteByLink eventId={eventId} title={ev.title} status={ev.status} management />}
         {isDraftEvent && (
           <p className="rounded-2xl bg-muted px-3 py-2 text-xs text-muted-foreground">
             Cet événement est en brouillon : les invitations ne peuvent pas être envoyées et
@@ -652,6 +654,7 @@ export default function InvitationsWidget({ config }: WidgetProps) {
                     <p className="flex items-center gap-1.5 text-xs text-muted-foreground truncate">
                       {hasPhone && <Phone className="h-3 w-3 shrink-0" />}
                       {[inv.email, masked].filter(Boolean).join(" · ") || "Sans coordonnées"}
+                      {inv.invitation_source === "free_link" && <span className="text-[10px]">· Lien libre</span>}
                       {inv.channel && (
                         <span className="text-[10px] uppercase tracking-wide">
                           · {CHANNEL_LABELS[inv.channel as keyof typeof CHANNEL_LABELS] ?? inv.channel}
